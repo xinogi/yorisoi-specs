@@ -1,0 +1,76 @@
+- !<AssetImportMetadata/8d01ab95-9448-4a81-b25b-5d3d39850b3d>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 19eed251-eb7b-4792-a152-cb53db7225c4
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 19eed251-eb7b-4792-a152-cb53db7225c4
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 9688b740-ced2-4cd0-954e-c2773516a414
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/9688b740-ced2-4cd0-954e-c2773516a414>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 7e4a48bf-c3a2-4db9-9af4-622f5125ebfc
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    actions: false
+    book: false
+    callButton: false
+    companion: false
+    debugColliders: false
+    page: false
+    uiClickAudio: false
+    uiClickSound: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - companion: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      callButton: !<MappingBased.AssignableType_2> 00000000-0000-0000-0000-000000000000
+      page: !<MappingBased.AssignableType_3> 00000000-0000-0000-0000-000000000000
+      actions: !<MappingBased.AssignableType_4> 00000000-0000-0000-0000-000000000000
+      book: !<MappingBased.AssignableType_5> 00000000-0000-0000-0000-000000000000
+      uiClickAudio: !<reference.AudioComponent> 00000000-0000-0000-0000-000000000000
+      uiClickSound: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
+      debugColliders: false
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">DeskCompanionMain – wires the desk stand-ins to the companion</span>"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">References</span>"}'
+    - '// @ui {"widget":"group_start", "label":"References"}'
+    - "// @input AssignableType_1 companion {\"hint\":\"The companion's behavior controller (on the Companion root)\"}"
+    - '// @input AssignableType_2 callButton {"hint":"Big Call button on the desk"}'
+    - '// @input AssignableType_3 page {"hint":"Stand-in foreign-language page on the desk"}'
+    - '// @input AssignableType_4 actions {"hint":"Dance / Pose panel that appears near her"}'
+    - '// @input AssignableType_5 book {"hint":"Grabbable stand-in book on the desk"}'
+    - '// @input Component.AudioComponent uiClickAudio {"hint":"Non-spatial AudioComponent for UI clicks"}'
+    - '// @input Asset.AudioTrackAsset uiClickSound {"hint":"Click sound for desk buttons and word pinches"}'
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Debug</span>"}'
+    - '// @ui {"widget":"group_start", "label":"Debug"}'
+    - '// @input bool debugColliders {"hint":"Wireframe every collider in the scene (takes effect on preview restart)"}'
+    - '// @ui {"widget":"group_end"}'

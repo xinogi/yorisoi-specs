@@ -7,7 +7,7 @@ status: approved
 <!-- Filled in by plan-lens from the learner's interview (interview held in Japanese; quotes translated). Values the learner didn't choose are marked (default). -->
 
 ## The one spatial moment
-I'm working at my desk, looking straight ahead. My companion is in the room doing her own thing, moving around me. After a while she comes over and teases me a little: "What are you doing? Anything I can do?" When I call her, she says "What's up?" and walks up in front of me. I point at a word I can't read in a foreign book on my desk, she tells me what it says, and the answer appears right next to the word.
+I'm working at my desk, looking straight ahead. My companion is always in front of me, a little to the side of my work, doing her own thing; she never goes behind me or out of view. After a while she comes over and teases me a little: "What are you doing? Anything I can do?" When I call her, she says "What's up?" and walks up in front of me. I point at a word I can't read in a foreign book on my desk, she tells me what it says, and the answer appears right next to the word.
 
 ## Why it belongs on glasses
 - Uses: draws in the world (she is in my real room, next to my real desk); shares your view (she talks about what I'm looking at); leaves your body free (I keep working with my hands and eyes on my task).
@@ -25,7 +25,7 @@ I'm working at my desk, looking straight ahead. My companion is in the room doin
 ## Where things live
 - Where the user is looking during the main task: straight ahead at the desk and the work on it, seated (default).
 - Desk: a virtual desk at real size, 72 cm high, 120 x 60 cm, in front of the user (default; the preview has no real desk).
-- Companion: an original 3D character who is stunningly beautiful (learner: "a super-beautiful 3D girl; I won't compromise on that"), clearly an adult, realistic like a real photo (learner: not anime-style). Learner's image: an ideal, elegant and pure-looking (seiso) model with a great figure, a vibe similar to the learner's own AI character Chloe but with a different face. Outfit: elegant everyday clothes in light colors, e.g. a light blouse and knee-length skirt, not revealing (default; light colors also show better on the additive display). Hair: light brown, long (default). Life-size (about 160 cm tall (default)). She roams 1.5 to 3 m away (front, sides, sometimes facing away), doing her own idle actions. When called she walks up and stops about 1.2 m in front, so her face and upper body are in view (default).
+- Companion: an original 3D character who is stunningly beautiful (learner: "a super-beautiful 3D girl; I won't compromise on that"), clearly an adult, realistic like a real photo (learner: not anime-style). Learner's image (updated 2026-11-08): an international, Western-style super-beautiful woman (the judges are likely English-speaking), "cuter than any supermodel," with a curvy hourglass figure shown through fitted but modest clothes. Chosen face (2026-11-08): candidate_5, a Western European woman with long light-brown waves in a light-ivory knit midi dress (avatar-work/stills/candidate_5.png, outside the repo until approved). Personality: super sweet, kind, attentive, thoughtful, and forgiving of everything — this sets the tone of all her lines. Outfit: a fitted but modest light-ivory knit midi dress (from the chosen still; light colors also show better on the additive display). Hair: long light-brown waves. Life-size, about 165 cm tall (learner: "at least 160 cm, ideally about 165"). How she is made (learner's decision 2026-11-08, after comparing a true-3D game-quality model with a photoreal option): a photoreal "video character" — short video clips of an original AI-generated woman (Z-Image-Turbo still → Wan2.2 image-to-video, both Apache-2.0, generated locally) on a pure black background, played on a card that always turns to face the user, with additive blending so black disappears on SPECS. Clips: idle, walk, wave, talk, lean in/tease, read a book, dance/pose. Realism comes first; from the side she is flat, which is acceptable because the user sits facing her. She always stays in front of the user, inside the glasses' narrow view (about 37° tall x 32° wide), never behind or beside the shoulder. Learner (2026-11-08): "If I'm working at my desk, I want her always in front of my view. I don't want her behind me." She lazily follows the head: if she drifts out of the center of view (more than about 12° off), she glides back to the front within about 1 to 2 s (default). Resting spot: about 2.5 m away so her whole body fits in view, slightly to the right of the desk work so she never covers it (default). Inside that front zone she moves a little, changes poses, turns, and does her own idle actions. When called she walks up and stops about 1.2 m in front, so her face and upper body are in view (default).
 - Call button: big and easy to press, on the front-right of the desk within reach, about 8 cm across (default). Learner: "anywhere easy to touch is fine."
 - Foreign-language page: lying on the desk about 40 to 50 cm in front, slightly below eye level (default).
 - Book to hand over: on the left side of the desk (default).
@@ -41,16 +41,16 @@ I'm working at my desk, looking straight ahead. My companion is in the room doin
 - Voice (if any) and the button that does the same job: talking to her uses SPECS speech recognition on real glasses (feel unproven); the Call button does the same job in the preview.
 
 ## When things show
-- Companion: always in the room, roaming and doing her own thing; comes close only when called or when she decides to tease.
+- Companion: always in front of the user and in view, doing her own thing; comes close only when called or when she decides to tease.
 - Teasing: after about 20 seconds with no interaction (default), she walks closer and says "What are you doing? Anything I can do?" / "Want something to eat?"
 - Subtitles: show while she speaks, fade about 3 seconds after (default).
 - Translation answer: shows when a word is pinched, fades after about 8 seconds or when another word is pinched (default).
 - Dance/pose button: appears only after she has come over, hides when she walks away (default).
-- If something needs attention out of view: when she is outside the narrow view, her voice and small sounds come from her direction (spatial sound), so I know where she is.
+- If something needs attention out of view: nothing should be out of view; she re-centers in front when the user turns away. Her voice still comes from where she stands (spatial sound).
 
 ## Done criteria
 Each one can be checked in Lens Studio's preview.
-1. At start, the companion is in the room 1.5 to 3 m away doing her own idle actions; when she is out of view, her voice/sounds come from her direction.
+1. At start, the companion is in front of the user about 2.5 m away, whole body in view and not covering the desk work, doing her own idle actions. Turning the head far to the left or right (or behind) makes her glide back to the front of view within about 2 s.
 2. After about 20 seconds without interaction, she walks closer and teases me with a line (voice + subtitle beside her).
 3. Pinching the Call button on the desk makes her say "What's up?" and walk up to about 1.2 m in front of me, face and upper body in view.
 4. Pinching a highlighted word on the foreign-language page makes her answer, and the translation/reading appears right next to that word, then fades.
@@ -65,13 +65,14 @@ Each one can be checked in Lens Studio's preview.
 - Sexual content of any kind.
 
 ## Risks and open questions
-- Biggest build risk: a life-size animated human character (walking, idle, approaching, reading, dancing). Her looks are the learner's top priority, so the character model's quality comes first. AI 3D generation may need a Snap login that currently fails; an alternative source for a rigged, beautiful, photoreal character may be needed. On the additive display dark areas (hair, eyes, shadows) render see-through, so a photoreal person will look partly translucent; the preview simulates this. Learner keeps photoreal (not anime).
+- Video-character limits (accepted by the learner): flat when seen from the side; small jumps between clips; mouth movement is generic, not matched to words; each clip MP4/H.264 under 10 MB, total Lens under 25 MB.
+- Earlier biggest build risk (now addressed by the video character): a life-size animated human character (walking, idle, approaching, reading, dancing). Her looks are the learner's top priority, so the character model's quality comes first. AI 3D generation may need a Snap login that currently fails; an alternative source for a rigged, beautiful, photoreal character may be needed. On the additive display dark areas (hair, eyes, shadows) render see-through, so a photoreal person will look partly translucent; the preview simulates this. Learner keeps photoreal (not anime).
 - Innovation: AI companion apps and devices already exist (e.g. Replika, Gatebox). The difference to show is that she shares my real space and what I'm looking at.
 - Learner wants her look "attractive/sexy" and gravure-model-like; kept to elegant, non-revealing, non-sexual so the public video stays within Snap's rules.
 - Chloe is the learner's separate AI-character brand; a Chloe-like look is fine but the face must differ so the brands aren't publicly linked.
 - Language: she speaks Japanese with Japanese + English subtitles so English-speaking judges can follow (default; open).
 - Voice lines are pre-recorded (default).
-- Feel unproven: what it feels like to have someone roaming around you over a long work session; comfort; real hand tracking.
+- Feel unproven: what it feels like to have someone always in front of you over a long work session (lazy-follow comfort); real hand tracking.
 
 ## Build notes for CLAD
 - Build for SPECS so it runs and can be demonstrated in Lens Studio's preview. No SPECS device is available.
