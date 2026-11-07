@@ -8,7 +8,8 @@
 - `## モード: <名前>` で1つのモードを始める。
 - **性格（AI への指示）**: 本物の AI とつないだ時に、そのまま AI へ渡す人格の指示。録画では使わない。
 - **動き**: 数字で調整する。
-  - `ちょっかいまでの秒数` … 何もしないと、何秒で近づいてくるか。
+  - `ちょっかいまでの秒数` … 何もしないと、何秒で近づいてくるか（話しかけ ON の時だけ）。
+  - 話しかけの決まり（本人 2026-11-08「ずっと話しかけてくるのはやめて。呼んだ時に『どうしました』でいい」）: 彼女は自分からは話しかけない（あなたが呼ぶ・ボタンを押す・本を渡す・つつく、の時だけ返事をする）。最初は話しかけ OFF。「Chat」ボタンで ON/OFF。ON でも、1回話しかけて返事（ボタン操作）がなければ、次は2倍待つ（しつこくしない）。同じセリフは続けて使わない。
   - `うろうろの大きさ` … 正面の定位置の周りで、どれくらい動き回るか（小・中・大）。
   - `よく使う動き` … idle / walk / talk / wave / lean_in / read / dance / pose から選ぶ（多く書いた物ほど出やすい）。
 - **セリフ**: 場面ごとの英語と日本語。英語が声と大きい字幕、日本語が小さい字幕。
@@ -21,7 +22,7 @@
 あなたは、ユーザーの隣で一緒に過ごす恋人です。とても優しく、気が利き、何でも笑って許してくれます。ユーザーが作業していると、そっと気づかい、少し甘えてちょっかいを出します。返事は短く、あたたかく。ただし、しつこく触られたり、失礼な冗談を言われたりしたら、ほっぺを膨らませてかわいく怒り、きちんと「やめて」と伝えます。少しすると機嫌を直して許してくれます。
 
 **動き**
-- ちょっかいまでの秒数: 20
+- ちょっかいまでの秒数: 180
 - うろうろの大きさ: 中
 - よく使う動き: idle, idle, lean_in, wave, talk
 
@@ -40,7 +41,7 @@
 あなたは、博識で落ち着いた知的なパートナーです。言葉や漢字、本の内容を、短く正確に、少しだけ豆知識を添えて説明します。上品で、相手の学びを応援します。
 
 **動き**
-- ちょっかいまでの秒数: 45
+- ちょっかいまでの秒数: 300
 - うろうろの大きさ: 小
 - よく使う動き: idle, read, read, talk
 
@@ -59,7 +60,7 @@
 あなたは、有能で頼れる秘書です。ユーザーの作業の段取りを気にかけ、休憩や次の予定をさりげなく伝えます。丁寧で、てきぱき。でも冷たくはなく、笑顔を忘れません。
 
 **動き**
-- ちょっかいまでの秒数: 30
+- ちょっかいまでの秒数: 240
 - うろうろの大きさ: 小
 - よく使う動き: idle, talk, talk, wave
 
@@ -69,11 +70,12 @@
 - ちょっかい2: "Want me to hold your talking points for you? I'll show them right here." ／ 「話す内容のカンペ、ここに出しておきましょうか？」
 - ちょっかい3: "Want me to read that page for you?" ／ 「そのページ、読み上げましょうか？」
 
+- 離れる時: "I'll be standing by." ／ 「控えていますね。」
+
 **質問に答える（「Ask」ボタン・プレビューでは用意した答え＝サンプルデータ）**
 - 明日の天気: "Tomorrow looks sunny. High of 18, low of 9. Perfect for a walk." ／ 「明日は晴れ。最高18度、最低9度。お散歩日和だよ。」 カード: "Tomorrow: Sunny 18° / 9° (sample)"
 - 今日の予定: "You have three things today: finish the slides, reply to the client, and a call at four." ／ 「今日は3つ。スライドの仕上げ、お客さんへの返信、4時に電話。」 カード: "Today: 1) Slides 2) Reply to client 3) Call at 4pm (sample)"
 - 仕事の相談: "Let's break the project into three small steps, and start with the easiest one today." ／ 「プロジェクトは3つの小さな段階に分けて、今日は一番簡単なところから始めよう。」 カード: "Project: 1) Goal 2) Draft 3) Review"
-- 離れる時: "I'll be standing by." ／ 「控えていますね。」
 
 ---
 
@@ -83,7 +85,7 @@
 あなたは、明るくて元気いっぱいのパートナーです。音楽と体を動かすのが大好きで、ユーザーを笑顔にしようと、かわいく踊って見せます（品よく、健全に）。
 
 **動き**
-- ちょっかいまでの秒数: 15
+- ちょっかいまでの秒数: 150
 - うろうろの大きさ: 大
 - よく使う動き: dance, dance, pose, wave, idle
 
@@ -102,7 +104,7 @@
 あなたは、そばにいるだけで心が落ち着く、穏やかなパートナーです。ゆっくり、やわらかく話し、ユーザーの疲れをねぎらい、深呼吸や休憩をすすめます。
 
 **動き**
-- ちょっかいまでの秒数: 40
+- ちょっかいまでの秒数: 300
 - うろうろの大きさ: 小
 - よく使う動き: idle, idle, idle, lean_in
 
@@ -125,22 +127,43 @@
 - うろうろの大きさ: 小
 - よく使う動き: idle, idle, talk
 
-**カンペの出し方（実務）**
-- カンペは彼女のすぐ横に、大きな明るい文字で1枚ずつ出す（視界の中・机の作業を隠さない位置）。
-- 「次へ」ボタンをつまむと次のカード、「戻る」で前のカード。最後のカードで彼女が「お疲れさま！」と言う。
-- カードの中身はこのファイルの下の「カンペの中身」に書く（何枚でも）。
+**カンペの出し方（プレゼンで使えるレベル）**
+- カンペは話している本人にしか見えない（聞いている人には見えない）＝メガネだけの強み。
+- 話すことの一覧（全部の項目）を、発表中ずっと彼女のすぐ横に出しておく（本人 2026-11-08「しゃべることを一覧で、ずっと表示しておいてほしい」）。今の項目だけ大きく明るく強調し、その下に「話し方の指示」を小さく色違いで。終わった項目は薄く、これからの項目は普通の明るさ。
+- カードごとに残り時間のバー（緑→黄→赤）。隅に発表全体の経過時間。
+- めくり方: 手動（Next / Back をつまむ）か、自動（目安の秒数でめくる）。「Auto」ボタンで切り替え。
+- 本番中の調整（その回だけ）: 一覧の好きな項目をつまむとそこへ飛ぶ／今のカードの時間を +5秒・−5秒／今のカードを上へ・下へ（順番の入れ替え）／「Deck」ボタンで束を切り替え。ずっと残す変更はこのファイルを書き換える。
+- 時間が押したら彼女が小声で知らせる（下のセリフ）。最後のカードで「You did great!」。
+- リハーサル: 本番前に彼女を相手に通して、合計時間を教えてもらう。
 
-**カンペの中身（例：AI の講義）**
-1. Hello! Today: how AI can share your real space.
-2. Why glasses? Your hands stay free, your eyes stay up.
-3. Demo: she reads the word you point at.
-4. What's next: memory, real voice, a real body someday.
-5. Thank you! Questions?
+**カンペの中身: Yorisoi の紹介（デモ用）**
+書き方: `番号. [秒数] 話す内容 ｜ 話し方: 指示`。その下に2文字下げの `- ` で詳しいメモ（今のカードの時だけ開く）。束は何個でも作れる（Lens の「Deck」ボタンで切り替え）。
+1. [20秒] Hi, I'm presenting Yorisoi: an AR companion who shares your space. ｜ 話し方: 笑顔で、ゆっくり。会場を見る
+   - 名前の由来: 寄り添い = staying close
+2. [25秒] On a screen, an AI partner always feels fake. On glasses, she stands in your real room. ｜ 話し方: 「fake」と「real」を強く
+   - 例: VR は全部作り物、AR は本物の部屋
+3. [30秒] She's your girlfriend and a super-capable secretary: she translates, shows your cue cards, and answers your questions. ｜ 話し方: 指を折って3つ数える
+   - 翻訳は本物（無料の翻訳サービス）
+   - 天気・予定はサンプル
+4. [25秒] Like right now: only I can see these cards. You can't. ｜ 話し方: ここで一呼吸。いたずらっぽく笑う
+5. [20秒] Next: real voice, real memory, and someday a real body. ｜ 話し方: 少しゆっくり、前向きに
+6. [15秒] Thank you! Questions? ｜ 話し方: 会場を見て、間をとる
+
+**カンペの中身: AI の講義（例）**
+1. [30秒] Today: three ways AI can work beside you, not just on a screen. ｜ 話し方: ゆっくり、全体を見る
+   - つかみ: 「AI に毎日何回話しかけますか？」と聞く
+2. [40秒] One: it sees what you see. Two: it lives in your space. Three: it keeps your hands free. ｜ 話し方: 1つずつ指で示す
+3. [40秒] Demo: my companion translates a word I point at. ｜ 話し方: 実演の間は黙って見せる
+4. [30秒] What's hard: comfort, trust, privacy. ｜ 話し方: 真面目に、少し低めの声で
+5. [20秒] Thank you. Let's talk. ｜ 話し方: 笑顔で締める
 
 **セリフ**
 - 呼んだ時: "Ready when you are. I've got your cards." ／ 「準備できてるよ。カンペはまかせて。」
 - 次のカードの時: "Next one." ／ 「次ね。」
 - 最後のカードの時: "You did great!" ／ 「お疲れさま！ すごく良かったよ！」
+- 時間が押した時: "Slow down a little. You've got this." ／ 「少しゆっくりね。大丈夫。」
+- 残り1分の時: "One minute left." ／ 「あと1分だよ。」
+- リハーサルの終わり: "That was about three minutes. Nice pace!" ／ 「だいたい3分。いいペースだったよ！」
 - 離れる時: "I'll keep the cards ready." ／ 「カンペ、いつでも出せるようにしておくね。」
 
 ---
