@@ -2,7 +2,7 @@
 status: approved
 ---
 
-# Design brief: (working title) AR companion at your desk
+# Design brief: Yorisoi — an AR companion who shares your space
 
 <!-- Filled in by plan-lens from the learner's interview (interview held in Japanese; quotes translated). Values the learner didn't choose are marked (default). -->
 
