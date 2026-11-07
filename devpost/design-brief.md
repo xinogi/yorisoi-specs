@@ -37,12 +37,16 @@ I'm working at my desk, looking straight ahead. My companion is always in front 
 - Ask about text: pinch a highlighted word on the page. She explains the reading/meaning; the answer appears next to the word.
 - Give her a book: grab the book on the desk and drop it into her hands (or near her). She opens it, reads, and says a short summary.
 - Ask for a dance or pose: pinch a button that appears near her after she comes over (default). She dances or strikes a pose (cute, fun, not sexual).
+- Switch her mode: pinch a "Mode" button in the same row (after she comes over). Modes (learner, 2026-11-08): Sweetheart (default), Smart, Secretary, Cue cards, Dance, Healing. Each mode changes her lines, how often she comes over, how much she moves, and which clips she favors. All modes are defined in one editable Markdown file, persona/modes.md, which is converted to the Lens data; it also holds a personality prompt per mode for a future live AI.
+- Cue cards (practical help, learner's request): in Cue cards mode she shows your talking points as big light cards right beside her; pinch "Next" / "Back" to move through them; on the last card she says "You did great!".
+- Translation stays available in every mode (the most practically useful help).
+- She only helps with words, cards, dancing and company. Physical help (fetching food or drinks) is future work for a robot body.
 - Targets are big and highlight when aimed at.
 - Voice (if any) and the button that does the same job: talking to her uses SPECS speech recognition on real glasses (feel unproven); the Call button does the same job in the preview.
 
 ## When things show
 - Companion: always in front of the user and in view, doing her own thing; comes close only when called or when she decides to tease.
-- Teasing: after about 20 seconds with no interaction (default), she walks closer and says "What are you doing? Anything I can do?" / "Want something to eat?"
+- Teasing: after about 20 seconds with no interaction (default), she walks closer and says "What are you working on? Anything I can help with?" (words only; she has no body, so no fetching food or drinks)
 - Subtitles: show while she speaks, fade about 3 seconds after (default).
 - Translation answer: shows when a word is pinched, fades after about 8 seconds or when another word is pinched (default).
 - Dance/pose button: appears only after she has come over, hides when she walks away (default).
@@ -55,6 +59,7 @@ Each one can be checked in Lens Studio's preview.
 3. Pinching the Call button on the desk makes her say "What's up?" and walk up to about 1.2 m in front of me, face and upper body in view.
 4. Pinching a highlighted word on the foreign-language page makes her answer, and the translation/reading appears right next to that word, then fades.
 5. Grabbing the book on the desk and handing it to her makes her open it and give a short summary (voice + subtitle).
+6. Pinching the Mode button cycles her mode and she answers in the new mode's voice; in Cue cards mode, pinching Next shows the next card beside her, and the last card makes her say "You did great!".
 
 ## Out of scope
 - Real camera vision: reading real books, signs, or zooming into real objects.
