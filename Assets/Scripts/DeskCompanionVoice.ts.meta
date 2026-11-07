@@ -118,7 +118,7 @@
     - '// @input Asset.AudioTrackAsset vo_word_remon {"hint":"檸檬 の説明"}'
     - '// @input Asset.AudioTrackAsset vo_word_kajiru {"hint":"齧る の説明"}'
     - '// @input Asset.AudioTrackAsset vo_book_received {"hint":"あ、本？ ちょっと読んでみるね。"}'
-    - '// @input Asset.AudioTrackAsset vo_book_summary {"hint":"『星の王子さま』の要約"}'
+    - '// @input Asset.AudioTrackAsset vo_book_summary {"hint":"『不思議の国のアリス』の要約"}'
     - '// @input Asset.AudioTrackAsset vo_book_return {"hint":"はい、返すね。素敵な本だった。"}'
     - '// @input Asset.AudioTrackAsset vo_dance {"hint":"ちょっとだけ踊るね！"}'
     - '// @input Asset.AudioTrackAsset vo_pose {"hint":"こんな感じ？"}'

@@ -64,7 +64,7 @@ export class DeskCompanionVoice extends BaseScriptComponent {
   @input @allowUndefined @hint("檸檬 の説明") vo_word_remon: AudioTrackAsset
   @input @allowUndefined @hint("齧る の説明") vo_word_kajiru: AudioTrackAsset
   @input @allowUndefined @hint("あ、本？ ちょっと読んでみるね。") vo_book_received: AudioTrackAsset
-  @input @allowUndefined @hint("『星の王子さま』の要約") vo_book_summary: AudioTrackAsset
+  @input @allowUndefined @hint("『不思議の国のアリス』の要約") vo_book_summary: AudioTrackAsset
   @input @allowUndefined @hint("はい、返すね。素敵な本だった。") vo_book_return: AudioTrackAsset
   @input @allowUndefined @hint("ちょっとだけ踊るね！") vo_dance: AudioTrackAsset
   @input @allowUndefined @hint("こんな感じ？") vo_pose: AudioTrackAsset

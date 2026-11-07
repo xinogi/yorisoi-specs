@@ -36,12 +36,16 @@
     facing: false
     handAnchor: false
     idleTeaseSeconds: false
-    roamMaxDistanceCm: false
-    roamMinDistanceCm: false
+    recenterSeconds: false
+    recenterThresholdDeg: false
+    restDistanceCm: false
+    restOffsetDeg: false
     sounds: false
     teaseDistanceCm: false
     voice: false
     walkSpeedCmPerSec: false
+    wanderCm: false
+    wanderDeg: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -57,10 +61,14 @@
       facing: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       handAnchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       book: !<MappingBased.AssignableType_4> 00000000-0000-0000-0000-000000000000
+      restDistanceCm: !<float> 250.000000
+      restOffsetDeg: !<float> 8.000000
+      recenterThresholdDeg: !<float> 12.000000
+      recenterSeconds: 1.600000
+      wanderDeg: !<float> 3.000000
+      wanderCm: !<float> 30.000000
       idleTeaseSeconds: !<float> 20.000000
       walkSpeedCmPerSec: !<float> 75.000000
-      roamMinDistanceCm: !<float> 150.000000
-      roamMaxDistanceCm: !<float> 300.000000
       approachDistanceCm: !<float> 120.000000
       teaseDistanceCm: !<float> 150.000000
       attendSeconds: !<float> 15.000000
@@ -69,7 +77,7 @@
     -
       {}
   InputLines:
-    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">DeskCompanionController – roam, tease, come when called, read, dance</span>"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">DeskCompanionController – always in front, tease, come when called, read, dance</span>"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">References</span>"}'
     - '// @ui {"widget":"group_start", "label":"References"}'
@@ -77,18 +85,26 @@
     - '// @input AssignableType_2 voice {"hint":"Voice + subtitles"}'
     - '// @input AssignableType_3 sounds {"hint":"Spatial footsteps and small sounds"}'
     - '// @input SceneObject facing {"hint":"Optional: a child that holds a 3D model and should yaw toward where she walks. Leave empty for the video card (it billboards to you on its own)."}'
-    - '// @input SceneObject handAnchor {"hint":"Point in front of her chest where a handed book is held (child of Facing)"}'
+    - '// @input SceneObject handAnchor {"hint":"Point in front of her chest where a handed book is held"}'
     - '// @input AssignableType_4 book {"hint":"The grabbable stand-in book on the desk"}'
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
-    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Settings</span>"}'
-    - '// @ui {"widget":"group_start", "label":"Settings"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Front zone (always in view)</span>"}'
+    - '// @ui {"widget":"group_start", "label":"Front zone"}'
+    - '// @input float restDistanceCm = 250 {"hint":"Resting distance in front of you (cm). Brief: ~2.5 m. Whole body fits in view when you look ~14° down, or from ~4.5 m when looking level while standing.", "widget":"slider", "min":150, "max":500, "step":10}'
+    - '// @input float restOffsetDeg = 8 {"hint":"Resting spot angle from the center of view (deg, + = right) so she never covers the desk work", "widget":"slider", "min":-14, "max":14, "step":0.5}'
+    - '// @input float recenterThresholdDeg = 12 {"hint":"Lazy follow: glide back to the front once she is this far (deg) from her spot in your view", "widget":"slider", "min":4, "max":30, "step":1}'
+    - '// @input float recenterSeconds = 1.4 {"hint":"Longest glide back to the front (s) — used when you turned all the way around", "widget":"slider", "min":0.6, "max":3, "step":0.1}'
+    - '// @input float wanderDeg = 3 {"hint":"Idle wandering inside the front zone: ± angle (deg)", "widget":"slider", "min":0, "max":6, "step":0.5}'
+    - '// @input float wanderCm = 30 {"hint":"Idle wandering inside the front zone: ± distance (cm)", "widget":"slider", "min":0, "max":60, "step":5}'
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Behavior</span>"}'
+    - '// @ui {"widget":"group_start", "label":"Behavior"}'
     - '// @input float idleTeaseSeconds = 20 {"hint":"Seconds with no interaction before she comes over to tease you", "widget":"slider", "min":5, "max":120, "step":1}'
-    - '// @input float walkSpeedCmPerSec = 75 {"hint":"Walking speed (cm/s)", "widget":"slider", "min":30, "max":160, "step":5}'
-    - '// @input float roamMinDistanceCm = 150 {"hint":"Closest roaming distance from you (cm)", "widget":"slider", "min":100, "max":400, "step":10}'
-    - '// @input float roamMaxDistanceCm = 300 {"hint":"Farthest roaming distance from you (cm)", "widget":"slider", "min":120, "max":500, "step":10}'
+    - '// @input float walkSpeedCmPerSec = 75 {"hint":"Walking speed (cm/s) when she comes over or wanders", "widget":"slider", "min":30, "max":160, "step":5}'
     - '// @input float approachDistanceCm = 120 {"hint":"Where she stops in front of you when called (cm)", "widget":"slider", "min":80, "max":250, "step":5}'
     - '// @input float teaseDistanceCm = 150 {"hint":"Where she stops when she comes over to tease (cm)", "widget":"slider", "min":90, "max":300, "step":5}'
-    - '// @input float attendSeconds = 15 {"hint":"Seconds she stays near you without interaction before wandering off again", "widget":"slider", "min":3, "max":60, "step":1}'
+    - '// @input float attendSeconds = 15 {"hint":"Seconds she stays near you without interaction before stepping back to her spot", "widget":"slider", "min":3, "max":60, "step":1}'
     - '// @input bool debugLogs = true {"hint":"Print each state change to the Logger"}'
     - '// @ui {"widget":"group_end"}'

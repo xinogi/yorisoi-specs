@@ -57,8 +57,8 @@ export const COMPANION_LINES: CompanionLine[] = [
   {id: "book_received", ja: "あ、本？ ちょっと読んでみるね。", en: "Oh, a book? Let me take a look."},
   {
     id: "book_summary",
-    ja: "『星の王子さま』は、小さな星から来た王子と飛行士の物語。大切なものは目に見えない、っていうお話だよ。",
-    en: "\"The Little Prince\": a pilot meets a little prince from a tiny planet. It says what matters most is invisible to the eye."
+    ja: "『不思議の国のアリス』は、白いウサギを追いかけて穴に落ちた女の子が、ふしぎな国で変な住人たちに出会うお話。読んでて楽しかった！",
+    en: "\"Alice's Adventures in Wonderland\": a girl follows a white rabbit down a hole into a strange land full of odd characters. Such a fun read!"
   },
   {id: "book_return", ja: "はい、返すね。素敵な本だった。", en: "Here you go. That was a lovely book."},
 
@@ -91,8 +91,9 @@ export const PAGE_LINES: PageLine[] = [
 
 /** The stand-in book on the desk (title printed on its cover is authored in the scene). */
 export const BOOK = {
-  titleEn: "The Little Prince",
-  titleJa: "星の王子さま",
+  // Public domain: Lewis Carroll, 1865. Plain title text only — no cover artwork from any edition.
+  titleEn: "Alice's Adventures in Wonderland",
+  titleJa: "不思議の国のアリス",
   receivedLineId: "book_received",
   summaryLineId: "book_summary",
   returnLineId: "book_return"

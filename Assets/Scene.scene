@@ -990,7 +990,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 40.000000, y: 0.000000, z: -220.000000}
+    Position: {x: 35.000000, y: 0.000000, z: -258.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -1322,15 +1322,16 @@
   ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
   ShadowDensity: 1.000000
   Text: |-
-    星の王子さま
-    The Little Prince
+    不思議の国のアリス
+    Alice's Adventures
+    in Wonderland
   CustomMaterial: !<reference> 00000000-0000-0000-0000-000000000000
   Editable: false
   ShowEditingPreview: true
   TouchHandler: !<reference> 00000000-0000-0000-0000-000000000000
   EnableRichText: false
   SizeToFit: false
-  FontSize: 46.000000
+  FontSize: 38.000000
   FontSource: !<reference> 6486fe59-bd73-4ca2-9578-2dda1ba18536
   PreferredStyle: Medium
   LayoutRect:
@@ -1557,10 +1558,13 @@
   ScriptAsset: !<reference> 955dd5cf-4488-49a0-9c14-cdbd96b00773
   ScriptInputsDefault:
     facing: true
+    restDistanceCm: true
+    restOffsetDeg: true
+    recenterThresholdDeg: true
+    wanderDeg: true
+    wanderCm: true
     idleTeaseSeconds: true
     walkSpeedCmPerSec: true
-    roamMinDistanceCm: true
-    roamMaxDistanceCm: true
     approachDistanceCm: true
     teaseDistanceCm: true
     attendSeconds: true
@@ -1575,10 +1579,14 @@
       facing: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       handAnchor: !<reference.SceneObject> 2c4dbcae-771d-45ce-8c03-f69a3240af47
       book: !<MappingBased.AssignableType_4> 0a48e56c-cf19-4fa4-9c8d-f0ccdd626027
+      restDistanceCm: !<float> 250.000000
+      restOffsetDeg: !<float> 8.000000
+      recenterThresholdDeg: !<float> 12.000000
+      recenterSeconds: 1.400000
+      wanderDeg: !<float> 3.000000
+      wanderCm: !<float> 30.000000
       idleTeaseSeconds: !<float> 20.000000
       walkSpeedCmPerSec: !<float> 75.000000
-      roamMinDistanceCm: !<float> 150.000000
-      roamMaxDistanceCm: !<float> 300.000000
       approachDistanceCm: !<float> 120.000000
       teaseDistanceCm: !<float> 150.000000
       attendSeconds: !<float> 15.000000

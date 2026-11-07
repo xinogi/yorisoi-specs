@@ -1,20 +1,29 @@
 /**
- * DeskCompanionController — the companion's behavior: where she is, where she walks, and
- * what she is doing. Drives the Companion root (position) and its Facing child (yaw), and asks
- * the animator / voice / sounds to perform.
+ * DeskCompanionController — the companion's behavior: where she stands, where she walks, and
+ * what she is doing. Drives the Companion root position (and an optional Facing child's yaw) and
+ * asks the animator / voice / sounds to perform.
  *
- * States: roam_walk -> roam_idle (her own idle actions 1.5–3 m away, front and sides, sometimes
- * facing away) ... approach (called / teasing / to take a book / after a word) -> attend (about
- * 1.2 m in front of you, facing you) -> reading | dance | pose -> attend -> leaving -> roam.
- * After `idleTeaseSeconds` with no interaction while roaming, she comes closer and teases you.
+ * She ALWAYS stays in front of the user, inside the narrow Specs view (learner, 2026-11-08:
+ * "If I'm working at my desk, I want her always in front of my view. I don't want her behind me."):
+ *   - Resting spot: `restDistanceCm` (~2.5 m) in front, `restOffsetDeg` to the right so she never
+ *     covers the desk work. Inside that front zone she wanders a little (±`wanderDeg`, ±`wanderCm`).
+ *   - Lazy head-follow: her spot is world-locked (she does not jitter with small head moves). If the
+ *     user's view turns so she is more than `recenterThresholdDeg` away from where she should be
+ *     (for a moment), she glides back to the front within `recenterSeconds` (≤ ~1.4 s, even from
+ *     behind), standing on the floor plane and facing the user.
+ *   - Call / word / book: she walks up to `approachDistanceCm` (~1.2 m) straight in front.
+ *     Tease: to `teaseDistanceCm`. Near states keep following the head the same lazy way.
  *
- * Movement is polar around the user (she arcs around you instead of cutting through the desk).
+ * States: roam_idle <-> roam_walk (small idle moves in the front zone) ... approach -> attend ->
+ * reading | dance | pose -> attend -> leaving -> roam_idle. After `idleTeaseSeconds` with no
+ * interaction (and some time roaming) she comes closer and teases you.
  *
- * Inputs: animator, voice, sounds, facing (yaw node), handAnchor (where a handed book sits), book.
- * Tunables are grouped in Settings; there are a few more than the usual 6 because her behavior
- * (timings + distances) IS the experience the learner wants to tune.
+ * Test hooks (read-only getters): state, isNear, isRecentering, distanceToUserCm,
+ * angleOffCenterDeg, isInView, isWholeBodyInView.
  *
- * Must not: build UI or text (the UI modules do), or read input devices directly.
+ * Inputs: animator, voice, sounds, optional facing, handAnchor, book. There are more tunables than
+ * the usual 6 because her placement and timing IS the experience the learner wants to tune.
+ * Must not: build UI or text (UI modules do), or read input devices directly.
  */
 import WorldCameraFinderProvider from "SpectaclesInteractionKit.lspkg/Providers/CameraProvider/WorldCameraFinderProvider"
 import Event, {PublicApi} from "SpectaclesInteractionKit.lspkg/Utils/Event"
@@ -23,7 +32,7 @@ import {DeskCompanionVoice} from "./DeskCompanionVoice"
 import {DeskCompanionSounds} from "./DeskCompanionSounds"
 import {DeskCompanionBook} from "./DeskCompanionBook"
 import {BOOK, TEASE_LINE_IDS} from "./DeskCompanionContent"
-import {angleDelta, clamp, degToRad, yawAngle} from "./DeskCompanionMath"
+import {angleDelta, clamp, degToRad, lerp, smoothStep01, yawAngle} from "./DeskCompanionMath"
 
 export type CompanionState = "roam_walk" | "roam_idle" | "approach" | "attend" | "reading" | "dance" | "pose" | "leaving"
 type ApproachReason = "call" | "tease" | "book" | "word"
@@ -33,9 +42,18 @@ interface Scheduled {
   fn: () => void
 }
 
+/** Specs display field of view (brief: about 37° tall x 32° wide) — half angles, degrees. */
+const FOV_HALF_H_DEG = 16
+const FOV_HALF_V_DEG = 18.5
+/** Height of the companion (cm) and half her body width, used for the in-view checks. */
+const BODY_HEIGHT_CM = 165
+const BODY_HALF_WIDTH_CM = 22
+/** How long she must be off before the lazy follow kicks in (s) — ignores quick glances. */
+const RECENTER_DWELL_S = 0.25
+
 @component
 export class DeskCompanionController extends BaseScriptComponent {
-  @ui.label('<span style="color: #60A5FA;">DeskCompanionController – roam, tease, come when called, read, dance</span>')
+  @ui.label('<span style="color: #60A5FA;">DeskCompanionController – always in front, tease, come when called, read, dance</span>')
   @ui.separator
 
   @ui.label('<span style="color: #60A5FA;">References</span>')
@@ -58,7 +76,7 @@ export class DeskCompanionController extends BaseScriptComponent {
   facing: SceneObject
 
   @input
-  @hint("Point in front of her chest where a handed book is held (child of Facing)")
+  @hint("Point in front of her chest where a handed book is held")
   handAnchor: SceneObject
 
   @input
@@ -67,8 +85,42 @@ export class DeskCompanionController extends BaseScriptComponent {
   @ui.group_end
 
   @ui.separator
-  @ui.label('<span style="color: #60A5FA;">Settings</span>')
-  @ui.group_start("Settings")
+  @ui.label('<span style="color: #60A5FA;">Front zone (always in view)</span>')
+  @ui.group_start("Front zone")
+  @input
+  @widget(new SliderWidget(150, 500, 10))
+  @hint("Resting distance in front of you (cm). Brief: ~2.5 m. Whole body fits in view when you look ~14° down, or from ~4.5 m when looking level while standing.")
+  restDistanceCm: number = 250
+
+  @input
+  @widget(new SliderWidget(-14, 14, 0.5))
+  @hint("Resting spot angle from the center of view (deg, + = right) so she never covers the desk work")
+  restOffsetDeg: number = 8
+
+  @input
+  @widget(new SliderWidget(4, 30, 1))
+  @hint("Lazy follow: glide back to the front once she is this far (deg) from her spot in your view")
+  recenterThresholdDeg: number = 12
+
+  @input
+  @widget(new SliderWidget(0.6, 3, 0.1))
+  @hint("Longest glide back to the front (s) — used when you turned all the way around")
+  recenterSeconds: number = 1.4
+
+  @input
+  @widget(new SliderWidget(0, 6, 0.5))
+  @hint("Idle wandering inside the front zone: ± angle (deg)")
+  wanderDeg: number = 3
+
+  @input
+  @widget(new SliderWidget(0, 60, 5))
+  @hint("Idle wandering inside the front zone: ± distance (cm)")
+  wanderCm: number = 30
+  @ui.group_end
+
+  @ui.separator
+  @ui.label('<span style="color: #60A5FA;">Behavior</span>')
+  @ui.group_start("Behavior")
   @input
   @widget(new SliderWidget(5, 120, 1))
   @hint("Seconds with no interaction before she comes over to tease you")
@@ -76,18 +128,8 @@ export class DeskCompanionController extends BaseScriptComponent {
 
   @input
   @widget(new SliderWidget(30, 160, 5))
-  @hint("Walking speed (cm/s)")
+  @hint("Walking speed (cm/s) when she comes over or wanders")
   walkSpeedCmPerSec: number = 75
-
-  @input
-  @widget(new SliderWidget(100, 400, 10))
-  @hint("Closest roaming distance from you (cm)")
-  roamMinDistanceCm: number = 150
-
-  @input
-  @widget(new SliderWidget(120, 500, 10))
-  @hint("Farthest roaming distance from you (cm)")
-  roamMaxDistanceCm: number = 300
 
   @input
   @widget(new SliderWidget(80, 250, 5))
@@ -101,7 +143,7 @@ export class DeskCompanionController extends BaseScriptComponent {
 
   @input
   @widget(new SliderWidget(3, 60, 1))
-  @hint("Seconds she stays near you without interaction before wandering off again")
+  @hint("Seconds she stays near you without interaction before stepping back to her spot")
   attendSeconds: number = 15
 
   @input
@@ -114,8 +156,6 @@ export class DeskCompanionController extends BaseScriptComponent {
   private _state: CompanionState = "roam_idle"
   private stateStart = 0
   private lastInteraction = 0
-  private targetR = 200
-  private targetTheta = 0
   private reason: ApproachReason = "call"
   private yaw = 0
   private desiredYaw = 0
@@ -125,16 +165,30 @@ export class DeskCompanionController extends BaseScriptComponent {
   private queue: Scheduled[] = []
   private ready = false
 
+  // front-zone placement
+  private committedYaw = 0 // polar angle (atan2(x, -z)) of the "front" she is locked to
+  private wanderDTheta = 0
+  private wanderDR = 0
+  private offTimer = 0
+  private gliding = false
+  private glideT = 0
+  private glideDur = 1
+  private glideStartR = 0
+  private glideStartTheta = 0
+
   private _onArrived = new Event<void>()
   private _onLeft = new Event<void>()
   private _onStateChanged = new Event<string>()
+  private _onRecenter = new Event<void>()
 
   /** She arrived near you (≈ approachDistanceCm) and is facing you. */
   get onArrived(): PublicApi<void> { return this._onArrived.publicApi() }
-  /** She started walking away (no longer near you). */
+  /** She stepped back from near you to her resting spot. */
   get onLeft(): PublicApi<void> { return this._onLeft.publicApi() }
   /** Every state change, with the new state name. */
   get onStateChanged(): PublicApi<string> { return this._onStateChanged.publicApi() }
+  /** The lazy head-follow started gliding her back to the front. */
+  get onRecenter(): PublicApi<void> { return this._onRecenter.publicApi() }
 
   public get state(): CompanionState { return this._state }
 
@@ -143,11 +197,48 @@ export class DeskCompanionController extends BaseScriptComponent {
     return this._state === "attend" || this._state === "reading" || this._state === "dance" || this._state === "pose"
   }
 
+  /** True while the lazy head-follow is gliding her back to the front. */
+  public get isRecentering(): boolean { return this.gliding }
+
   /** Horizontal distance from the user's head to her (cm). */
   public get distanceToUserCm(): number {
     const u = this.userFloor()
     const p = this.getTransform().getWorldPosition()
     return new vec3(p.x - u.x, 0, p.z - u.z).length
+  }
+
+  /** Signed horizontal angle (deg) from the center of the user's view to her (+ = right). */
+  public get angleOffCenterDeg(): number {
+    const u = this.userFloor()
+    const p = this.getTransform().getWorldPosition()
+    return (angleDelta(this.thetaOf(this.userForward()), this.thetaOf(p.sub(u))) * 180) / Math.PI
+  }
+
+  /** Her center is inside the horizontal field of view (±16°). */
+  public get isInView(): boolean {
+    return Math.abs(this.angleOffCenterDeg) <= FOV_HALF_H_DEG
+  }
+
+  /** Head top, feet and both sides are inside the display field of view for the current head pose. */
+  public get isWholeBodyInView(): boolean {
+    if (!this.camT) return false
+    const p = this.getTransform().getWorldPosition()
+    const pts = [
+      p.add(new vec3(0, BODY_HEIGHT_CM, 0)),
+      p,
+      p.add(new vec3(BODY_HALF_WIDTH_CM, BODY_HEIGHT_CM * 0.55, 0)),
+      p.add(new vec3(-BODY_HALF_WIDTH_CM, BODY_HEIGHT_CM * 0.55, 0))
+    ]
+    const inv = this.camT.getWorldRotation().invert()
+    const eye = this.camT.getWorldPosition()
+    for (const q of pts) {
+      const d = inv.multiplyVec3(q.sub(eye))
+      if (d.z >= 0) return false // behind the eye
+      const h = (Math.atan2(d.x, -d.z) * 180) / Math.PI
+      const v = (Math.atan2(d.y, -d.z) * 180) / Math.PI
+      if (Math.abs(h) > FOV_HALF_H_DEG || Math.abs(v) > FOV_HALF_V_DEG) return false
+    }
+    return true
   }
 
   public get secondsSinceInteraction(): number {
@@ -167,10 +258,12 @@ export class DeskCompanionController extends BaseScriptComponent {
     }
     const now = getTime()
     this.lastInteraction = now
+    // Start at her resting spot in front of wherever the user is looking.
+    this.committedYaw = this.thetaOf(this.userForward())
+    this.getTransform().setWorldPosition(this.polarPoint(this.userFloor(), this.restDistanceCm, this.committedYaw + degToRad(this.restOffsetDeg)))
     const p = this.getTransform().getWorldPosition()
-    const u = this.userFloor()
-    this.yaw = yawAngle(u.sub(p))
-    this.desiredYaw = this.yaw + degToRad(70) // start looking off to the side, doing her own thing
+    this.yaw = yawAngle(this.userFloor().sub(p))
+    this.desiredYaw = this.yaw
     this.idleUntil = now + 3
     this.roamSince = now
     this.setState("roam_idle")
@@ -191,18 +284,17 @@ export class DeskCompanionController extends BaseScriptComponent {
     if (this.sounds) this.sounds.playChime()
     if (this.voice) this.voice.say("call_whats_up")
     if (this.isNear) {
-      this.faceUserNow()
       if (this.animator) this.animator.playOnce("wave")
       return
     }
-    this.beginApproach("call", this.approachDistanceCm)
+    this.beginApproach("call")
   }
 
   /** She comes closer on her own and teases you. */
   public tease(): void {
     this.lastInteraction = getTime() // so she does not immediately tease again
     if (this.sounds) this.sounds.playChime()
-    this.beginApproach("tease", this.teaseDistanceCm)
+    this.beginApproach("tease")
   }
 
   /** She explains a pinched word (line already chosen by the caller) and comes over if far. */
@@ -210,11 +302,8 @@ export class DeskCompanionController extends BaseScriptComponent {
     this.noteInteraction()
     if (this.voice) this.voice.say(lineId)
     if (this._state === "reading" || this._state === "dance" || this._state === "pose") return
-    if (this.isNear) {
-      this.faceUserNow()
-      return
-    }
-    this.beginApproach("word", this.approachDistanceCm)
+    if (this.isNear) return
+    this.beginApproach("word")
   }
 
   /** The user held the book out toward her: she comes (if needed), takes it, reads, summarizes. */
@@ -225,7 +314,7 @@ export class DeskCompanionController extends BaseScriptComponent {
       this.takeBook()
       return
     }
-    this.beginApproach("book", this.approachDistanceCm)
+    this.beginApproach("book")
   }
 
   /** Dance (only while she is near you). Returns false if she can't right now. */
@@ -286,37 +375,36 @@ export class DeskCompanionController extends BaseScriptComponent {
     return new vec3(center.x + Math.sin(theta) * r, this.floorY, center.z - Math.cos(theta) * r)
   }
 
-  private beginApproach(reason: ApproachReason, distance: number): void {
-    // a call / book outranks a tease that is already under way
+  private isRoamState(): boolean {
+    return this._state === "roam_idle" || this._state === "roam_walk" || this._state === "leaving"
+  }
+
+  /** Where she should stand right now (polar around the user): front zone, or near spot. */
+  private targetPolar(): {r: number; theta: number} {
+    if (this.isRoamState()) {
+      return {
+        r: this.restDistanceCm + this.wanderDR,
+        theta: this.committedYaw + degToRad(this.restOffsetDeg) + this.wanderDTheta
+      }
+    }
+    const near = this.reason === "tease" ? this.teaseDistanceCm : this.approachDistanceCm
+    return {r: near, theta: this.committedYaw}
+  }
+
+  private beginApproach(reason: ApproachReason): void {
     this.reason = reason
-    this.targetR = distance
-    this.targetTheta = this.thetaOf(this.userForward())
+    this.gliding = false
+    this.committedYaw = this.thetaOf(this.userForward())
     this.setState("approach")
   }
 
-  private pickRoamTarget(): void {
-    const u = this.userFloor()
-    const p = this.getTransform().getWorldPosition()
-    const theta = this.thetaOf(p.sub(u))
-    const span = degToRad(115)
-    // Specs' display is narrow, so favour the front sector (in view) but still visit the sides.
-    let t = 0
-    for (let i = 0; i < 6; i++) {
-      t = Math.random() < 0.55 ? degToRad(-30 + Math.random() * 60) : (Math.random() < 0.5 ? -1 : 1) * degToRad(40 + Math.random() * 75)
-      if (Math.abs(angleDelta(theta, t)) > degToRad(25)) break // make it a visible move
-    }
-    this.targetTheta = clamp(t, -span, span)
-    this.targetR = this.roamMinDistanceCm + Math.random() * Math.max(0, this.roamMaxDistanceCm - this.roamMinDistanceCm)
-  }
-
-  private faceUserNow(): void {
-    const p = this.getTransform().getWorldPosition()
-    this.desiredYaw = yawAngle(this.userFloor().sub(p))
+  private pickWander(): void {
+    this.wanderDTheta = degToRad((Math.random() * 2 - 1) * this.wanderDeg)
+    this.wanderDR = (Math.random() * 2 - 1) * this.wanderCm
   }
 
   private onArrive(): void {
     this.setState("attend")
-    this.faceUserNow()
     this._onArrived.invoke()
     if (this.reason === "tease") {
       const id = TEASE_LINE_IDS[Math.floor(Math.random() * TEASE_LINE_IDS.length)]
@@ -332,7 +420,6 @@ export class DeskCompanionController extends BaseScriptComponent {
   private takeBook(): void {
     if (!this.book || !this.handAnchor) return
     this.setState("reading")
-    this.faceUserNow()
     const d1 = this.voice ? this.voice.say(BOOK.receivedLineId) : 2
     this.book.flyTo(this.handAnchor, 0.7, () => {
       this.book.setOpen(true)
@@ -354,7 +441,7 @@ export class DeskCompanionController extends BaseScriptComponent {
 
   private leave(): void {
     if (this.voice) this.voice.say("leave")
-    this.pickRoamTarget()
+    this.pickWander()
     this.roamSince = getTime()
     this.setState("leaving")
     this._onLeft.invoke()
@@ -374,13 +461,45 @@ export class DeskCompanionController extends BaseScriptComponent {
 
     let anim: CompanionAnim = this.voice && this.voice.isSpeaking ? "talk" : "idle"
 
+    // ── lazy head-follow: glide back to the front when she drifts out of her spot in view ──
+    if (this._state === "approach") {
+      this.committedYaw = this.thetaOf(this.userForward()) // come up in front of where you look
+    } else if (this.gliding) {
+      this.committedYaw = this.thetaOf(this.userForward()) // land on the current front
+      this.glideT += dt / this.glideDur
+      const k = smoothStep01(this.glideT)
+      const tgt = this.targetPolar()
+      const theta = this.glideStartTheta + angleDelta(this.glideStartTheta, tgt.theta) * k
+      const r = lerp(this.glideStartR, tgt.r, k)
+      const prev = this.getTransform().getWorldPosition()
+      const next = this.polarPoint(this.userFloor(), r, theta)
+      this.getTransform().setWorldPosition(next)
+      const heading = next.sub(prev)
+      if (heading.length > 0.05) this.desiredYaw = yawAngle(heading)
+      this.footsteps(dt)
+      anim = "walk"
+      if (this.glideT >= 1) {
+        this.gliding = false
+        this.offTimer = 0
+      }
+    } else {
+      const u = this.userFloor()
+      const p = this.getTransform().getWorldPosition()
+      const her = this.thetaOf(p.sub(u))
+      const desired = this.thetaOf(this.userForward()) + (this.isRoamState() ? degToRad(this.restOffsetDeg) : 0)
+      const drift = Math.abs(angleDelta(desired, her))
+      this.offTimer = drift > degToRad(this.recenterThresholdDeg) ? this.offTimer + dt : 0
+      if (this.offTimer > RECENTER_DWELL_S) this.startGlide()
+    }
+
     switch (this._state) {
       case "roam_walk":
       case "approach":
       case "leaving": {
-        // keep the approach target in front of the user as they turn
-        if (this._state === "approach") this.targetTheta = this.thetaOf(this.userForward())
-        const arrived = this.stepTowardTarget(dt)
+        if (this.gliding) break
+        const tgt = this.targetPolar()
+        const speed = this._state === "roam_walk" ? this.walkSpeedCmPerSec * 0.5 : this.walkSpeedCmPerSec
+        const arrived = this.stepTowardTarget(dt, tgt.r, tgt.theta, speed)
         if (!arrived) anim = "walk" // on the arrival frame keep idle/talk so a wave / lean-in is not cancelled
         if (arrived) {
           if (this._state === "approach") {
@@ -394,26 +513,30 @@ export class DeskCompanionController extends BaseScriptComponent {
         break
       }
       case "roam_idle": {
-        if (now >= this.idleUntil) {
-          this.pickRoamTarget()
+        if (!this.gliding && now >= this.idleUntil) {
+          this.pickWander() // a small move inside the front zone
           this.setState("roam_walk")
         }
         break
       }
       case "attend": {
-        this.faceUserNow()
+        if (!this.gliding) this.faceUserNow()
         const busy = this.voice && this.voice.isSpeaking
         if (!busy && now - this.lastInteraction > this.attendSeconds) this.leave()
         break
       }
       case "reading":
-        anim = "read"
-        this.faceUserNow()
+        if (!this.gliding) {
+          anim = "read"
+          this.faceUserNow()
+        }
         break
       case "dance":
       case "pose": {
-        anim = this._state
-        this.faceUserNow()
+        if (!this.gliding) {
+          anim = this._state
+          this.faceUserNow()
+        }
         const elapsed = now - this.stateStart
         const clipDone = elapsed > 0.6 && this.animator && this.animator.currentAnim !== this._state
         if (clipDone || elapsed > 20) {
@@ -425,13 +548,13 @@ export class DeskCompanionController extends BaseScriptComponent {
     }
 
     // quiet for a while while roaming -> come over and tease
-    // (also needs ~8 s of roaming, so she does not walk away and turn straight back)
+    // (also needs ~8 s back at her spot, so she does not step back and turn straight around)
     const roaming = this._state === "roam_idle" || this._state === "roam_walk"
-    if (roaming && now - this.lastInteraction > this.idleTeaseSeconds && now - this.roamSince > 8) {
+    if (roaming && !this.gliding && now - this.lastInteraction > this.idleTeaseSeconds && now - this.roamSince > 8) {
       this.tease()
     }
 
-    // turn smoothly toward the desired yaw
+    // turn smoothly toward the desired yaw (only matters for an optional 3D model on `facing`)
     const turn = clamp(dt * 5, 0, 1)
     this.yaw += angleDelta(this.yaw, this.desiredYaw) * turn
     if (this.facing) this.facing.getTransform().setWorldRotation(quat.angleAxis(this.yaw, vec3.up()))
@@ -439,43 +562,66 @@ export class DeskCompanionController extends BaseScriptComponent {
     if (this.animator) this.animator.play(anim)
   }
 
-  /** Move along an arc around the user toward (targetR, targetTheta). Returns true on arrival. */
-  private stepTowardTarget(dt: number): boolean {
+  /** Lazy follow kicked in: glide back to the front of the current view. */
+  private startGlide(): void {
+    const u = this.userFloor()
+    const p = this.getTransform().getWorldPosition()
+    const d = new vec3(p.x - u.x, 0, p.z - u.z)
+    this.glideStartR = Math.max(1, d.length)
+    this.glideStartTheta = this.thetaOf(d)
+    this.committedYaw = this.thetaOf(this.userForward())
+    const tgt = this.targetPolar()
+    const turn = Math.abs(angleDelta(this.glideStartTheta, tgt.theta)) / Math.PI // 0..1 (1 = behind)
+    this.glideDur = lerp(0.7, Math.max(0.7, this.recenterSeconds), clamp(turn, 0, 1))
+    this.glideT = 0
+    this.gliding = true
+    this.offTimer = 0
+    if (this.debugLogs) print("DeskCompanion recenter: gliding " + (turn * 180).toFixed(0) + " deg in " + this.glideDur.toFixed(2) + " s")
+    this._onRecenter.invoke()
+  }
+
+  /** Walk along an arc around the user toward (r, theta). Returns true on arrival. */
+  private stepTowardTarget(dt: number, targetR: number, targetTheta: number, speed: number): boolean {
     const u = this.userFloor()
     const t = this.getTransform()
     const p = t.getWorldPosition()
     const d = new vec3(p.x - u.x, 0, p.z - u.z)
     const r = Math.max(1, d.length)
     const theta = this.thetaOf(d)
-    const dTheta = angleDelta(theta, this.targetTheta)
-    const dR = this.targetR - r
-    const pathLen = Math.sqrt(Math.pow(Math.max(r, this.targetR) * dTheta, 2) + dR * dR)
+    const dTheta = angleDelta(theta, targetTheta)
+    const dR = targetR - r
+    const pathLen = Math.sqrt(Math.pow(Math.max(r, targetR) * dTheta, 2) + dR * dR)
     if (pathLen < 4) {
-      t.setWorldPosition(this.polarPoint(u, this.targetR, this.targetTheta))
+      t.setWorldPosition(this.polarPoint(u, targetR, targetTheta))
       return true
     }
-    const k = Math.min(1, (this.walkSpeedCmPerSec * dt) / pathLen)
+    const k = Math.min(1, (speed * dt) / pathLen)
     const next = this.polarPoint(u, r + dR * k, theta + dTheta * k)
     const heading = next.sub(p)
     if (heading.length > 0.01) this.desiredYaw = yawAngle(heading)
     t.setWorldPosition(next)
+    this.footsteps(dt)
+    return false
+  }
 
+  private footsteps(dt: number): void {
     const stepsPerSecond = this.animator ? this.animator.stepsPerSecond : 1.8
     this.stepTimer += dt
     if (this.stepTimer >= 1 / stepsPerSecond) {
       this.stepTimer = 0
       if (this.sounds) this.sounds.playFootstep()
     }
-    return false
   }
 
-  /** After arriving at a roam spot: face you, look sideways, or turn away for a while. */
+  private faceUserNow(): void {
+    const p = this.getTransform().getWorldPosition()
+    this.desiredYaw = yawAngle(this.userFloor().sub(p))
+  }
+
+  /** After a small idle move: mostly face you, sometimes look a little aside. */
   private chooseIdleFacing(): void {
     const p = this.getTransform().getWorldPosition()
     const toUser = yawAngle(this.userFloor().sub(p))
-    const r = Math.random()
-    if (r < 0.4) this.desiredYaw = toUser
-    else if (r < 0.8) this.desiredYaw = toUser + (Math.random() < 0.5 ? -1 : 1) * degToRad(80 + Math.random() * 30)
-    else this.desiredYaw = toUser + Math.PI // facing away, doing her own thing
+    this.desiredYaw = Math.random() < 0.6 ? toUser : toUser + (Math.random() < 0.5 ? -1 : 1) * degToRad(30 + Math.random() * 30)
   }
 }
