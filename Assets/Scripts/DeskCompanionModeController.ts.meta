@@ -51,13 +51,13 @@
     -
       {}
   InputLines:
-    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">DeskCompanionModeController – persona modes + cue cards (persona/modes.md)</span>"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">DeskCompanionModeController – persona modes + cue-card talk list (persona/modes.md)</span>"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">References</span>"}'
     - '// @ui {"widget":"group_start", "label":"References"}'
     - '// @input AssignableType_1 controller {"hint":"Companion controller the active mode is applied to"}'
-    - '// @input AssignableType_2 voice {"hint":"Voice + subtitles (mode call line, cue_next, cue_done)"}'
-    - '// @input AssignableType_3 cueCards {"hint":"Cue card beside her (Cue cards mode)"}'
+    - '// @input AssignableType_2 voice {"hint":"Voice + subtitles (mode call line, cue coaching lines)"}'
+    - '// @input AssignableType_3 cueCards {"hint":"Talk list beside her (Cue cards mode)"}'
     - '// @input AssignableType_4 askCard {"hint":"Small answer card beside her head (Ask button)"}'
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'

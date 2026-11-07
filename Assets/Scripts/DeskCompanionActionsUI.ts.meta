@@ -36,6 +36,8 @@
     modeGlyph: false
     modeLabel: false
     poseLabel: false
+    translateGlyph: false
+    translateLabel: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -53,6 +55,8 @@
       modeGlyph: ⇄
       askLabel: 質問 Ask
       askGlyph: "?"
+      translateLabel: Translate…
+      translateGlyph: 文
   ScriptTypes:
     -
       {}
@@ -63,10 +67,12 @@
     - '// @ui {"widget":"group_start", "label":"Settings"}'
     - '// @input float buttonWidthCm = 5.8 {"hint":"Width of each button (cm)", "widget":"slider", "min":5, "max":14, "step":0.5}'
     - '// @input float buttonHeightCm = 4.5 {"hint":"Height of each button (cm)", "widget":"slider", "min":3, "max":8, "step":0.5}'
-    - '// @input string danceLabel = "ダンス Dance" {"hint":"Dance button label"}'
-    - '// @input string poseLabel = "ポーズ Pose" {"hint":"Pose button label"}'
-    - '// @input string modeLabel = "モード Mode" {"hint":"Mode button label (each press switches her mode)"}'
+    - '// @input string danceLabel = "Dance" {"hint":"Dance button label"}'
+    - '// @input string poseLabel = "Pose" {"hint":"Pose button label"}'
+    - '// @input string modeLabel = "Mode" {"hint":"Mode button label (each press switches her mode)"}'
     - '// @input string modeGlyph = "⇄" {"hint":"Glyph shown on the Mode button face"}'
-    - "// @input string askLabel = \"質問 Ask\" {\"hint\":\"Ask button label (each press: weather -> today's plan -> project tip)\"}"
+    - "// @input string askLabel = \"Ask\" {\"hint\":\"Ask button label (each press: weather -> today's plan -> project tip)\"}"
     - '// @input string askGlyph = "?" {"hint":"Glyph shown on the Ask button face"}'
+    - '// @input string translateLabel = "Translate…" {"hint":"Translate button label (opens the keyboard; she translates what you type)"}'
+    - '// @input string translateGlyph = "文" {"hint":"Glyph shown on the Translate button face"}'
     - '// @ui {"widget":"group_end"}'

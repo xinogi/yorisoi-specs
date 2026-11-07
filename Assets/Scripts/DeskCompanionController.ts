@@ -15,12 +15,14 @@
  *     Tease: to `teaseDistanceCm`. Near states keep following the head the same lazy way.
  *
  * States: roam_idle <-> roam_walk (small idle moves in the front zone) ... approach -> attend ->
- * reading | dance | pose -> attend -> leaving -> roam_idle. After `idleTeaseSeconds` with no
- * interaction (and some time roaming) she comes closer and teases you.
+ * reading | dance | pose -> attend -> leaving -> roam_idle. Quiet by default: she only talks when
+ * you act. With Chat on (setChatEnabled), after `idleTeaseSeconds` × back-off with no interaction
+ * she comes closer and teases you; an unanswered tease doubles the next wait (up to ×8), and the
+ * same tease line never plays twice in a row.
  *
  * Modes (persona/modes.md, applied by DeskCompanionModeController through applyMode()): the active
- * mode sets the tease interval (0 = never), the wander size (resting distance never closer than
- * 240 cm so her whole body stays in view at the ~14 deg desk gaze), the clips she favours while
+ * mode sets the tease interval (0 = never), the wander size (sideways swing capped at ±wanderDeg,
+ * resting distance never closer than 240 cm so her whole body stays in view at the ~14 deg desk gaze), the clips she favours while
  * idle, and her call / tease / leave lines.
  *
  * Test hooks (read-only getters): state, isNear, isRecentering, distanceToUserCm,
@@ -39,6 +41,7 @@ import {DeskCompanionBook} from "./DeskCompanionBook"
 import {BOOK, lineIdForMode, SHARED_TEASE_LINE_IDS} from "./DeskCompanionContent"
 import {PersonaMode} from "./DeskCompanionPersonaData"
 import {angleDelta, clamp, degToRad, lerp, smoothStep01, yawAngle} from "./DeskCompanionMath"
+import {DeskCompanionVoiceDot} from "./DeskCompanionVoiceDot"
 
 export type CompanionState = "roam_walk" | "roam_idle" | "approach" | "attend" | "reading" | "dance" | "pose" | "leaving"
 type ApproachReason = "call" | "call_surprised" | "tease" | "book" | "word"
@@ -58,6 +61,18 @@ const BODY_HALF_WIDTH_CM = 22
 const RECENTER_DWELL_S = 0.25
 /** Resting spot never closer than this (cm): keeps her whole body in view at the ~14 deg desk gaze. */
 const MIN_REST_DISTANCE_CM = 240
+/** In Cue cards mode she steps aside so the talk list can take the middle of the view. */
+const ASIDE_EXTRA_DEG = 27
+const ASIDE_EXTRA_CM = 40
+/** Her body's half-width plus a little air (cm): the card never comes closer than this to the desk. */
+const KEEP_OUT_MARGIN_CM = 28
+/** Wander moves shorter than this are a weight shift (idle clip, slow ease), not a walk. */
+const SHUFFLE_MAX_CM = 40
+/** Seconds to reach full walking speed / distance (cm) over which she slows before stopping. */
+const WALK_EASE_IN_S = 0.3
+const WALK_EASE_OUT_CM = 25
+/** Longest back-off multiplier for unanswered teases (wait = teaseSeconds × backoff). */
+const MAX_TEASE_BACKOFF = 8
 /** Calling her this soon (s) after she teased you makes her look surprised. */
 const SURPRISE_WINDOW_S = 10
 /** Wander multipliers for the mode's wander size. */
@@ -136,7 +151,7 @@ export class DeskCompanionController extends BaseScriptComponent {
   @input
   @widget(new SliderWidget(30, 160, 5))
   @hint("Walking speed (cm/s) when she comes over or wanders")
-  walkSpeedCmPerSec: number = 75
+  walkSpeedCmPerSec: number = 100
 
   @input
   @widget(new SliderWidget(80, 250, 5))
@@ -158,8 +173,21 @@ export class DeskCompanionController extends BaseScriptComponent {
   debugLogs: boolean = true
   @ui.group_end
 
-  /** Seconds with no interaction before she comes over to tease you (0 = never). Set by the active mode. */
+  /** Seconds with no interaction before she comes over to tease you (0 = never). Set by the active mode. Only used while chat is on. */
   public idleTeaseSeconds: number = 20
+  /** A tease counts as answered if you act (button, poke, word, book) within this many seconds; else the next wait doubles. */
+  public teaseReplyWindowSeconds: number = 20
+
+  private _chatEnabled = false // quiet by default: she only talks when you act
+  private _avatarVisible = true
+  private _cardsAside = false
+  private deskTop: Transform | null = null
+  private walkStartedAt = -1
+  private moveIsShuffle = false
+  private voiceDot: DeskCompanionVoiceDot | null = null
+  private teaseBackoff = 1
+  private teaseAwaitingReply = false
+  private lastTeaseLineId = ""
 
   private camT: Transform | null = null
   private mode: PersonaMode | null = null
@@ -266,6 +294,69 @@ export class DeskCompanionController extends BaseScriptComponent {
   public get callLineId(): string { return this._callLineId }
   public get teaseLineIds(): string[] { return this._teaseLineIds.slice() }
   public get leaveLineId(): string { return this._leaveLineId }
+  /** Chat on = she may come over on her own now and then (long, backing-off intervals). Off (default) = never. */
+  public get chatEnabled(): boolean { return this._chatEnabled }
+  /** Current multiplier on the tease wait (doubles after each unanswered tease, resets when you answer). */
+  public get currentTeaseBackoff(): number { return this.teaseBackoff }
+  /** Effective seconds of quiet before the next tease (0 = she will not come over on her own). */
+  public get nextTeaseWaitSeconds(): number {
+    return this._chatEnabled && this.idleTeaseSeconds > 0 ? this.idleTeaseSeconds * this.teaseBackoff : 0
+  }
+
+  /** True while she stands aside (~35° and a bit farther) so the cue-card talk list has the middle. */
+  public get cardsAside(): boolean { return this._cardsAside }
+
+  /** Step aside for the talk list (on) or go back to her normal resting spot (off). */
+  public setCardsAside(on: boolean): void {
+    if (on === this._cardsAside) return
+    this._cardsAside = on
+    if (this.debugLogs) print("DeskCompanion: " + (on ? "stepping aside for the talk list" : "back to her resting spot"))
+    if (this.isRoamState() && !this.gliding) this.startGlide()
+  }
+
+  private restOffsetRad(): number {
+    return degToRad(this.restOffsetDeg + (this._cardsAside ? ASIDE_EXTRA_DEG : 0))
+  }
+
+  /** False in "Voice only" mode: her body (VideoCard) is hidden and a soft light dot stands in. */
+  public get avatarVisible(): boolean { return this._avatarVisible }
+
+  /**
+   * "Yori: Visible" / "Yori: Voice only". Voice only hides the VideoCard and the poke target
+   * (nothing to poke) and shows a small light dot at her head; she still moves, follows the head,
+   * talks (spatial voice from the dot) and every card / subtitle stays where it would be.
+   */
+  public setAvatarVisible(on: boolean): void {
+    this._avatarVisible = on
+    const root = this.getSceneObject()
+    const card = findDescendant(root, "VideoCard")
+    if (card) card.enabled = on
+    const touch = findDescendant(root, "CompanionTouch")
+    if (touch) touch.enabled = on
+    if (!this.voiceDot) this.voiceDot = new DeskCompanionVoiceDot(findDescendant(root, "VoiceSource") || root)
+    this.voiceDot.setEnabled(!on)
+    if (this.debugLogs) print("DeskCompanion avatar: " + (on ? "visible" : "voice only (light dot)"))
+  }
+
+  /** Turn chatting on/off (the "Chat" toggle). Turning it on starts a fresh wait with no back-off. */
+  public setChatEnabled(on: boolean): void {
+    this._chatEnabled = on
+    this.teaseBackoff = 1
+    this.teaseAwaitingReply = false
+    this.lastInteraction = getTime()
+    if (this.debugLogs) print("DeskCompanion chat: " + (on ? "on (tease every " + this.idleTeaseSeconds + " s, backing off)" : "off (quiet unless you act)"))
+  }
+
+  /** The next tease line: random, never the same one twice in a row. */
+  public nextTeaseLineId(): string {
+    const ids = this._teaseLineIds
+    if (ids.length === 0) return ""
+    let pool = ids.filter((id) => id !== this.lastTeaseLineId)
+    if (pool.length === 0) pool = ids
+    const id = pool[Math.floor(Math.random() * pool.length)]
+    this.lastTeaseLineId = id
+    return id
+  }
   public get modeId(): string { return this.mode ? this.mode.id : "" }
 
   /** Apply a persona mode: tease interval, wander size, favourite idle clips, call/tease/leave lines. */
@@ -273,7 +364,9 @@ export class DeskCompanionController extends BaseScriptComponent {
     this.mode = mode
     this.idleTeaseSeconds = mode.teaseSeconds
     this.wanderScale = WANDER_SCALE[mode.wander] || 1
-    this.favoriteAnims = mode.favoriteAnims && mode.favoriteAnims.length > 0 ? mode.favoriteAnims.slice() : ["idle"]
+    // "talk" is skipped as an idle extra: mouthing words with no voice reads as talking on her own
+    const favs = (mode.favoriteAnims || []).filter((a) => a !== "talk")
+    this.favoriteAnims = favs.length > 0 ? favs : ["idle"]
     this._callLineId = lineIdForMode(mode, "call", "call_whats_up")
     const teases = ["tease_1", "tease_2", "tease_3"].filter((k) => !!mode.lines[k]).map((k) => lineIdForMode(mode, k, k))
     this._teaseLineIds = teases.length > 0 ? teases : SHARED_TEASE_LINE_IDS.slice()
@@ -302,15 +395,23 @@ export class DeskCompanionController extends BaseScriptComponent {
 
   private start(): void {
     this.camT = WorldCameraFinderProvider.getInstance().getTransform()
+    const room = this.getSceneObject().getParent()
+    const deskTopSO = room ? findDescendant(room, "DeskTop") : null
+    this.deskTop = deskTopSO ? deskTopSO.getTransform() : null
     this.floorY = this.getTransform().getWorldPosition().y
     if (!this.animator || !this.voice) {
       print("DeskCompanionController: animator / voice not wired — check the scene")
     }
     const now = getTime()
     this.lastInteraction = now
+    if (this.debugLogs) {
+      const cp = this.camT.getWorldPosition()
+      const f = this.camT.getWorldRotation().multiplyVec3(new vec3(0, 0, -1))
+      print("DeskCompanion start: camera at (" + cp.x.toFixed(1) + ", " + cp.y.toFixed(1) + ", " + cp.z.toFixed(1) + ") forward (" + f.x.toFixed(2) + ", " + f.y.toFixed(2) + ", " + f.z.toFixed(2) + "), her floor y=" + this.floorY.toFixed(1))
+    }
     // Start at her resting spot in front of wherever the user is looking.
     this.committedYaw = this.thetaOf(this.userForward())
-    this.getTransform().setWorldPosition(this.polarPoint(this.userFloor(), this.restDistanceCm, this.committedYaw + degToRad(this.restOffsetDeg)))
+    this.getTransform().setWorldPosition(this.keepOut(this.polarPoint(this.userFloor(), this.restDistanceCm, this.committedYaw + degToRad(this.restOffsetDeg))))
     const p = this.getTransform().getWorldPosition()
     this.yaw = yawAngle(this.userFloor().sub(p))
     this.desiredYaw = this.yaw
@@ -324,7 +425,12 @@ export class DeskCompanionController extends BaseScriptComponent {
 
   /** Any user interaction resets the tease timer. */
   public noteInteraction(): void {
-    this.lastInteraction = getTime()
+    const now = getTime()
+    this.lastInteraction = now
+    if (this.teaseAwaitingReply && now - this.lastTeaseArriveAt <= this.teaseReplyWindowSeconds) {
+      this.teaseAwaitingReply = false
+      this.teaseBackoff = 1 // you answered: back to the mode's normal interval
+    }
   }
 
   /** "I called her": she says "What's up?" and walks up to about 1.2 m in front. */
@@ -398,6 +504,8 @@ export class DeskCompanionController extends BaseScriptComponent {
     const prev = this._state
     this._state = s
     this.stateStart = getTime()
+    this.walkStartedAt = -1 // every new move starts with its own ease-in
+    this.moveIsShuffle = false
     if (this.debugLogs) print("DeskCompanion state: " + prev + " -> " + s)
     this._onStateChanged.invoke(s)
   }
@@ -425,6 +533,27 @@ export class DeskCompanionController extends BaseScriptComponent {
     return Math.atan2(d.x, -d.z)
   }
 
+  /**
+   * Keep-out: if p is inside the desk footprint (grown by her half-width), push it straight away
+   * from the user until it is clear — she stands on the far side of the desk, never in it.
+   */
+  private keepOut(p: vec3): vec3 {
+    if (!this.deskTop) return p
+    const inv = this.deskTop.getInvertedWorldTransform()
+    const s = this.deskTop.getWorldScale()
+    const inside = (q: vec3): boolean => {
+      const l = inv.multiplyPoint(q)
+      return Math.abs(l.x * s.x) < s.x / 2 + KEEP_OUT_MARGIN_CM && Math.abs(l.z * s.z) < s.z / 2 + KEEP_OUT_MARGIN_CM
+    }
+    if (!inside(p)) return p
+    const u = this.userFloor()
+    let d = new vec3(p.x - u.x, 0, p.z - u.z)
+    d = d.length > 0.01 ? d.normalize() : this.userForward()
+    let q = p
+    for (let i = 0; i < 80 && inside(q); i++) q = q.add(d.uniformScale(5))
+    return q
+  }
+
   private polarPoint(center: vec3, r: number, theta: number): vec3 {
     return new vec3(center.x + Math.sin(theta) * r, this.floorY, center.z - Math.cos(theta) * r)
   }
@@ -437,8 +566,8 @@ export class DeskCompanionController extends BaseScriptComponent {
   private targetPolar(): {r: number; theta: number} {
     if (this.isRoamState()) {
       return {
-        r: Math.max(MIN_REST_DISTANCE_CM, this.restDistanceCm + this.wanderDR),
-        theta: this.committedYaw + degToRad(this.restOffsetDeg) + this.wanderDTheta
+        r: Math.max(MIN_REST_DISTANCE_CM, this.restDistanceCm + (this._cardsAside ? ASIDE_EXTRA_CM : 0) + this.wanderDR),
+        theta: this.committedYaw + this.restOffsetRad() + this.wanderDTheta
       }
     }
     const near = this.reason === "tease" ? this.teaseDistanceCm : this.approachDistanceCm
@@ -453,7 +582,9 @@ export class DeskCompanionController extends BaseScriptComponent {
   }
 
   private pickWander(): void {
-    this.wanderDTheta = degToRad((Math.random() * 2 - 1) * this.wanderDeg * this.wanderScale)
+    // the sideways swing never grows past ±wanderDeg (her whole body must stay inside the narrow
+    // ±16 deg view); a "large" wander mode roams further in depth instead
+    this.wanderDTheta = degToRad((Math.random() * 2 - 1) * this.wanderDeg * Math.min(1, this.wanderScale))
     this.wanderDR = (Math.random() * 2 - 1) * this.wanderCm * this.wanderScale
   }
 
@@ -461,9 +592,9 @@ export class DeskCompanionController extends BaseScriptComponent {
     this.setState("attend")
     this._onArrived.invoke()
     if (this.reason === "tease") {
-      const ids = this._teaseLineIds
-      const id = ids[Math.floor(Math.random() * ids.length)]
+      const id = this.nextTeaseLineId()
       this.lastTeaseArriveAt = getTime()
+      this.teaseAwaitingReply = true
       if (this.animator) this.animator.playOnce("lean_in")
       if (this.voice) this.voice.say(id)
     } else if (this.reason === "book") {
@@ -503,7 +634,8 @@ export class DeskCompanionController extends BaseScriptComponent {
   }
 
   private leave(): void {
-    if (this.voice) this.voice.say(this._leaveLineId)
+    // quiet by default: she only says goodbye after a chat she started herself
+    if (this._chatEnabled && this.reason === "tease" && this.voice) this.voice.say(this._leaveLineId)
     this.pickWander()
     this.roamSince = getTime()
     this.setState("leaving")
@@ -514,6 +646,9 @@ export class DeskCompanionController extends BaseScriptComponent {
     if (!this.ready) return
     const now = getTime()
     const dt = getDeltaTime()
+    if (this.voiceDot && this.voiceDot.enabled && this.camT) {
+      this.voiceDot.update(dt, !!this.voice && this.voice.isSpeaking, this.camT.getWorldPosition())
+    }
 
     // run scheduled actions
     if (this.queue.length > 0) {
@@ -535,7 +670,7 @@ export class DeskCompanionController extends BaseScriptComponent {
       const theta = this.glideStartTheta + angleDelta(this.glideStartTheta, tgt.theta) * k
       const r = lerp(this.glideStartR, tgt.r, k)
       const prev = this.getTransform().getWorldPosition()
-      const next = this.polarPoint(this.userFloor(), r, theta)
+      const next = this.keepOut(this.polarPoint(this.userFloor(), r, theta))
       this.getTransform().setWorldPosition(next)
       const heading = next.sub(prev)
       if (heading.length > 0.05) this.desiredYaw = yawAngle(heading)
@@ -549,7 +684,7 @@ export class DeskCompanionController extends BaseScriptComponent {
       const u = this.userFloor()
       const p = this.getTransform().getWorldPosition()
       const her = this.thetaOf(p.sub(u))
-      const desired = this.thetaOf(this.userForward()) + (this.isRoamState() ? degToRad(this.restOffsetDeg) : 0)
+      const desired = this.thetaOf(this.userForward()) + (this.isRoamState() ? this.restOffsetRad() : 0)
       const drift = Math.abs(angleDelta(desired, her))
       this.offTimer = drift > degToRad(this.recenterThresholdDeg) ? this.offTimer + dt : 0
       if (this.offTimer > RECENTER_DWELL_S) this.startGlide()
@@ -561,9 +696,12 @@ export class DeskCompanionController extends BaseScriptComponent {
       case "leaving": {
         if (this.gliding) break
         const tgt = this.targetPolar()
-        const speed = this._state === "roam_walk" ? this.walkSpeedCmPerSec * 0.5 : this.walkSpeedCmPerSec
+        const shuffle = this.walkStartedAt >= 0 && this.moveIsShuffle
+        const speed = shuffle ? 30 : this.walkSpeedCmPerSec
         const arrived = this.stepTowardTarget(dt, tgt.r, tgt.theta, speed)
-        if (!arrived) anim = "walk" // on the arrival frame keep idle/talk so a wave / lean-in is not cancelled
+        // walk clip only while really walking; a short weight shift keeps idle; on the arrival frame
+        // keep idle/talk so a wave / lean-in is not cancelled
+        if (!arrived && !this.moveIsShuffle) anim = "walk"
         if (arrived) {
           if (this._state === "approach") {
             this.onArrive()
@@ -614,7 +752,13 @@ export class DeskCompanionController extends BaseScriptComponent {
     // quiet for a while while roaming -> come over and tease
     // (also needs ~8 s back at her spot, so she does not step back and turn straight around)
     const roaming = this._state === "roam_idle" || this._state === "roam_walk"
-    if (roaming && !this.gliding && this.idleTeaseSeconds > 0 && now - this.lastInteraction > this.idleTeaseSeconds && now - this.roamSince > 8) {
+    if (this.teaseAwaitingReply && now - this.lastTeaseArriveAt > this.teaseReplyWindowSeconds) {
+      this.teaseAwaitingReply = false
+      this.teaseBackoff = Math.min(MAX_TEASE_BACKOFF, this.teaseBackoff * 2)
+      if (this.debugLogs) print("DeskCompanion tease unanswered: next wait x" + this.teaseBackoff + " (" + this.nextTeaseWaitSeconds + " s)")
+    }
+    const wait = this.nextTeaseWaitSeconds
+    if (roaming && !this.gliding && wait > 0 && now - this.lastInteraction > wait && now - this.roamSince > 8) {
       this.tease()
     }
 
@@ -656,15 +800,25 @@ export class DeskCompanionController extends BaseScriptComponent {
     const dR = targetR - r
     const pathLen = Math.sqrt(Math.pow(Math.max(r, targetR) * dTheta, 2) + dR * dR)
     if (pathLen < 4) {
-      t.setWorldPosition(this.polarPoint(u, targetR, targetTheta))
+      t.setWorldPosition(this.keepOut(this.polarPoint(u, targetR, targetTheta)))
+      this.walkStartedAt = -1
       return true
     }
-    const k = Math.min(1, (speed * dt) / pathLen)
-    const next = this.polarPoint(u, r + dR * k, theta + dTheta * k)
+    // ease: ramp up over WALK_EASE_IN_S, slow down over the last WALK_EASE_OUT_CM
+    const now = getTime()
+    if (this.walkStartedAt < 0) {
+      this.walkStartedAt = now
+      this.moveIsShuffle = this._state === "roam_walk" && pathLen < SHUFFLE_MAX_CM
+    }
+    const easeIn = Math.min(1, (now - this.walkStartedAt) / WALK_EASE_IN_S)
+    const easeOut = Math.min(1, pathLen / WALK_EASE_OUT_CM)
+    const v = Math.max(0.25, Math.min(easeIn, easeOut)) * speed
+    const k = Math.min(1, (v * dt) / pathLen)
+    const next = this.keepOut(this.polarPoint(u, r + dR * k, theta + dTheta * k))
     const heading = next.sub(p)
     if (heading.length > 0.01) this.desiredYaw = yawAngle(heading)
     t.setWorldPosition(next)
-    this.footsteps(dt)
+    if (!this.moveIsShuffle) this.footsteps(dt)
     return false
   }
 
@@ -696,4 +850,15 @@ export class DeskCompanionController extends BaseScriptComponent {
     const toUser = yawAngle(this.userFloor().sub(p))
     this.desiredYaw = Math.random() < 0.6 ? toUser : toUser + (Math.random() < 0.5 ? -1 : 1) * degToRad(30 + Math.random() * 30)
   }
+}
+
+/** Depth-first search for a descendant SceneObject by name. */
+function findDescendant(root: SceneObject, name: string): SceneObject | null {
+  for (let i = 0; i < root.getChildrenCount(); i++) {
+    const c = root.getChild(i)
+    if (c.name === name) return c
+    const deeper = findDescendant(c, name)
+    if (deeper) return deeper
+  }
+  return null
 }

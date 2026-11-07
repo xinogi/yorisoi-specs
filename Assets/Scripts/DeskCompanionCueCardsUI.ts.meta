@@ -29,9 +29,10 @@
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     backLabel: false
-    cardHeightCm: false
     cardWidthCm: false
+    maxVisibleItems: false
     nextLabel: false
+    noteColor: false
     textColor: false
   ScriptTypesHidden:
     {}
@@ -43,21 +44,23 @@
     []
   DefaultScriptInputs:
     - cardWidthCm: !<float> 60.000000
-      cardHeightCm: !<float> 26.000000
+      maxVisibleItems: !<float> 7.000000
       textColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      noteColor: !<Vec4> {x: 0.450000, y: 0.850000, z: 1.000000, w: 1.000000}
       backLabel: ◀ 戻る Back
       nextLabel: 次へ Next ▶
   ScriptTypes:
     -
       {}
   InputLines:
-    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">DeskCompanionCueCardsUI – cue card beside her with Back / Next</span>"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">DeskCompanionCueCardsUI – talk list beside her (decks, jump, timing, order)</span>"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Settings</span>"}'
     - '// @ui {"widget":"group_start", "label":"Settings"}'
-    - '// @input float cardWidthCm = 60 {"hint":"Card width (cm) — read from ~2.5 m", "widget":"slider", "min":30, "max":90, "step":1}'
-    - '// @input float cardHeightCm = 26 {"hint":"Card height (cm)", "widget":"slider", "min":15, "max":50, "step":0.5}'
-    - '// @input vec4 textColor = "{1, 1, 1, 1}" {"hint":"Talking-point text color (keep light: the display is additive)", "widget":"color"}'
-    - '// @input string backLabel = "◀ 戻る Back" {"hint":"Back button label"}'
-    - '// @input string nextLabel = "次へ Next ▶" {"hint":"Next button label"}'
+    - '// @input float cardWidthCm = 72 {"hint":"List width (cm) — read from ~2.5 m", "widget":"slider", "min":40, "max":100, "step":1}'
+    - '// @input float maxVisibleItems = 7 {"hint":"Rows shown at once; longer decks scroll to keep the current item in view", "widget":"slider", "min":3, "max":12, "step":1}'
+    - '// @input vec4 textColor = "{1, 1, 1, 1}" {"hint":"Current item text color (keep light: the display is additive)", "widget":"color"}'
+    - '// @input vec4 noteColor = "{0.45, 0.85, 1, 1}" {"hint":"Delivery note (話し方) and detail bullets color", "widget":"color"}'
+    - '// @input string backLabel = "◀ Back" {"hint":"Back button label"}'
+    - '// @input string nextLabel = "Next ▶" {"hint":"Next button label"}'
     - '// @ui {"widget":"group_end"}'

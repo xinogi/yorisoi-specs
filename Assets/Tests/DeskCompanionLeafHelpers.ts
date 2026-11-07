@@ -40,7 +40,7 @@ function requireObject(name: string): SceneObject {
   return so
 }
 
-function requireComponent<T>(objectName: string, typeName: any): T {
+export function requireComponent<T>(objectName: string, typeName: any): T {
   const c = requireObject(objectName).getComponent(typeName as any) as unknown as T
   if (!c) throw new Error(`Component ${typeName} not found on "${objectName}"`)
   return c

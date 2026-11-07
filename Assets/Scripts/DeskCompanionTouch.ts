@@ -97,13 +97,21 @@ export class DeskCompanionTouch extends BaseScriptComponent {
     if (!it) it = so.createComponent(Interactable.getTypeName()) as Interactable
 
     this.createEvent("OnStartEvent").bind(() => {
-      it.onTriggerStart.add(() => this.poke())
+      it.onTriggerStart.add((e) => {
+        let by = "?"
+        try {
+          by = "inputType " + e.interactor.inputType
+        } catch (err) {
+          by = "?"
+        }
+        this.poke(by)
+      })
     })
     this.createEvent("UpdateEvent").bind(() => this.tick())
   }
 
   /** One poke (also callable from tests). */
-  public poke(): void {
+  public poke(by: string = "code"): void {
     const now = getTime()
     if (this.mood === "annoyed") return // ignoring you for a moment
     if (this.controller && this.controller.state === "reading") return
@@ -112,7 +120,7 @@ export class DeskCompanionTouch extends BaseScriptComponent {
     if (this.controller) this.controller.noteInteraction()
     const n = this.pokes.length
     this._onPoke.invoke(n)
-    print("DeskCompanionTouch: poke " + n + " (mood " + this.mood + ")")
+    print("DeskCompanionTouch: poke " + n + " (mood " + this.mood + ", by " + by + ")")
     if (n >= this.annoyedAfterPokes) {
       this.setMood("annoyed", now + this.ignoreSeconds)
       if (this.voice) this.voice.say("poke_annoyed")

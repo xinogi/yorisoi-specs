@@ -1,10 +1,13 @@
 /**
- * Done criterion 2 — after a quiet stretch with no interaction she walks closer (approach ->
- * attend, ~1.5 m) and teases with a line (subtitle beside her head; voice clip if one is wired).
+ * Done criterion 2 — quiet by default; with Chat on, after a quiet stretch she walks closer
+ * (approach -> attend, ~1.5 m) and teases with a line (subtitle beside her head; voice clip).
  *
- * The lens default is 20 s; the scenario lowers idleTeaseSeconds (parameter teaseSeconds, "3") so
- * the run is short, and restores it afterwards. The lens also requires ~8 s back at her resting
- * spot before teasing, so the tease is expected roughly 8 s after the lens starts.
+ * 1. Chat OFF (the default): even with a 3 s interval she never comes over on her own.
+ * 2. Chat ON (setChatEnabled(true), as the "Chat" toggle does) with idleTeaseSeconds lowered to
+ *    the `teaseSeconds` parameter ("3"): she approaches, attends at ~1.5 m and teases.
+ * 3. The tease picker never repeats the same line twice in a row.
+ * 4. An unanswered tease doubles the next wait (reply window lowered to 2 s for the run).
+ * Everything is restored afterwards (chat off, mode interval, 20 s reply window).
  */
 import {Scenario} from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import {ScenarioConfig} from "Leaf.lspkg/Scenarios/scenario/ScenarioConfig"
@@ -35,10 +38,19 @@ export class DC2IdleTeaseScenario extends Scenario {
     lens.voice.onLineSpoken.add(onLine)
 
     const saved = c.idleTeaseSeconds
+    const savedWindow = c.teaseReplyWindowSeconds
     c.idleTeaseSeconds = teaseSeconds
-    const t0 = getTime()
-    log(`DC2 idleTeaseSeconds ${saved} -> ${teaseSeconds}; waiting with no interaction :: ${lens.summary()}`)
+    c.teaseReplyWindowSeconds = 2
     try {
+      // ── 1. quiet by default ──
+      checks.check("chat is off by default", !c.chatEnabled, `chatEnabled=${c.chatEnabled} nextTeaseWait=${c.nextTeaseWaitSeconds}`)
+      await sleep((8 + teaseSeconds + 1) * 1000) // longer than the 8 s settle + interval
+      checks.check("chat off: she never comes over on her own", states.indexOf("approach") < 0 && (c.state === "roam_idle" || c.state === "roam_walk"), `states=${states.join(">") || "-"} state=${c.state} lines=${lines.join(",") || "-"}`)
+
+      // ── 2. chat on ──
+      c.setChatEnabled(true)
+      const t0 = getTime()
+      log(`DC2 chat on, idleTeaseSeconds ${saved} -> ${teaseSeconds}; waiting with no interaction :: ${lens.summary()}`)
       const approached = await waitUntil(() => states.indexOf("approach") >= 0, 20000)
       const tApproach = getTime() - t0
       checks.check("she starts walking closer (approach)", approached, `approach after ${f1(tApproach)} s of no interaction; states=${states.join(">")}`)
@@ -73,7 +85,20 @@ export class DC2IdleTeaseScenario extends Scenario {
 
       const clip = lens.voice.clipFor(id)
       log(`DC2 info: voice clip for ${id} ${clip ? "assigned" : "NOT assigned (subtitle only)"}; isSpeaking=${lens.voice.isSpeaking}`)
+
+      // ── 4. unanswered tease -> next wait doubles ──
+      const backedOff = await waitUntil(() => c.currentTeaseBackoff === 2, 4000)
+      checks.check("unanswered tease doubles the next wait", backedOff, `backoff=x${c.currentTeaseBackoff} nextWait=${c.nextTeaseWaitSeconds} s (interval ${teaseSeconds} s)`)
+
+      // ── 3. never the same tease line twice in a row ──
+      const picks: string[] = []
+      for (let i = 0; i < 12; i++) picks.push(c.nextTeaseLineId())
+      let repeats = 0
+      for (let i = 1; i < picks.length; i++) if (picks[i] === picks[i - 1]) repeats++
+      checks.check("tease line never repeats back-to-back", c.teaseLineIds.length < 2 || repeats === 0, `${repeats} repeats in ${picks.join(",")}`)
     } finally {
+      c.setChatEnabled(false)
+      c.teaseReplyWindowSeconds = savedWindow
       c.idleTeaseSeconds = saved
       c.onStateChanged.remove(onState)
       lens.voice.onLineSpoken.remove(onLine)

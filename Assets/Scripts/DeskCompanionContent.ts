@@ -80,12 +80,19 @@ export const COMPANION_LINES: CompanionLine[] = [
   // Live translation (DeskCompanionTranslator)
   {id: "live_prompt", ja: "何でも入力してね。翻訳してあげる。", en: "Type anything you want, and I'll translate it for you."},
   {id: "live_result", ja: "こういう意味だよ。", en: "Here's what that means."},
-  {id: "live_offline", ja: "ごめんね、翻訳サービスにつながらなかった。", en: "Sorry, I couldn't reach the translator."},
+  {id: "live_offline", ja: "うーん、今は翻訳サービスにつながらないみたい。でも、知ってることを教えるね。", en: "Hmm, I can't reach the translator right now. But here's what I know."},
 
   // Poked / pinched (same in every mode; no body-part zones on purpose)
   {id: "poke_tickle", ja: "くすぐったいよ！", en: "Hey, that tickles!"},
   {id: "poke_annoyed", ja: "もう、やめて！", en: "Okay, that's enough. Hands off!"},
-  {id: "poke_forgive", ja: "もう…許してあげる。", en: "Hmph... fine. I forgive you."}
+  {id: "poke_forgive", ja: "もう…許してあげる。", en: "Hmph... fine. I forgive you."},
+  // Stretch break (subtitles; check against the recorded stretch_*.mp3)
+  {id: "stretch_intro", ja: "ちょっとストレッチしよう。まねしてね！", en: "Let's take a quick stretch break. Follow me!"},
+  {id: "stretch_arms_up", ja: "腕を上に、ぐーっと伸ばして。", en: "Arms up. Reach for the sky."},
+  {id: "stretch_side", ja: "ゆっくり横に倒して。", en: "Now lean to the side, slowly."},
+  {id: "stretch_shoulders", ja: "肩をゆっくり回して。", en: "Roll your shoulders back."},
+  {id: "stretch_neck", ja: "首をやさしく傾けて。", en: "Gently tilt your head."},
+  {id: "stretch_done", ja: "おつかれさま！すっきりした？", en: "Great job! Feel better?"}
 ]
 
 /** Separator between mode id and line key in per-mode line ids ("sweetheart__tease_1"). */

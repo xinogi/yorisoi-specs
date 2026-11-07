@@ -1,6 +1,6 @@
 /**
  * LeafIndex — registers the Desk Companion LEAF scenarios (one per done criterion in
- * devpost/design-brief.md). Attached to the root SceneObject "LeafIndex" so the module loads.
+ * devpost/design-brief.md, plus DC6 modes + talk list, DC7 pokes, DC8 Ask + translation). Attached to the root SceneObject "LeafIndex" so the module loads.
  */
 import {scenariosIndex} from "Leaf.lspkg/Scenarios/decorator/ScenarioIndexDecorator"
 import {ScenarioMetadata} from "Leaf.lspkg/Scenarios/scenario/ScenarioMetadata"
@@ -9,6 +9,11 @@ import {DC2IdleTeaseScenario} from "./DC2IdleTeaseScenario"
 import {DC3CallButtonScenario} from "./DC3CallButtonScenario"
 import {DC4WordTranslationScenario} from "./DC4WordTranslationScenario"
 import {DC5BookHandoffScenario} from "./DC5BookHandoffScenario"
+import {DC6ModesAndCueListScenario} from "./DC6ModesAndCueListScenario"
+import {DC7PokeMoodScenario} from "./DC7PokeMoodScenario"
+import {DC8AskAndTranslateScenario} from "./DC8AskAndTranslateScenario"
+import {ViewDeskScenario} from "./ViewDeskScenario"
+import {DC9StretchScenario} from "./DC9StretchScenario"
 
 @component
 export class LeafIndex extends BaseScriptComponent {
@@ -38,6 +43,31 @@ export class LeafIndex extends BaseScriptComponent {
       id: "dc5-book-handoff",
       typename: DC5BookHandoffScenario.getTypeName(),
       parameters: {handoffMode: "holdOut"}
+    },
+    {
+      id: "dc6-modes-and-cue-list",
+      typename: DC6ModesAndCueListScenario.getTypeName(),
+      parameters: {timeScale: "20"}
+    },
+    {
+      id: "dc7-poke-mood",
+      typename: DC7PokeMoodScenario.getTypeName(),
+      parameters: {}
+    },
+    {
+      id: "dc8-ask-and-translate",
+      typename: DC8AskAndTranslateScenario.getTypeName(),
+      parameters: {word: "bara"}
+    },
+    {
+      id: "dc9-stretch",
+      typename: DC9StretchScenario.getTypeName(),
+      parameters: {timeScale: "3"}
+    },
+    {
+      id: "view-desk",
+      typename: ViewDeskScenario.getTypeName(),
+      parameters: {pitchDeg: "-50", holdSeconds: "10"}
     }
   ]
 }

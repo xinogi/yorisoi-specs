@@ -6,8 +6,9 @@
     - !<own> f5d74682-203a-4970-81ea-9fa7b88c96bb
     - !<own> 4597ae56-140f-4d39-8b63-7fe60b3918fa
     - !<own> 766745ea-319a-40bb-a39b-e94806f86186
-    - !<own> 29639c8e-8956-487e-9cba-2bc3c1bfe807
     - !<own> 4d75d98c-f44f-45f0-8dbf-e4964815ba50
+    - !<own> 2afa8146-65fd-4b1e-a7e3-b6c48550c76e
+    - !<own> 2a3537bf-dc3a-411f-bf58-c06fc528a710
   layers: !<Layers/267ee9a7-aff2-4f9d-9a49-f71214747d03>
     userLayers:
       - id: 1
@@ -472,6 +473,31 @@
     - !<own> bbcddeb1-2c47-482e-861a-4f2d74fda27a
   Components:
     []
+- !<ScriptComponent/0e8334b6-a2f0-475e-9dd9-3c3a4662dd00>
+  PrefabRemaps:
+    []
+  Name: DeskCompanionTouch
+  Enabled: true
+  ScriptAsset: !<reference> 6f387e05-025c-4d4a-bb57-2cc6407eeebd
+  ScriptInputsDefault:
+    pokeWindowSeconds: true
+    annoyedAfterPokes: true
+    ignoreSeconds: true
+    touchSizeCm: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      controller: !<MappingBased.AssignableType_1> 5d1b12de-cb67-496f-967d-a4ef75782f3c
+      voice: !<MappingBased.AssignableType_2> 7e2f9600-795b-4112-a1d2-022ccebd9d2f
+      animator: !<MappingBased.AssignableType_3> 6bdcdc7c-89e2-45ec-b65b-83796c0cdc6f
+      pokeWindowSeconds: !<float> 6.000000
+      annoyedAfterPokes: !<float> 4.000000
+      ignoreSeconds: !<float> 4.000000
+      touchSizeCm: !<Vec3> {x: 50.000000, y: 165.000000, z: 24.000000}
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/0e9b1690-3fd4-4213-ab8e-202043835999>
   PrefabRemaps:
     []
@@ -479,9 +505,9 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 84.500000, z: 10.000000}
+    Position: {x: 0.000000, y: 87.050003, z: 5.580000}
     Rotation: {x: -60.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    Scale: {x: 1.350000, y: 1.350000, z: 1.350000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -544,8 +570,6 @@
     translationHoldSeconds: true
     textColor: true
     highlightTextColor: true
-    headerText: true
-    footerText: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -555,8 +579,8 @@
       translationHoldSeconds: !<float> 8.000000
       textColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
       highlightTextColor: !<Vec4> {x: 0.150000, y: 0.120000, z: 0.020000, w: 1.000000}
-      headerText: 外国語の本（代役） · Foreign book — stand-in
-      footerText: 光っている単語をつまむと教えてくれます · Pinch a highlighted word
+      headerText: Foreign book (stand-in) · 外国語の本
+      footerText: Pinch a highlighted word · 光っている単語をつまんでね
   ScriptTypes:
     "":
       {}
@@ -682,14 +706,34 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 82.500000, z: 0.000000}
+    Position: {x: 0.000000, y: 87.699997, z: 0.000000}
     Rotation: {x: 90.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 132.000000, y: 1.000000, z: 165.000000}
+    Scale: {x: 128.000000, y: 1.000000, z: 227.000000}
     HasSegmentScaleCompensation: false
   Children:
     []
   Components:
     - !<own> 4d1cc0a9-aaa3-49a3-a773-153850357c3b
+- !<ScriptComponent/1d0775f4-0d43-4829-a0f6-b07d2797a4fe>
+  PrefabRemaps:
+    []
+  Name: DeskCompanionTranslateCardUI
+  Enabled: true
+  ScriptAsset: !<reference> 638cbe0e-6f31-433a-8d21-a09bc107e5c7
+  ScriptInputsDefault:
+    cardWidthCm: true
+    cardHeightCm: true
+    englishColor: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      cardWidthCm: !<float> 22.000000
+      cardHeightCm: !<float> 13.000000
+      englishColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ScriptTypes:
+    "":
+      {}
 - !<RenderMeshVisual/1f969daa-5809-4500-b314-98d91ccba131>
   PrefabRemaps:
     []
@@ -734,16 +778,19 @@
   ScriptInputsDefault:
     buttonDiameterCm: true
     iconSizeCm: true
-    labelText: true
     labelColor: true
+    chatOffLabel: true
+    chatOnLabel: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       buttonDiameterCm: !<float> 8.000000
       iconSizeCm: 3.600000
-      labelText: 呼ぶ · Call
+      labelText: Call
       labelColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      chatOffLabel: "Chat: Off"
+      chatOnLabel: "Chat: On"
   ScriptTypes:
     "":
       {}
@@ -806,7 +853,7 @@
   ScriptInputs:
     "":
       followTarget: !<reference.SceneObject> 2d50465f-d6f4-406f-b458-db1660f1c5c3
-      offsetCm: !<Vec3> {x: -18.000000, y: 125.000000, z: 22.000000}
+      offsetCm: !<Vec3> {x: -8.000000, y: 125.000000, z: 25.000000}
       scaleWithDistance: false
       referenceDistanceCm: !<float> 120.000000
       maxScale: 2.400000
@@ -828,6 +875,22 @@
     - !<own> d9071294-12e8-425f-98f1-bf308a02639e
   Components:
     []
+- !<SceneObject/26ede9b6-18d2-4b91-92d1-6c2d8345a465>
+  PrefabRemaps:
+    []
+  Name: AskCard
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: -16.000000, y: 178.000000, z: 10.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> b9e7e3f8-8cdc-4a15-b0e1-e97a593e3fc4
+    - !<own> e0ac6fba-4013-46f5-9a23-4e5e892c6a15
 - !<ScriptComponent/275aeb4d-77ac-4b1b-811e-907652542110>
   PrefabRemaps:
     []
@@ -931,7 +994,22 @@
     - !<own> 0ef58f0c-5672-4206-9926-1c6e342c4c25
   Components:
     []
-- !<SceneObject/29639c8e-8956-487e-9cba-2bc3c1bfe807>
+- !<SceneObject/2a3537bf-dc3a-411f-bf58-c06fc528a710>
+  PrefabRemaps:
+    []
+  Name: LeafAutoRun
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> b50a8719-4933-4cbc-a532-cff096bffa0b
+- !<SceneObject/2afa8146-65fd-4b1e-a7e3-b6c48550c76e>
   PrefabRemaps:
     []
   Name: LEAF Plugin Bridge
@@ -945,7 +1023,7 @@
   Children:
     []
   Components:
-    - !<own> 50f2748f-3ec6-4b61-9984-f67a97df72dc
+    - !<own> 3a3441bc-f460-407b-856b-54277216d30b
 - !<SceneObject/2c20a34c-ef41-4af3-9034-c5d3430e4099>
   PrefabRemaps:
     []
@@ -960,6 +1038,7 @@
   Children:
     - !<own> 19b94f62-c7bb-4ab3-8aed-4f66a2e395ad
     - !<own> 2c4dbcae-771d-45ce-8c03-f69a3240af47
+    - !<own> e13e8b84-5a10-4e75-beec-71eb918d31d1
   Components:
     - !<own> afd9d427-b478-4b87-925a-236147996be8
 - !<SceneObject/2c4dbcae-771d-45ce-8c03-f69a3240af47>
@@ -994,6 +1073,8 @@
       page: !<MappingBased.AssignableType_3> 111a173c-172f-467d-8459-66a8e128bf63
       actions: !<MappingBased.AssignableType_4> ebe8b020-c7f5-4ddf-ba37-43918adb65cb
       book: !<MappingBased.AssignableType_5> 0a48e56c-cf19-4fa4-9c8d-f0ccdd626027
+      modes: !<MappingBased.AssignableType_6> a3957c59-b9d0-4d54-b640-69fc1c18f792
+      translator: !<MappingBased.AssignableType_7> c4800158-55dd-4b03-ab41-1063ec1db4cf
       uiClickAudio: !<reference.AudioComponent> 4b6c3740-613f-4acc-b0f4-4ef2c8979dec
       uiClickSound: !<reference.AudioTrackAsset> 06a345eb-b3de-4c98-b1dd-51f0cf2e0972
       debugColliders: false
@@ -1018,6 +1099,10 @@
     - !<own> b0a235f0-33ca-416c-a39d-19d1753babba
     - !<own> 53024aa2-7fc0-41cc-9262-11c6961c5451
     - !<own> 82ce77ec-fbca-49ff-863f-469b62ad3753
+    - !<own> e259082e-72ce-40ba-a0fb-b94eb5c47514
+    - !<own> 7342f560-02ea-430e-ac8f-2887ba116fc1
+    - !<own> 26ede9b6-18d2-4b91-92d1-6c2d8345a465
+    - !<own> a76fd47d-e252-427e-ad5c-26a258805210
   Components:
     - !<own> 5d1b12de-cb67-496f-967d-a4ef75782f3c
     - !<own> 6bdcdc7c-89e2-45ec-b65b-83796c0cdc6f
@@ -1154,6 +1239,46 @@
     - !<own> 4051028a-c608-4a97-b3d5-1a3912a7c007
   Components:
     []
+- !<ScriptComponent/3a2b7100-fa16-4fad-9821-e61a89ae0298>
+  PrefabRemaps:
+    []
+  Name: DeskCompanionCueCardsUI
+  Enabled: true
+  ScriptAsset: !<reference> af732550-c191-4819-8852-34684b8e8b57
+  ScriptInputsDefault:
+    cardWidthCm: true
+    maxVisibleItems: true
+    textColor: true
+    noteColor: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      cardWidthCm: !<float> 60.000000
+      maxVisibleItems: !<float> 7.000000
+      textColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      noteColor: !<Vec4> {x: 0.450000, y: 0.850000, z: 1.000000, w: 1.000000}
+      backLabel: ◀ Back
+      nextLabel: Next ▶
+  ScriptTypes:
+    "":
+      {}
+- !<ScriptComponent/3a3441bc-f460-407b-856b-54277216d30b>
+  PrefabRemaps:
+    []
+  Name: MessagingBridge
+  Enabled: true
+  ScriptAsset: !<reference> 9aa407db-2872-4afc-a162-cf7faf2a0f29
+  ScriptInputsDefault:
+    {}
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      {}
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/3a794764-c758-4d72-9d89-bf3ed978113f>
   PrefabRemaps:
     []
@@ -1184,6 +1309,21 @@
     - !<own> 54130007-65c1-48d3-b9df-0866d8112e01
   Components:
     []
+- !<SceneObject/3dd008bd-5867-40c1-9575-9a189d597b94>
+  PrefabRemaps:
+    []
+  Name: Translator
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> c4800158-55dd-4b03-ab41-1063ec1db4cf
 - !<SceneObject/3de2c7ea-1525-465a-9056-68565a4014a7>
   PrefabRemaps:
     []
@@ -1257,6 +1397,7 @@
     HasSegmentScaleCompensation: false
   Children:
     - !<own> ebce6be5-9270-483d-a1b9-2baaae13ee7c
+    - !<own> 3dd008bd-5867-40c1-9575-9a189d597b94
   Components:
     - !<own> 2cab3195-38dc-4a4a-a76d-7694e3ac9ee1
 - !<RenderMeshVisual/45f790f0-aa48-411b-bb5f-134aa57166bd>
@@ -1465,7 +1606,7 @@
     []
   Name: Render Mesh Visual
   Enabled: true
-  RenderOrder: 0
+  RenderOrder: 10
   StretchMode: Stretch
   VerticalAlignment: Center
   HorizontalAlignment: Center
@@ -1495,22 +1636,6 @@
     []
   Components:
     - !<own> 4a1bf18b-35d3-4e8c-92a8-baf1f5aeb00d
-- !<ScriptComponent/50f2748f-3ec6-4b61-9984-f67a97df72dc>
-  PrefabRemaps:
-    []
-  Name: MessagingBridge
-  Enabled: true
-  ScriptAsset: !<reference> 9aa407db-2872-4afc-a162-cf7faf2a0f29
-  ScriptInputsDefault:
-    {}
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      {}
-  ScriptTypes:
-    "":
-      {}
 - !<RenderMeshVisual/510901bc-49fb-4ad7-bb8b-d25821fca27c>
   PrefabRemaps:
     []
@@ -1627,7 +1752,6 @@
     recenterThresholdDeg: true
     wanderDeg: true
     wanderCm: true
-    idleTeaseSeconds: true
     walkSpeedCmPerSec: true
     approachDistanceCm: true
     teaseDistanceCm: true
@@ -1649,7 +1773,6 @@
       recenterSeconds: 1.400000
       wanderDeg: !<float> 3.000000
       wanderCm: !<float> 30.000000
-      idleTeaseSeconds: !<float> 20.000000
       walkSpeedCmPerSec: !<float> 75.000000
       approachDistanceCm: !<float> 120.000000
       teaseDistanceCm: !<float> 150.000000
@@ -1724,9 +1847,9 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 83.599998, z: 9.500000}
+    Position: {x: 0.000000, y: 86.150002, z: 5.080000}
     Rotation: {x: -60.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 36.000000, y: 29.000000, z: 0.800000}
+    Scale: {x: 48.599998, y: 39.200001, z: 0.800000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -1919,6 +2042,12 @@
     readClip: true
     danceClip: true
     poseClip: true
+    happyLaughClip: true
+    surprisedClip: true
+    thoughtfulClip: true
+    poutClip: true
+    scoldClip: true
+    forgiveClip: true
     stepsPerSecond: true
     fallbackOnceSeconds: true
   ScriptTypesDefault:
@@ -1935,6 +2064,12 @@
       readVideo: !<reference.Texture> b4666009-1123-4237-aea0-9aa5faf60d87
       danceVideo: !<reference.Texture> c1e45236-6990-4f2c-bdc4-96faa1340197
       poseVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      happyLaughVideo: !<reference.Texture> 1f0a953d-daf3-415e-bc1c-27b619bfcf48
+      surprisedVideo: !<reference.Texture> db2de848-4de9-4170-a0aa-930661bc7531
+      thoughtfulVideo: !<reference.Texture> 75bee2e8-1e9a-4e9c-894f-9587e2e04502
+      poutVideo: !<reference.Texture> 02b1ff0d-a74f-420a-8d8c-a85fa38d7237
+      scoldVideo: !<reference.Texture> 2fbd5be2-7336-4057-a51a-f983f55388cc
+      forgiveVideo: !<reference.Texture> 6542bccc-b77c-4951-8016-6c1754629670
       idleClip: idle
       walkClip: walk
       talkClip: talk
@@ -1943,6 +2078,12 @@
       readClip: read
       danceClip: dance
       poseClip: pose
+      happyLaughClip: laugh
+      surprisedClip: surpris
+      thoughtfulClip: thought
+      poutClip: pout
+      scoldClip: scold
+      forgiveClip: forgive
       stepsPerSecond: 1.800000
       fallbackOnceSeconds: 2.500000
   ScriptTypes:
@@ -2057,6 +2198,22 @@
   MaxDistance: 900.000000
   EnableDirectivityEffect: false
   EnablePositionEffect: true
+- !<SceneObject/7342f560-02ea-430e-ac8f-2887ba116fc1>
+  PrefabRemaps:
+    []
+  Name: CueCards
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: -62.000000, y: 135.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 3a2b7100-fa16-4fad-9821-e61a89ae0298
+    - !<own> d9ec28a7-40b3-44a2-a6e3-45779ca02edc
 - !<SceneObject/74d13517-1dbf-42e6-b536-27afc4909c65>
   PrefabRemaps:
     []
@@ -2189,54 +2346,76 @@
   Enabled: true
   ScriptAsset: !<reference> 92990cba-554f-4c34-9cda-32292669ef32
   ScriptInputsDefault:
-    voiceVolume: true
     subtitleHoldSeconds: true
     secondsPerChar: true
-    vo_call_whats_up: true
-    vo_tease_1: true
-    vo_tease_2: true
-    vo_tease_3: true
-    vo_leave: true
-    vo_word_serendipity: true
-    vo_word_ephemeral: true
-    vo_word_nalssi: true
-    vo_word_gamsahamnida: true
-    vo_word_bara: true
-    vo_word_yuuutsu: true
-    vo_word_remon: true
-    vo_word_kajiru: true
-    vo_book_received: true
-    vo_book_summary: true
-    vo_book_return: true
-    vo_dance: true
-    vo_pose: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       voiceAudio: !<reference.AudioComponent> 6f84e21f-1d4b-4ffa-938e-efd23355a911
       speechBubble: !<MappingBased.AssignableType_1> 7f9bd4ec-81a1-4579-a1fa-77a9556d0832
-      voiceVolume: !<float> 1.000000
+      voiceVolume: 0.700000
       subtitleHoldSeconds: !<float> 3.000000
       secondsPerChar: 0.130000
-      vo_call_whats_up: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_tease_1: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_tease_2: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_tease_3: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_leave: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_serendipity: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_ephemeral: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_nalssi: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_gamsahamnida: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_bara: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_yuuutsu: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_remon: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_kajiru: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_book_received: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_book_summary: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_book_return: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_dance: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_pose: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
+      voiceClips: !<reference.AudioTrackAsset[]>
+        - !<reference> cf09c4b9-8a6e-444a-bf21-e06dd644feeb
+        - !<reference> 3548d8a4-1730-49b8-93e3-c14bb05c2b61
+        - !<reference> 553270a7-dd1c-49b6-bdb2-7e11195f7bd8
+        - !<reference> 91f6977b-88f0-4b55-854b-3f919d285a11
+        - !<reference> 4c3c6012-2faf-4158-a251-e9ae74adf301
+        - !<reference> 04b9563f-a2ea-42a4-97c2-6b5382dc93da
+        - !<reference> ead3e932-e1fb-44fc-88e6-33fced6050cc
+        - !<reference> b2637063-5b95-460e-b1d8-7b13db9e1163
+        - !<reference> b4d88394-5fdd-4043-ac20-899fa20eeb96
+        - !<reference> a71a8de9-dd9f-4337-af08-fb12a523e04c
+        - !<reference> 53527bdc-3ef1-4f61-a825-ee8efed839cc
+        - !<reference> ee83e5b8-aeef-435b-be1d-19151a4f0062
+        - !<reference> 093b3160-9fa0-470a-a343-0ea4b1b8b614
+        - !<reference> 8058bb33-e07f-4361-a8a2-55c34ac8a76d
+        - !<reference> 1c3fbb12-361b-40f7-83cd-1151c1c647d1
+        - !<reference> 073f11ff-8bf1-4546-9f9c-4492a500bc01
+        - !<reference> d0ec63d2-e9da-4aec-9cfd-975abe0e4442
+        - !<reference> 54fdcf3b-603c-4db1-a10d-f9490a815d15
+        - !<reference> c689f3ff-4794-4bf9-b7c4-f6ed351e215f
+        - !<reference> 153d51a0-2e66-4361-8ddd-b8673706903d
+        - !<reference> 1682b6c9-155a-4b68-bc29-e1bb491cd61f
+        - !<reference> 220805e9-bf13-4f33-a2e3-84c4f3fbc48d
+        - !<reference> 228b3260-c23f-441d-b563-226567735494
+        - !<reference> 046597ad-0c3b-42de-b025-d884dd3b941a
+        - !<reference> ffab7eb3-3c58-45af-99d1-f70df1d8d286
+        - !<reference> 79a35c5f-de1c-49bf-9ac6-4bbfbb4735e2
+        - !<reference> 34404bed-ba84-47f2-904c-479549ebdeb8
+        - !<reference> 7564988a-e105-41d2-bcce-a801fa0db5a2
+        - !<reference> 702983a6-ef9e-4102-ad52-44361d40f2e1
+        - !<reference> fa0a036a-1f5b-45e6-860c-8c812c141fec
+        - !<reference> 6a3d4a66-893f-4761-8f02-e2a7da7c1f03
+        - !<reference> aa5fc00b-64fa-443d-82d3-d2029b82d047
+        - !<reference> 038fa9fd-b9b3-4b24-8a2f-d057b47398f0
+        - !<reference> 9f00780f-b675-46e9-a5c6-93d969f56af1
+        - !<reference> e4b450ca-6659-4e08-9968-74b8d4f8a0d3
+        - !<reference> 6ca66050-66f3-430c-91b2-baab85227276
+        - !<reference> 52867145-3c7a-43be-9e13-79ff7e578d2c
+        - !<reference> 521e2634-4d1d-48e1-821b-0f403271a21f
+        - !<reference> ecc7aa1e-0dbb-47de-af83-805d2a7f1f35
+        - !<reference> dd1a563b-a622-487e-8d13-06054243ca2b
+        - !<reference> 9a0caafa-e4da-4c33-bfad-6b8fa68a6224
+        - !<reference> 344060f1-89d6-48ec-a6f8-21e64c4edafd
+        - !<reference> e1b0e24e-02fd-42da-86ff-f2cead82c07d
+        - !<reference> 819a6491-f7ec-4852-9c3f-93f9f4760611
+        - !<reference> 5fa3c8f3-d338-463e-9ea4-92131f731d65
+        - !<reference> e6d8bc25-d0d9-4d4a-926e-208453757748
+        - !<reference> 69f023f0-2ef6-4b2c-a35f-15a11bdfac98
+        - !<reference> 6addb233-3eb6-4eda-934e-c4da692b21b4
+        - !<reference> e96cbcc5-1ea6-492c-a7f9-7a7d113f4a86
+        - !<reference> 86536798-0653-4dcd-8203-309719d81f4e
+        - !<reference> b6475acd-8b89-4325-a1aa-526a47fb2e9e
+        - !<reference> 2a6de82e-0ffb-4e9b-8a52-67308dd9cf84
+        - !<reference> c8ec1451-6184-4933-8713-d683d75cd2ac
+        - !<reference> 3ef9ec80-33b1-41c4-8b92-71e5149eb784
+        - !<reference> 9544fc9b-bfce-47e5-a379-d0b2dbdc6ec5
+        - !<reference> a008e906-f91e-424f-8d32-84e25461e511
+        - !<reference> 68ee30f6-a807-49d6-9da6-98925e1a475b
+        - !<reference> 4a91e50e-281a-492f-af48-79f52bc020ce
   ScriptTypes:
     "":
       {}
@@ -2274,16 +2453,18 @@
   ScriptInputsDefault:
     widthCm: true
     heightCm: true
-    jaColor: true
     enColor: true
+    jaColor: true
+    badgeColor: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       widthCm: !<float> 24.000000
       heightCm: 12.500000
-      jaColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
       enColor: !<Vec4> {x: 0.780000, y: 0.880000, z: 1.000000, w: 0.950000}
+      jaColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      badgeColor: !<Vec4> {x: 1.000000, y: 0.900000, z: 0.500000, w: 1.000000}
   ScriptTypes:
     "":
       {}
@@ -2378,6 +2559,28 @@
   Components:
     - !<own> ebe8b020-c7f5-4ddf-ba37-43918adb65cb
     - !<own> 258bb38d-3df8-4e31-8359-6fffc5fcf21b
+- !<ScriptComponent/8325d789-e67d-45b9-bc37-d3ff904228f5>
+  PrefabRemaps:
+    []
+  Name: DeskCompanionBillboard
+  Enabled: true
+  ScriptAsset: !<reference> 1c0d9221-6ccb-4ec1-8375-46b0baa0b66f
+  ScriptInputsDefault:
+    scaleWithDistance: true
+    referenceDistanceCm: true
+    maxScale: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      followTarget: !<reference.SceneObject> 2d50465f-d6f4-406f-b458-db1660f1c5c3
+      offsetCm: !<Vec3> {x: -16.000000, y: 178.000000, z: 10.000000}
+      scaleWithDistance: true
+      referenceDistanceCm: !<float> 120.000000
+      maxScale: 2.400000
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/8363e9a6-cd83-4889-abd4-6521e394f244>
   PrefabRemaps:
     []
@@ -2661,6 +2864,26 @@
     - !<own> 46ea93d6-d161-4453-9064-6ac11e1d6523
   Components:
     []
+- !<ScriptComponent/a3957c59-b9d0-4d54-b640-69fc1c18f792>
+  PrefabRemaps:
+    []
+  Name: DeskCompanionModeController
+  Enabled: true
+  ScriptAsset: !<reference> 994e0c11-8996-48fc-9715-638665683d46
+  ScriptInputsDefault:
+    askHoldSeconds: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      controller: !<MappingBased.AssignableType_1> 5d1b12de-cb67-496f-967d-a4ef75782f3c
+      voice: !<MappingBased.AssignableType_2> 7e2f9600-795b-4112-a1d2-022ccebd9d2f
+      cueCards: !<MappingBased.AssignableType_3> 3a2b7100-fa16-4fad-9821-e61a89ae0298
+      askCard: !<MappingBased.AssignableType_4> b9e7e3f8-8cdc-4a15-b0e1-e97a593e3fc4
+      askHoldSeconds: !<float> 8.000000
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/a4b1ce71-4840-4493-bc52-58f3c13933e1>
   PrefabRemaps:
     []
@@ -2740,6 +2963,22 @@
     - !<own> b22d97e6-4c06-4135-af29-d26adb2b9d86
   Components:
     []
+- !<SceneObject/a76fd47d-e252-427e-ad5c-26a258805210>
+  PrefabRemaps:
+    []
+  Name: TranslateCard
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: -16.000000, y: 178.000000, z: 10.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 1d0775f4-0d43-4829-a0f6-b07d2797a4fe
+    - !<own> 8325d789-e67d-45b9-bc37-d3ff904228f5
 - !<SceneObject/a7da4af4-3d84-4acd-a31e-920a56b4c5c8>
   PrefabRemaps:
     []
@@ -2898,6 +3137,24 @@
     - !<own> 23018601-1041-4785-a20e-9ad5ab722f95
   Components:
     []
+- !<ScriptComponent/b50a8719-4933-4cbc-a532-cff096bffa0b>
+  PrefabRemaps:
+    []
+  Name: DeskCompanionLeafAutoRun
+  Enabled: true
+  ScriptAsset: !<reference> 0447385d-78ab-4678-902e-f7e2e7d01e8a
+  ScriptInputsDefault:
+    scenarioIds: true
+    startDelaySeconds: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      scenarioIds: ""
+      startDelaySeconds: !<float> 2.000000
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/b54dc8b5-dbcf-4fcc-a310-fb436127cc60>
   PrefabRemaps:
     []
@@ -2958,6 +3215,28 @@
     - !<own> 11ac73c9-b802-4eb6-abf5-f73054ca7e20
   Components:
     []
+- !<ScriptComponent/b9e7e3f8-8cdc-4a15-b0e1-e97a593e3fc4>
+  PrefabRemaps:
+    []
+  Name: DeskCompanionAskCardUI
+  Enabled: true
+  ScriptAsset: !<reference> 63c099d3-f70a-4f90-a53d-a9e5fb36759c
+  ScriptInputsDefault:
+    cardWidthCm: true
+    cardHeightCm: true
+    textColor: true
+    sampleLabel: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      cardWidthCm: !<float> 20.000000
+      cardHeightCm: !<float> 10.000000
+      textColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      sampleLabel: sample data · サンプル
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/bb75b5ea-8baf-4d8d-bcf8-49bd79873881>
   PrefabRemaps:
     []
@@ -3050,6 +3329,29 @@
     []
   Components:
     []
+- !<ScriptComponent/c4800158-55dd-4b03-ab41-1063ec1db4cf>
+  PrefabRemaps:
+    []
+  Name: DeskCompanionTranslator
+  Enabled: true
+  ScriptAsset: !<reference> 603115df-b5ae-4dc9-9f92-cf46fa076a4d
+  ScriptInputsDefault:
+    timeoutSeconds: true
+    cardHoldSeconds: true
+    keyboardFallbackSeconds: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      voice: !<MappingBased.AssignableType_1> 7e2f9600-795b-4112-a1d2-022ccebd9d2f
+      controller: !<MappingBased.AssignableType_2> 5d1b12de-cb67-496f-967d-a4ef75782f3c
+      card: !<MappingBased.AssignableType_3> 1d0775f4-0d43-4829-a0f6-b07d2797a4fe
+      timeoutSeconds: !<float> 3.000000
+      cardHoldSeconds: !<float> 10.000000
+      keyboardFallbackSeconds: !<float> 2.000000
+  ScriptTypes:
+    "":
+      {}
 - !<ScriptComponent/c8e031d3-a8a1-468a-a419-427f8556de4c>
   PrefabRemaps:
     []
@@ -3333,6 +3635,27 @@
     - !<own> 74d13517-1dbf-42e6-b536-27afc4909c65
   Components:
     []
+- !<ScriptComponent/d9ec28a7-40b3-44a2-a6e3-45779ca02edc>
+  PrefabRemaps:
+    []
+  Name: DeskCompanionBillboard
+  Enabled: true
+  ScriptAsset: !<reference> 1c0d9221-6ccb-4ec1-8375-46b0baa0b66f
+  ScriptInputsDefault:
+    referenceDistanceCm: true
+    maxScale: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      followTarget: !<reference.SceneObject> 2d50465f-d6f4-406f-b458-db1660f1c5c3
+      offsetCm: !<Vec3> {x: -68.000000, y: 135.000000, z: 0.000000}
+      scaleWithDistance: false
+      referenceDistanceCm: !<float> 120.000000
+      maxScale: 2.400000
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/da214b27-43a7-4db4-90fd-993798e859d9>
   PrefabRemaps:
     []
@@ -3413,6 +3736,28 @@
     - !<own> d4a9c5e3-fe96-4824-9b20-59f5ad39eabd
   Components:
     []
+- !<ScriptComponent/e0ac6fba-4013-46f5-9a23-4e5e892c6a15>
+  PrefabRemaps:
+    []
+  Name: DeskCompanionBillboard
+  Enabled: true
+  ScriptAsset: !<reference> 1c0d9221-6ccb-4ec1-8375-46b0baa0b66f
+  ScriptInputsDefault:
+    scaleWithDistance: true
+    referenceDistanceCm: true
+    maxScale: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      followTarget: !<reference.SceneObject> 2d50465f-d6f4-406f-b458-db1660f1c5c3
+      offsetCm: !<Vec3> {x: -16.000000, y: 178.000000, z: 10.000000}
+      scaleWithDistance: true
+      referenceDistanceCm: !<float> 120.000000
+      maxScale: 2.400000
+  ScriptTypes:
+    "":
+      {}
 - !<RenderMeshVisual/e1031f7e-3474-489f-a529-282f7192f812>
   PrefabRemaps:
     []
@@ -3433,6 +3778,36 @@
   BlendNormals: false
   BlendShapes:
     {}
+- !<SceneObject/e13e8b84-5a10-4e75-beec-71eb918d31d1>
+  PrefabRemaps:
+    []
+  Name: CompanionTouch
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 82.500000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 0e8334b6-a2f0-475e-9dd9-3c3a4662dd00
+- !<SceneObject/e259082e-72ce-40ba-a0fb-b94eb5c47514>
+  PrefabRemaps:
+    []
+  Name: CompanionModes
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> a3957c59-b9d0-4d54-b640-69fc1c18f792
 - !<SceneObject/e2ba526d-75d1-466b-86a5-9cd7c42dca84>
   PrefabRemaps:
     []
@@ -3470,9 +3845,9 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 38.000000, y: 78.400002, z: 22.000000}
+    Position: {x: 44.000000, y: 82.500000, z: 11.500000}
     Rotation: {x: -60.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    Scale: {x: 1.500000, y: 1.500000, z: 1.500000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -3563,18 +3938,25 @@
   Enabled: true
   ScriptAsset: !<reference> a0105753-1bbb-4573-82a5-b135795dfc5c
   ScriptInputsDefault:
-    buttonWidthCm: true
     buttonHeightCm: true
-    danceLabel: true
-    poseLabel: true
+    modeGlyph: true
+    askGlyph: true
+    translateLabel: true
+    translateGlyph: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
-      buttonWidthCm: 7.500000
+      buttonWidthCm: 5.800000
       buttonHeightCm: 4.500000
-      danceLabel: ダンス Dance
-      poseLabel: ポーズ Pose
+      danceLabel: Dance
+      poseLabel: Pose
+      modeLabel: Mode
+      modeGlyph: ⇄
+      askLabel: Ask
+      askGlyph: "?"
+      translateLabel: Translate…
+      translateGlyph: 文
   ScriptTypes:
     "":
       {}

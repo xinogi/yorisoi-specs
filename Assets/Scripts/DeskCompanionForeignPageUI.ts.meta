@@ -64,6 +64,6 @@
     - '// @input float translationHoldSeconds = 8 {"hint":"Seconds the translation card stays before fading", "widget":"slider", "min":2, "max":20, "step":0.5}'
     - '// @input vec4 textColor = "{1, 1, 1, 1}" {"hint":"Printed text color (keep light: the display is additive)", "widget":"color"}'
     - '// @input vec4 highlightTextColor = "{1, 0.95, 0.62, 1}" {"hint":"Text color on the highlighted (yellow) words — light, like a highlighter on the additive display", "widget":"color"}'
-    - '// @input string headerText = "外国語の本（代役） · Foreign book — stand-in" {"hint":"Small caption at the top of the page so the stand-in is obvious"}'
-    - '// @input string footerText = "光っている単語をつまむと教えてくれます · Pinch a highlighted word" {"hint":"Hint at the bottom of the page"}'
+    - '// @input string headerText = "Foreign book (stand-in) · 外国語の本" {"hint":"Small caption at the top of the page so the stand-in is obvious"}'
+    - '// @input string footerText = "Pinch a highlighted word · 光っている単語をつまんでね" {"hint":"Hint at the bottom of the page"}'
     - '// @ui {"widget":"group_end"}'

@@ -164,10 +164,25 @@ export class DeskCompanionTranslator extends BaseScriptComponent {
     } catch (e) {
       print("DeskCompanionTranslator: keyboard unavailable: " + e)
     }
-    // Lens Studio Preview with SPECS 27 has no AR keyboard: fall back to a demo phrase
+    // Lens Studio Preview has no usable AR keyboard (it may still report "open"): in the editor,
+    // fall back to a demo phrase when nothing was typed; on the glasses, wait for the user's typing
+    let inEditor = false
+    try {
+      inEditor = global.deviceInfoSystem.isEditor()
+    } catch (e) {
+      inEditor = false
+    }
     const ev = this.createEvent("DelayedCallbackEvent")
     ev.bind(() => {
-      if (this.keyboardOpened || this.typed.length > 0) return
+      if (this.typed.length > 0) return
+      if (this.keyboardOpened && !inEditor) return
+      if (this.keyboardOpened) {
+        try {
+          global.textInputSystem.dismissKeyboard()
+        } catch (e) {
+          // nothing to dismiss
+        }
+      }
       const phrase = DEMO_PHRASES[this.demoIndex % DEMO_PHRASES.length]
       this.demoIndex++
       print("DeskCompanionTranslator: no AR keyboard (preview) — using demo text: " + phrase)

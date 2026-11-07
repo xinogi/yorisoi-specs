@@ -24,16 +24,19 @@ import {clamp, degToRad, lerp} from "./DeskCompanionMath"
 export type CompanionAnim =
   | "idle" | "walk" | "talk" | "read" | "dance" | "pose" | "wave" | "lean_in"
   | "happy_laugh" | "surprised" | "thoughtful" | "pout" | "scold" | "forgive"
+  | "stretch_arms_up" | "stretch_side" | "stretch_shoulders" | "stretch_neck"
 
 const LOOP_HOOKS: CompanionAnim[] = ["idle", "walk", "talk"]
 const ALL_HOOKS: CompanionAnim[] = [
-  "idle", "walk", "talk", "read", "dance", "pose", "wave", "lean_in", "happy_laugh", "surprised", "thoughtful", "pout", "scold", "forgive"
+  "idle", "walk", "talk", "read", "dance", "pose", "wave", "lean_in", "happy_laugh", "surprised", "thoughtful", "pout", "scold", "forgive",
+  "stretch_arms_up", "stretch_side", "stretch_shoulders", "stretch_neck"
 ]
 
 /** Longest time (s) a play-once hook stays on screen before returning to idle (clips are ~10 s). */
 const ONCE_CAP_S: Partial<Record<CompanionAnim, number>> = {
   wave: 3.5, lean_in: 4, surprised: 3, happy_laugh: 4, thoughtful: 6, dance: 6, pose: 4, read: 10, talk: 4,
-  pout: 4, scold: 4, forgive: 4
+  pout: 4, scold: 4, forgive: 4,
+  stretch_arms_up: 9, stretch_side: 9, stretch_shoulders: 9, stretch_neck: 9
 }
 
 type JointName =
@@ -84,6 +87,10 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
   @input @allowUndefined @hint("pout.mp4 (optional) — once, when poked too often (empty = scold, then surprised)") poutVideo: Texture
   @input @allowUndefined @hint("scold.mp4 (optional) — used when there is no pout clip") scoldVideo: Texture
   @input @allowUndefined @hint("forgive.mp4 (optional) — once, when she forgives you (empty = idle)") forgiveVideo: Texture
+  @input @allowUndefined @hint("stretch_arms_up.mp4 (optional; empty = dance)") stretchArmsUpVideo: Texture
+  @input @allowUndefined @hint("stretch_side.mp4 (optional; empty = dance)") stretchSideVideo: Texture
+  @input @allowUndefined @hint("stretch_shoulders.mp4 (optional; empty = idle)") stretchShouldersVideo: Texture
+  @input @allowUndefined @hint("stretch_neck.mp4 (optional; empty = idle)") stretchNeckVideo: Texture
   @ui.group_end
 
   @ui.separator
@@ -236,7 +243,8 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
       idle: this.idleClip, walk: this.walkClip, talk: this.talkClip, wave: this.waveClip,
       lean_in: this.leanInClip, read: this.readClip, dance: this.danceClip, pose: this.poseClip,
       happy_laugh: this.happyLaughClip, surprised: this.surprisedClip, thoughtful: this.thoughtfulClip,
-      pout: this.poutClip, scold: this.scoldClip, forgive: this.forgiveClip
+      pout: this.poutClip, scold: this.scoldClip, forgive: this.forgiveClip,
+      stretch_arms_up: "stretch_arms_up", stretch_side: "stretch_side", stretch_shoulders: "stretch_shoulders", stretch_neck: "stretch_neck"
     }
     for (const h of ALL_HOOKS) {
       const key = (wanted[h] || h).toLowerCase()
@@ -356,6 +364,7 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
     if (h === "happy_laugh") return "wave"
     if (h === "pout") return "scold"
     if (h === "scold") return "surprised"
+    if (h === "stretch_arms_up" || h === "stretch_side") return "dance"
     return "idle"
   }
 
@@ -364,7 +373,9 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
       idle: this.idleVideo, walk: this.walkVideo, talk: this.talkVideo, wave: this.waveVideo,
       lean_in: this.leanInVideo, read: this.readVideo, dance: this.danceVideo, pose: this.poseVideo,
       happy_laugh: this.happyLaughVideo, surprised: this.surprisedVideo, thoughtful: this.thoughtfulVideo,
-      pout: this.poutVideo, scold: this.scoldVideo, forgive: this.forgiveVideo
+      pout: this.poutVideo, scold: this.scoldVideo, forgive: this.forgiveVideo,
+      stretch_arms_up: this.stretchArmsUpVideo, stretch_side: this.stretchSideVideo,
+      stretch_shoulders: this.stretchShouldersVideo, stretch_neck: this.stretchNeckVideo
     }
     let cur: CompanionAnim = h
     for (let i = 0; i < 4; i++) {

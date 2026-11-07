@@ -24,11 +24,17 @@
   VersionPatch: 0
   VersionPrerelease: ""
   UpdateOrder: 0
-  ComponentUid: 00000000-0000-0000-0000-000000000000
+  ComponentUid: ebd205a9-073a-413f-978e-e1532fd45e49
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
-    {}
+    animator: false
+    annoyedAfterPokes: false
+    controller: false
+    ignoreSeconds: false
+    pokeWindowSeconds: false
+    touchSizeCm: false
+    voice: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -38,10 +44,30 @@
   Attachments:
     []
   DefaultScriptInputs:
-    -
-      {}
+    - controller: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      voice: !<MappingBased.AssignableType_2> 00000000-0000-0000-0000-000000000000
+      animator: !<MappingBased.AssignableType_3> 00000000-0000-0000-0000-000000000000
+      pokeWindowSeconds: !<float> 6.000000
+      annoyedAfterPokes: !<float> 4.000000
+      ignoreSeconds: !<float> 4.000000
+      touchSizeCm: !<Vec3> {x: 50.000000, y: 165.000000, z: 24.000000}
   ScriptTypes:
     -
       {}
   InputLines:
-    []
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">DeskCompanionTouch – poke her: tickled / annoyed / forgiving</span>"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">References</span>"}'
+    - '// @ui {"widget":"group_start", "label":"References"}'
+    - '// @input AssignableType_1 controller {"hint":"Companion controller (pokes count as interaction; ignored while she reads)"}'
+    - '// @input AssignableType_2 voice {"hint":"Voice + subtitles"}'
+    - '// @input AssignableType_3 animator {"hint":"Animation hooks (happy_laugh / pout / scold / forgive)"}'
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Settings</span>"}'
+    - '// @ui {"widget":"group_start", "label":"Settings"}'
+    - '// @input float pokeWindowSeconds = 6 {"hint":"Pokes are counted inside this window (s)", "widget":"slider", "min":2, "max":15, "step":0.5}'
+    - '// @input float annoyedAfterPokes = 4 {"hint":"This many pokes inside the window make her annoyed", "widget":"slider", "min":2, "max":10, "step":1}'
+    - '// @input float ignoreSeconds = 4 {"hint":"After getting annoyed she ignores pokes for this long (s), then forgives you", "widget":"slider", "min":1, "max":10, "step":0.5}'
+    - '// @input vec3 touchSizeCm = "{50, 165, 24}" {"hint":"Touch box around her whole figure (cm: width, height, depth); the box sits on her feet"}'
+    - '// @ui {"widget":"group_end"}'

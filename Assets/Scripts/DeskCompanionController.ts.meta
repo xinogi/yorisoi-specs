@@ -35,7 +35,6 @@
     debugLogs: false
     facing: false
     handAnchor: false
-    idleTeaseSeconds: false
     recenterSeconds: false
     recenterThresholdDeg: false
     restDistanceCm: false
@@ -67,7 +66,6 @@
       recenterSeconds: 1.600000
       wanderDeg: !<float> 3.000000
       wanderCm: !<float> 30.000000
-      idleTeaseSeconds: !<float> 20.000000
       walkSpeedCmPerSec: !<float> 75.000000
       approachDistanceCm: !<float> 120.000000
       teaseDistanceCm: !<float> 150.000000
@@ -101,8 +99,7 @@
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Behavior</span>"}'
     - '// @ui {"widget":"group_start", "label":"Behavior"}'
-    - '// @input float idleTeaseSeconds = 20 {"hint":"Seconds with no interaction before she comes over to tease you", "widget":"slider", "min":5, "max":120, "step":1}'
-    - '// @input float walkSpeedCmPerSec = 75 {"hint":"Walking speed (cm/s) when she comes over or wanders", "widget":"slider", "min":30, "max":160, "step":5}'
+    - '// @input float walkSpeedCmPerSec = 100 {"hint":"Walking speed (cm/s) when she comes over or wanders", "widget":"slider", "min":30, "max":160, "step":5}'
     - '// @input float approachDistanceCm = 120 {"hint":"Where she stops in front of you when called (cm)", "widget":"slider", "min":80, "max":250, "step":5}'
     - '// @input float teaseDistanceCm = 150 {"hint":"Where she stops when she comes over to tease (cm)", "widget":"slider", "min":90, "max":300, "step":5}'
     - '// @input float attendSeconds = 15 {"hint":"Seconds she stays near you without interaction before stepping back to her spot", "widget":"slider", "min":3, "max":60, "step":1}'

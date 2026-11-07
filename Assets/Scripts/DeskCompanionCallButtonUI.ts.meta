@@ -29,6 +29,8 @@
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     buttonDiameterCm: false
+    chatOffLabel: false
+    chatOnLabel: false
     iconSizeCm: false
     labelColor: false
     labelText: false
@@ -45,6 +47,8 @@
       iconSizeCm: 3.600000
       labelText: 呼ぶ · Call
       labelColor: !<Vec4> {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+      chatOffLabel: "Chat: Off"
+      chatOnLabel: "Chat: On"
   ScriptTypes:
     -
       {}
@@ -55,6 +59,8 @@
     - '// @ui {"widget":"group_start", "label":"Settings"}'
     - '// @input float buttonDiameterCm = 8 {"hint":"Button diameter (cm) — brief: about 8 cm, big and easy to press", "widget":"slider", "min":4, "max":14, "step":0.5}'
     - '// @input float iconSizeCm = 3.6 {"hint":"Icon size on the button (cm)", "widget":"slider", "min":1.5, "max":6, "step":0.1}'
-    - '// @input string labelText = "呼ぶ · Call" {"hint":"Label under the button"}'
+    - '// @input string labelText = "Call" {"hint":"Label under the button"}'
     - '// @input vec4 labelColor = "{1, 1, 1, 1}" {"hint":"Label color (keep light)", "widget":"color"}'
+    - '// @input string chatOffLabel = "Chat: Off" {"hint":"Chat toggle label when chat is off"}'
+    - '// @input string chatOnLabel = "Chat: On" {"hint":"Chat toggle label when chat is on"}'
     - '// @ui {"widget":"group_end"}'

@@ -5,6 +5,7 @@
  *   Highlighted word pinched   -> page.showTranslation(..) next to the word + companion.explainWord(line)
  *   Book grabbed / offered     -> companion.noteInteraction() / companion.offerBook() (reads + summarizes)
  *   Dance / Pose pinched       -> companion.dance() / companion.pose()
+ *   Chat toggled               -> companion.setChatEnabled() (default off: she only talks when you act)
  *   Mode pinched               -> modes.cycleMode()   (persona modes + cue cards live in DeskCompanionModeController)
  *   Ask pinched                -> modes.ask()         (weather / today's plan / project tip, sample data)
  *   Word pinched (also)        -> translator.translateWord() -> page.setTranslationResult() (live / offline)
@@ -23,6 +24,7 @@ import {DeskCompanionCallButtonUI} from "./DeskCompanionCallButtonUI"
 import {DeskCompanionForeignPageUI} from "./DeskCompanionForeignPageUI"
 import {DeskCompanionActionsUI} from "./DeskCompanionActionsUI"
 import {DeskCompanionModeController} from "./DeskCompanionModeController"
+import {DeskCompanionStretch} from "./DeskCompanionStretch"
 import {DeskCompanionTranslator} from "./DeskCompanionTranslator"
 import {findWord} from "./DeskCompanionContent"
 
@@ -63,6 +65,11 @@ export class DeskCompanionMain extends BaseScriptComponent {
 
   @input
   @allowUndefined
+  @hint("Stretch break routine (Stretch button)")
+  stretch: DeskCompanionStretch
+
+  @input
+  @allowUndefined
   @hint("Non-spatial AudioComponent for UI clicks")
   uiClickAudio: AudioComponent
 
@@ -98,6 +105,41 @@ export class DeskCompanionMain extends BaseScriptComponent {
       this.companion.callOver()
     })
 
+    // Chat toggle: quiet by default (she only talks when you act); on = occasional teases
+    this.callButton.setChatState(this.companion.chatEnabled)
+    this.callButton.onChatToggle.add(() => {
+      this.click()
+      const on = !this.companion.chatEnabled
+      this.companion.setChatEnabled(on)
+      this.callButton.setChatState(on)
+      print("DeskCompanionMain: chat " + (on ? "on" : "off"))
+    })
+
+    // Voice volume (desk slider + mute): DeskCompanionVoice owns the value, the desk UI shows it
+    const voice = this.modes ? this.modes.voice : null // the shared voice (wired on CompanionModes)
+    if (voice) {
+      this.callButton.setVoiceState(voice.voiceVolume, voice.muted)
+      this.callButton.onVoiceVolume.add((v: number) => {
+        voice.setVolume(v)
+        this.callButton.setVoiceState(voice.voiceVolume, voice.muted)
+      })
+      this.callButton.onMuteToggle.add(() => {
+        this.click()
+        voice.setMuted(!voice.muted)
+        this.callButton.setVoiceState(voice.voiceVolume, voice.muted)
+        print("DeskCompanionMain: voice " + (voice.muted ? "muted" : "unmuted"))
+      })
+    }
+
+    // Yori: Visible / Voice only
+    this.callButton.setAvatarState(this.companion.avatarVisible)
+    this.callButton.onAvatarToggle.add(() => {
+      this.click()
+      const on = !this.companion.avatarVisible
+      this.companion.setAvatarVisible(on)
+      this.callButton.setAvatarState(on)
+    })
+
     this.page.onWordPinched.add((wordId: string) => {
       const w = findWord(wordId)
       if (!w) return
@@ -129,6 +171,10 @@ export class DeskCompanionMain extends BaseScriptComponent {
       this.click()
       this.modes.ask()
     })
+    this.actions.onStretch.add(() => {
+      this.click()
+      if (this.stretch) this.stretch.start()
+    })
     this.actions.onTranslate.add(() => {
       this.click()
       if (this.translator) this.translator.openFreeInput()
@@ -148,6 +194,8 @@ export class DeskCompanionMain extends BaseScriptComponent {
   }
 
   private click(): void {
+    if (this.companion) this.companion.noteInteraction() // any button counts as answering her
+    if (this.stretch && this.stretch.stretchActive) this.stretch.cancel() // any button stops a stretch break
     if (!this.uiClickAudio || !this.uiClickSound) return
     try {
       if (this.uiClickAudio.isPlaying()) this.uiClickAudio.stop(false)

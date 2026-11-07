@@ -31,6 +31,8 @@
     danceClip: false
     danceVideo: false
     fallbackOnceSeconds: false
+    forgiveClip: false
+    forgiveVideo: false
     happyLaughClip: false
     happyLaughVideo: false
     idleClip: false
@@ -40,8 +42,12 @@
     modelRoot: false
     poseClip: false
     poseVideo: false
+    poutClip: false
+    poutVideo: false
     readClip: false
     readVideo: false
+    scoldClip: false
+    scoldVideo: false
     stepsPerSecond: false
     surprisedClip: false
     surprisedVideo: false
@@ -76,6 +82,9 @@
       happyLaughVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
       surprisedVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
       thoughtfulVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      poutVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      scoldVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      forgiveVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
       idleClip: idle
       walkClip: walk
       talkClip: talk
@@ -87,6 +96,9 @@
       happyLaughClip: laugh
       surprisedClip: surpris
       thoughtfulClip: thought
+      poutClip: pout
+      scoldClip: scold
+      forgiveClip: forgive
       stepsPerSecond: 1.800000
       fallbackOnceSeconds: 2.500000
   ScriptTypes:
@@ -114,6 +126,9 @@
     - '// @input Asset.Texture happyLaughVideo {"hint":"happy_laugh.mp4 — once, after she sums up the book"}'
     - '// @input Asset.Texture surprisedVideo {"hint":"surprised.mp4 — once, when you call her right after she teased you"}'
     - '// @input Asset.Texture thoughtfulVideo {"hint":"thoughtful.mp4 — once, while she explains a word"}'
+    - '// @input Asset.Texture poutVideo {"hint":"pout.mp4 (optional) — once, when poked too often (empty = scold, then surprised)"}'
+    - '// @input Asset.Texture scoldVideo {"hint":"scold.mp4 (optional) — used when there is no pout clip"}'
+    - '// @input Asset.Texture forgiveVideo {"hint":"forgive.mp4 (optional) — once, when she forgives you (empty = idle)"}'
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">AnimationPlayer clip names (3D model only)</span>"}'
@@ -129,6 +144,9 @@
     - '// @input string happyLaughClip = "laugh" {"hint":"Substring of the happy / laugh clip"}'
     - '// @input string surprisedClip = "surpris" {"hint":"Substring of the surprised clip"}'
     - '// @input string thoughtfulClip = "thought" {"hint":"Substring of the thoughtful clip"}'
+    - '// @input string poutClip = "pout" {"hint":"Substring of the pout clip"}'
+    - '// @input string scoldClip = "scold" {"hint":"Substring of the scold clip"}'
+    - '// @input string forgiveClip = "forgive" {"hint":"Substring of the forgive clip"}'
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Settings</span>"}'

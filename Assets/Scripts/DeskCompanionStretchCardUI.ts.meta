@@ -1,0 +1,54 @@
+- !<AssetImportMetadata/4a294843-77c3-4726-b38e-2b5c08ed5ec8>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> be1569ec-858d-4937-bc8c-a3f6a46560a2
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> be1569ec-858d-4937-bc8c-a3f6a46560a2
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 1b1f332d-27d9-45d1-a728-d5d2b3d85918
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/1b1f332d-27d9-45d1-a728-d5d2b3d85918>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 80b88ac0-68fc-42b1-8f97-e2e2eecddcf7
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    cardWidthCm: false
+    countColor: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - cardWidthCm: !<float> 34.000000
+      countColor: !<Vec4> {x: 1.000000, y: 0.900000, z: 0.500000, w: 1.000000}
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">DeskCompanionStretchCardUI – move name, 1–2–3–4 count, time bar</span>"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Settings</span>"}'
+    - '// @ui {"widget":"group_start", "label":"Settings"}'
+    - '// @input float cardWidthCm = 34 {"hint":"Card width (cm)", "widget":"slider", "min":20, "max":60, "step":1}'
+    - '// @input vec4 countColor = "{1, 0.9, 0.5, 1}" {"hint":"Count color", "widget":"color"}'
+    - '// @ui {"widget":"group_end"}'

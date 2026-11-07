@@ -1,0 +1,49 @@
+- !<AssetImportMetadata/2b960d66-db62-428b-bf96-6f2ce99048e6>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 0447385d-78ab-4678-902e-f7e2e7d01e8a
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 0447385d-78ab-4678-902e-f7e2e7d01e8a
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> c360fe19-9f4a-43c0-a1dc-c6675f8a59b9
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/c360fe19-9f4a-43c0-a1dc-c6675f8a59b9>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: b444e719-9afe-4143-b1ae-cfca653c7b17
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    scenarioIds: false
+    startDelaySeconds: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - scenarioIds: ""
+      startDelaySeconds: !<float> 2.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input string scenarioIds {"hint":"Comma-separated LEAF scenario ids to run when the Lens starts (empty = do nothing)"}'
+    - '// @input float startDelaySeconds = 2 {"hint":"Seconds to wait after the Lens starts before running"}'

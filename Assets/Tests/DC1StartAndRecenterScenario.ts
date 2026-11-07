@@ -29,6 +29,11 @@ export class DC1StartAndRecenterScenario extends Scenario {
     expect(await waitForLensReady(lens), "lens never placed the companion").toBe(true)
     log(`DC1 start (turnMode=${turnMode}, disableDeviceTracking=${disableTracking}) :: ${lens.summary()}`)
 
+    // the preview camera settles a frame or two after the Lens starts, which can trigger one
+    // recenter glide right at start; measure the resting spot once that glide has finished
+    const settled = await waitUntil(() => !c.isRecentering, 2500)
+    log(`DC1 start settled=${settled} :: ${lens.summary()}`)
+
     // ── 1a. at start: in front, ~2.5 m, slightly right, idling ──
     const d0 = c.distanceToUserCm
     const a0 = c.angleOffCenterDeg

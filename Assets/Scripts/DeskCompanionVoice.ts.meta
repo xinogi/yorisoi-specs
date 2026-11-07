@@ -31,25 +31,8 @@
     secondsPerChar: false
     speechBubble: false
     subtitleHoldSeconds: false
-    vo_book_received: false
-    vo_book_return: false
-    vo_book_summary: false
-    vo_call_whats_up: false
-    vo_dance: false
-    vo_leave: false
-    vo_pose: false
-    vo_tease_1: false
-    vo_tease_2: false
-    vo_tease_3: false
-    vo_word_bara: false
-    vo_word_ephemeral: false
-    vo_word_gamsahamnida: false
-    vo_word_kajiru: false
-    vo_word_nalssi: false
-    vo_word_remon: false
-    vo_word_serendipity: false
-    vo_word_yuuutsu: false
     voiceAudio: false
+    voiceClips: false
     voiceVolume: false
   ScriptTypesHidden:
     {}
@@ -65,24 +48,8 @@
       voiceVolume: !<float> 1.000000
       subtitleHoldSeconds: !<float> 3.000000
       secondsPerChar: 0.130000
-      vo_call_whats_up: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_tease_1: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_tease_2: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_tease_3: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_leave: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_serendipity: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_ephemeral: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_nalssi: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_gamsahamnida: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_bara: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_yuuutsu: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_remon: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_word_kajiru: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_book_received: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_book_summary: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_book_return: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_dance: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      vo_pose: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
+      voiceClips: !<reference.AudioTrackAsset[]>
+        []
   ScriptTypes:
     -
       {}
@@ -97,29 +64,12 @@
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Settings</span>"}'
     - '// @ui {"widget":"group_start", "label":"Settings"}'
-    - '// @input float voiceVolume = 1 {"hint":"Voice volume", "widget":"slider", "min":0, "max":1, "step":0.05}'
+    - "// @input float voiceVolume = 0.7 {\"hint\":\"Voice volume (0-1). The desk 'Voice' slider changes it at runtime (session only).\", \"widget\":\"slider\", \"min\":0, \"max\":1, \"step\":0.05}"
     - '// @input float subtitleHoldSeconds = 3 {"hint":"Seconds the subtitle stays after she finishes speaking, then it fades", "widget":"slider", "min":0.5, "max":8, "step":0.5}'
-    - '// @input float secondsPerChar = 0.13 {"hint":"Assumed speaking time per Japanese character when a line has no recorded clip", "widget":"slider", "min":0.05, "max":0.3, "step":0.01}'
+    - '// @input float secondsPerChar = 0.065 {"hint":"Assumed speaking time per English character when a line has no recorded clip", "widget":"slider", "min":0.03, "max":0.15, "step":0.005}'
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
-    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Voice clips (optional) — drop a recording on the matching line</span>"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Voice clips — file name = line id (e.g. smart__call, word_bara)</span>"}'
     - '// @ui {"widget":"group_start", "label":"Voice clips"}'
-    - "// @input Asset.AudioTrackAsset vo_call_whats_up {\"hint\":\"どうしたの？ / What's up?\"}"
-    - '// @input Asset.AudioTrackAsset vo_tease_1 {"hint":"何してるの？ 何か手伝おうか？"}'
-    - '// @input Asset.AudioTrackAsset vo_tease_2 {"hint":"何か食べたいものある？"}'
-    - '// @input Asset.AudioTrackAsset vo_tease_3 {"hint":"ずっと頑張ってるね。少し休憩する？"}'
-    - '// @input Asset.AudioTrackAsset vo_leave {"hint":"じゃあ、また呼んでね。"}'
-    - '// @input Asset.AudioTrackAsset vo_word_serendipity {"hint":"serendipity の説明"}'
-    - '// @input Asset.AudioTrackAsset vo_word_ephemeral {"hint":"ephemeral の説明"}'
-    - '// @input Asset.AudioTrackAsset vo_word_nalssi {"hint":"날씨 の説明"}'
-    - '// @input Asset.AudioTrackAsset vo_word_gamsahamnida {"hint":"감사합니다 の説明"}'
-    - '// @input Asset.AudioTrackAsset vo_word_bara {"hint":"薔薇 の説明"}'
-    - '// @input Asset.AudioTrackAsset vo_word_yuuutsu {"hint":"憂鬱 の説明"}'
-    - '// @input Asset.AudioTrackAsset vo_word_remon {"hint":"檸檬 の説明"}'
-    - '// @input Asset.AudioTrackAsset vo_word_kajiru {"hint":"齧る の説明"}'
-    - '// @input Asset.AudioTrackAsset vo_book_received {"hint":"あ、本？ ちょっと読んでみるね。"}'
-    - '// @input Asset.AudioTrackAsset vo_book_summary {"hint":"『不思議の国のアリス』の要約"}'
-    - '// @input Asset.AudioTrackAsset vo_book_return {"hint":"はい、返すね。素敵な本だった。"}'
-    - '// @input Asset.AudioTrackAsset vo_dance {"hint":"ちょっとだけ踊るね！"}'
-    - '// @input Asset.AudioTrackAsset vo_pose {"hint":"こんな感じ？"}'
+    - '// @input Asset.AudioTrackAsset[] voiceClips {"hint":"All voice MP3s. Each is matched to a line by its asset name (= line id)"}'
     - '// @ui {"widget":"group_end"}'

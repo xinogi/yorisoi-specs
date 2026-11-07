@@ -35,8 +35,8 @@ export class DeskCompanionVoice extends BaseScriptComponent {
   @ui.group_start("Settings")
   @input
   @widget(new SliderWidget(0, 1, 0.05))
-  @hint("Voice volume")
-  voiceVolume: number = 1.0
+  @hint("Voice volume (0-1). The desk 'Voice' slider changes it at runtime (session only).")
+  voiceVolume: number = 0.7
 
   @input
   @widget(new SliderWidget(0.5, 8, 0.5))
@@ -73,6 +73,29 @@ export class DeskCompanionVoice extends BaseScriptComponent {
     return this.lastLine ? this.lastLine.id : ""
   }
 
+  private _muted = false
+
+  /** True while the desk mute button has silenced her voice (subtitles still show). */
+  public get muted(): boolean { return this._muted }
+  /** Volume actually applied to the voice AudioComponent (0 when muted). */
+  public get effectiveVolume(): number { return this._muted ? 0 : this.voiceVolume }
+
+  /** Set her voice volume (0-1) — applies right away, also to a line already playing. */
+  public setVolume(v: number): void {
+    this.voiceVolume = Math.max(0, Math.min(1, v))
+    this.applyVolume()
+  }
+
+  /** Mute / unmute her voice (subtitles keep showing). */
+  public setMuted(m: boolean): void {
+    this._muted = m
+    this.applyVolume()
+  }
+
+  private applyVolume(): void {
+    if (this.voiceAudio) this.voiceAudio.volume = this.effectiveVolume
+  }
+
   public get isSpeaking(): boolean {
     return getTime() < this.speakingUntil
   }
@@ -93,7 +116,7 @@ export class DeskCompanionVoice extends BaseScriptComponent {
       return
     }
     this.voiceAudio.playbackMode = Audio.PlaybackMode.LowLatency
-    this.voiceAudio.volume = this.voiceVolume
+    this.voiceAudio.volume = this.effectiveVolume
     const sa = this.voiceAudio.spatialAudio
     if (sa) {
       sa.enabled = true
@@ -131,12 +154,14 @@ export class DeskCompanionVoice extends BaseScriptComponent {
    * Speak a line. Returns how long she will be speaking (seconds).
    * Plays the recorded clip if present; otherwise shows subtitles only for an estimated time.
    */
-  public say(lineId: string, badge: string = ""): number {
-    const line = findLine(lineId)
-    if (!line) {
+  public say(lineId: string, badge: string = "", subtitle: {en: string; ja: string} | null = null): number {
+    const found = findLine(lineId)
+    if (!found) {
       print("DeskCompanionVoice: unknown line id " + lineId)
       return 0
     }
+    // optional subtitle override (e.g. the measured rehearsal time); the voice clip stays the same
+    const line = subtitle ? Object.assign({}, found, {en: subtitle.en, ja: subtitle.ja}) : found
     this.lastLine = line
     let duration = Math.max(1.6, line.en.length * this.secondsPerChar)
     const clip = this.clipFor(lineId)
@@ -144,7 +169,7 @@ export class DeskCompanionVoice extends BaseScriptComponent {
       try {
         if (this.voiceAudio.isPlaying()) this.voiceAudio.stop(false) // stop() throws if nothing has played yet
         this.voiceAudio.audioTrack = clip
-        this.voiceAudio.volume = this.voiceVolume
+        this.voiceAudio.volume = this.effectiveVolume
         this.voiceAudio.play(1)
         if (this.voiceAudio.duration > 0) duration = this.voiceAudio.duration
       } catch (e) {

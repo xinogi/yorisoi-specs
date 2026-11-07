@@ -5,7 +5,8 @@
  * Owns: a UIKit BackPlate with five UIKit Buttons on SceneObjects named "DanceButton",
  * "PoseButton", "ModeButton", "AskButton" and "TranslateButton" (LEAF-findable), and the
  * show/hide animation. Labels are English-first.
- * Public API: onDance, onPose, onMode, onAsk, onTranslate (Event<void>), show(), hide(), isShown.
+ * Plus "StretchButton" (stretch break).
+ * Public API: onDance, onPose, onMode, onAsk, onTranslate, onStretch (Event<void>), show(), hide(), isShown.
  * Placement/facing is done by DeskCompanionBillboard on the same SceneObject.
  * Must not: decide whether she can dance (the controller does).
  */
@@ -92,12 +93,15 @@ export class DeskCompanionActionsUI extends BaseScriptComponent {
   private cancel: CancelFunction | null = null
   private _onDance = new Event<void>()
   private _onPose = new Event<void>()
+  private _onStretch = new Event<void>()
   private _onMode = new Event<void>()
   private _onAsk = new Event<void>()
   private _onTranslate = new Event<void>()
 
   get onDance(): PublicApi<void> { return this._onDance.publicApi() }
   get onPose(): PublicApi<void> { return this._onPose.publicApi() }
+  /** "Stretch" pinched: start the stretch break. */
+  get onStretch(): PublicApi<void> { return this._onStretch.publicApi() }
   get onMode(): PublicApi<void> { return this._onMode.publicApi() }
   get onAsk(): PublicApi<void> { return this._onAsk.publicApi() }
   get onTranslate(): PublicApi<void> { return this._onTranslate.publicApi() }
@@ -133,7 +137,8 @@ export class DeskCompanionActionsUI extends BaseScriptComponent {
     const mode = this.addButton(content, "ModeButton", this.modeLabel, null, () => this._onMode.invoke(), this.modeGlyph)
     const ask = this.addButton(content, "AskButton", this.askLabel, null, () => this._onAsk.invoke(), this.askGlyph)
     const tr = this.addButton(content, "TranslateButton", this.translateLabel, null, () => this._onTranslate.invoke(), this.translateGlyph)
-    flex.addItems([dance.item, pose.item, mode.item, ask.item, tr.item])
+    const stretch = this.addButton(content, "StretchButton", "Stretch", null, () => this._onStretch.invoke(), "↑")
+    flex.addItems([dance.item, pose.item, mode.item, ask.item, tr.item, stretch.item])
 
     const done = () => {
       this.pendingInits--
