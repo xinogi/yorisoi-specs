@@ -6,6 +6,12 @@ status: approved
 
 <!-- Filled in by plan-lens from the learner's interview (interview held in Japanese; quotes translated). Values the learner didn't choose are marked (default). -->
 
+## Her name and privacy (learner, 2026-11-08)
+Her name is **Yori** (from "Yorisoi"). Yori is the learner's personal character: she appears in the demo video, but her face images and video clips are never published. The public repo ships placeholder clips and the swappable character system, so everyone builds their own ideal companion.
+
+## Core concept (learner, 2026-11-08)
+She is your girlfriend AND a super-capable secretary at the same time: she keeps you company and cheers you on, and she also does real work for you — translating what you can't read, showing your cue cards, answering "what's the weather tomorrow?", helping you think through a work project. Long term she remembers things with you (connected to the learner's own knowledge base); that is future work and none of its contents are ever shown.
+
 ## The one spatial moment
 I'm working at my desk, looking straight ahead. My companion is always in front of me, a little to the side of my work, doing her own thing; she never goes behind me or out of view. After a while she comes over and teases me a little: "What are you doing? Anything I can do?" When I call her, she says "What's up?" and walks up in front of me. I point at a word I can't read in a foreign book on my desk, she tells me what it says, and the answer appears right next to the word.
 
@@ -40,6 +46,7 @@ I'm working at my desk, looking straight ahead. My companion is always in front 
 - Switch her mode: pinch a "Mode" button in the same row (after she comes over). Modes (learner, 2026-11-08): Sweetheart (default), Smart, Secretary, Cue cards, Dance, Healing. Each mode changes her lines, how often she comes over, how much she moves, and which clips she favors. All modes are defined in one editable Markdown file, persona/modes.md, which is converted to the Lens data; it also holds a personality prompt per mode for a future live AI.
 - Cue cards (practical help, learner's request): in Cue cards mode she shows your talking points as big light cards right beside her; pinch "Next" / "Back" to move through them; on the last card she says "You did great!".
 - Translation stays available in every mode (the most practically useful help).
+- Ask her (Secretary mode): a big "Ask" button cycles a few everyday questions; she answers out loud and shows a small card beside her. Preview stand-in: hard-coded sample answers, labeled "sample data" (e.g. "Tomorrow: sunny, 18° / 9°"; "Today's plan: 3 tasks"; "Project tip: split it into three small steps"). A live AI and real weather data are future work.
 - She only helps with words, cards, dancing and company. Physical help (fetching food or drinks) is future work for a robot body.
 - Targets are big and highlight when aimed at.
 - Voice (if any) and the button that does the same job: talking to her uses SPECS speech recognition on real glasses (feel unproven); the Call button does the same job in the preview.

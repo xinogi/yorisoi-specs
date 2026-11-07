@@ -33,7 +33,9 @@
     callButton: false
     companion: false
     debugColliders: false
+    modes: false
     page: false
+    translator: false
     uiClickAudio: false
     uiClickSound: false
   ScriptTypesHidden:
@@ -50,6 +52,8 @@
       page: !<MappingBased.AssignableType_3> 00000000-0000-0000-0000-000000000000
       actions: !<MappingBased.AssignableType_4> 00000000-0000-0000-0000-000000000000
       book: !<MappingBased.AssignableType_5> 00000000-0000-0000-0000-000000000000
+      modes: !<MappingBased.AssignableType_6> 00000000-0000-0000-0000-000000000000
+      translator: !<MappingBased.AssignableType_7> 00000000-0000-0000-0000-000000000000
       uiClickAudio: !<reference.AudioComponent> 00000000-0000-0000-0000-000000000000
       uiClickSound: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
       debugColliders: false
@@ -66,6 +70,8 @@
     - '// @input AssignableType_3 page {"hint":"Stand-in foreign-language page on the desk"}'
     - '// @input AssignableType_4 actions {"hint":"Dance / Pose panel that appears near her"}'
     - '// @input AssignableType_5 book {"hint":"Grabbable stand-in book on the desk"}'
+    - '// @input AssignableType_6 modes {"hint":"Persona modes + cue cards (Mode button)"}'
+    - '// @input AssignableType_7 translator {"hint":"Live translation (MyMemory) with the hard-coded table as fallback"}'
     - '// @input Component.AudioComponent uiClickAudio {"hint":"Non-spatial AudioComponent for UI clicks"}'
     - '// @input Asset.AudioTrackAsset uiClickSound {"hint":"Click sound for desk buttons and word pinches"}'
     - '// @ui {"widget":"group_end"}'

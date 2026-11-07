@@ -1,11 +1,13 @@
 /**
- * DeskCompanionVoice — makes the companion "say" a line: plays the recorded voice clip for that
- * line id (if one is dropped in) from her spatial AudioComponent, and shows the Japanese +
- * English subtitle in her speech bubble. With no clip, subtitles only.
+ * DeskCompanionVoice — makes the companion "say" a line: plays the recorded (English) voice clip
+ * for that line id from her spatial AudioComponent, and shows the subtitle in her speech bubble
+ * (English big, Japanese small). With no clip for a line, subtitles only.
  *
  * Owns: voice playback and subtitle timing.
- * Inputs: voiceAudio (spatial AudioComponent at her head), speechBubble UI, one optional
- *         AudioTrackAsset slot per line id (see DeskCompanionContent for the text of each id).
+ * Inputs: voiceAudio (spatial AudioComponent at her head), speechBubble UI, and `voiceClips`: every
+ *         voice MP3. A clip is matched to a line by its asset NAME = the line id
+ *         (Assets/Companion/Voice/<id>.mp3, Assets/Companion/Voice/modes/<modeId>__<key>.mp3).
+ *         To add or replace a voice line: drop the MP3 (named after the line id) into the list.
  * Must not: decide when she speaks (the controller does) or hold experience state.
  */
 import Event, {PublicApi} from "SpectaclesInteractionKit.lspkg/Utils/Event"
@@ -42,32 +44,18 @@ export class DeskCompanionVoice extends BaseScriptComponent {
   subtitleHoldSeconds: number = 3
 
   @input
-  @widget(new SliderWidget(0.05, 0.3, 0.01))
-  @hint("Assumed speaking time per Japanese character when a line has no recorded clip")
-  secondsPerChar: number = 0.13
+  @widget(new SliderWidget(0.03, 0.15, 0.005))
+  @hint("Assumed speaking time per English character when a line has no recorded clip")
+  secondsPerChar: number = 0.065
   @ui.group_end
 
   @ui.separator
-  @ui.label('<span style="color: #60A5FA;">Voice clips (optional) — drop a recording on the matching line</span>')
+  @ui.label('<span style="color: #60A5FA;">Voice clips — file name = line id (e.g. smart__call, word_bara)</span>')
   @ui.group_start("Voice clips")
-  @input @allowUndefined @hint("どうしたの？ / What's up?") vo_call_whats_up: AudioTrackAsset
-  @input @allowUndefined @hint("何してるの？ 何か手伝おうか？") vo_tease_1: AudioTrackAsset
-  @input @allowUndefined @hint("何か食べたいものある？") vo_tease_2: AudioTrackAsset
-  @input @allowUndefined @hint("ずっと頑張ってるね。少し休憩する？") vo_tease_3: AudioTrackAsset
-  @input @allowUndefined @hint("じゃあ、また呼んでね。") vo_leave: AudioTrackAsset
-  @input @allowUndefined @hint("serendipity の説明") vo_word_serendipity: AudioTrackAsset
-  @input @allowUndefined @hint("ephemeral の説明") vo_word_ephemeral: AudioTrackAsset
-  @input @allowUndefined @hint("날씨 の説明") vo_word_nalssi: AudioTrackAsset
-  @input @allowUndefined @hint("감사합니다 の説明") vo_word_gamsahamnida: AudioTrackAsset
-  @input @allowUndefined @hint("薔薇 の説明") vo_word_bara: AudioTrackAsset
-  @input @allowUndefined @hint("憂鬱 の説明") vo_word_yuuutsu: AudioTrackAsset
-  @input @allowUndefined @hint("檸檬 の説明") vo_word_remon: AudioTrackAsset
-  @input @allowUndefined @hint("齧る の説明") vo_word_kajiru: AudioTrackAsset
-  @input @allowUndefined @hint("あ、本？ ちょっと読んでみるね。") vo_book_received: AudioTrackAsset
-  @input @allowUndefined @hint("『不思議の国のアリス』の要約") vo_book_summary: AudioTrackAsset
-  @input @allowUndefined @hint("はい、返すね。素敵な本だった。") vo_book_return: AudioTrackAsset
-  @input @allowUndefined @hint("ちょっとだけ踊るね！") vo_dance: AudioTrackAsset
-  @input @allowUndefined @hint("こんな感じ？") vo_pose: AudioTrackAsset
+  @input
+  @allowUndefined
+  @hint("All voice MP3s. Each is matched to a line by its asset name (= line id)")
+  voiceClips: AudioTrackAsset[]
   @ui.group_end
 
   private speakingUntil = 0
@@ -119,24 +107,38 @@ export class DeskCompanionVoice extends BaseScriptComponent {
     }
   }
 
-  /** Returns the clip dropped into the slot for this line id, or null. */
+  private clipIndex: Record<string, AudioTrackAsset> | null = null
+
+  /** Returns the voice clip whose asset name equals this line id, or null. */
   public clipFor(lineId: string): AudioTrackAsset | null {
-    const v = (this as unknown as Record<string, AudioTrackAsset | undefined>)["vo_" + lineId]
-    return v ? v : null
+    if (!this.clipIndex) {
+      this.clipIndex = {}
+      const list = this.voiceClips || []
+      for (const c of list) {
+        if (c && !isNull(c)) this.clipIndex[c.name] = c
+      }
+    }
+    return this.clipIndex[lineId] || null
+  }
+
+  /** Number of voice clips found (for checks). */
+  public get clipCount(): number {
+    this.clipFor("")
+    return Object.keys(this.clipIndex).length
   }
 
   /**
    * Speak a line. Returns how long she will be speaking (seconds).
    * Plays the recorded clip if present; otherwise shows subtitles only for an estimated time.
    */
-  public say(lineId: string): number {
+  public say(lineId: string, badge: string = ""): number {
     const line = findLine(lineId)
     if (!line) {
       print("DeskCompanionVoice: unknown line id " + lineId)
       return 0
     }
     this.lastLine = line
-    let duration = Math.max(1.6, line.ja.length * this.secondsPerChar)
+    let duration = Math.max(1.6, line.en.length * this.secondsPerChar)
     const clip = this.clipFor(lineId)
     if (clip && this.voiceAudio) {
       try {
@@ -149,10 +151,10 @@ export class DeskCompanionVoice extends BaseScriptComponent {
         print("DeskCompanionVoice: could not play clip for " + lineId + ": " + e)
       }
     }
-    if (this.speechBubble) this.speechBubble.showLine(line.ja, line.en)
+    if (this.speechBubble) this.speechBubble.showLine(line.ja, line.en, badge)
     this.speakingUntil = getTime() + duration
     this.hideAt = this.speakingUntil + this.subtitleHoldSeconds
-    print("DeskCompanion says [" + line.id + "] " + line.ja + " / " + line.en + (clip ? " (voice clip)" : " (subtitle only)"))
+    print("DeskCompanion says [" + line.id + "] " + line.en + " / " + line.ja + (clip ? " (voice clip)" : " (subtitle only)"))
     this._onLineSpoken.invoke(line.id)
     return duration
   }

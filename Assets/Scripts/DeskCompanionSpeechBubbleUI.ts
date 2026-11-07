@@ -1,10 +1,11 @@
 /**
- * DeskCompanionSpeechBubbleUI — the speech bubble beside her head: Japanese line on top,
- * English line below, light text on a UIKit BackPlate. Pops in when she speaks; the voice
+ * DeskCompanionSpeechBubbleUI — the speech bubble beside her head: a small mode badge row
+ * (only when a mode was just switched), the English line (big — she speaks English), and the
+ * Japanese line (small), light text on a UIKit BackPlate. Pops in when she speaks; the voice
  * script hides it a few seconds after she finishes.
  *
  * Owns: bubble layout and show/hide animation only (a passive view).
- * Public API: showLine(ja, en), hide(), isShown, currentJa, currentEn.
+ * Public API: showLine(ja, en, badge?), hide(), isShown, currentJa, currentEn, currentBadge.
  * Placement/facing is done by DeskCompanionBillboard on the same SceneObject.
  * Must not: decide what she says or when (DeskCompanionVoice does).
  */
@@ -16,8 +17,9 @@ import animate, {CancelFunction} from "SpectaclesInteractionKit.lspkg/Utils/anim
 
 // ── Typography (see DeskCompanionForeignPageUI for the rationale) ──
 const FONT_SIZE_SCALE = 0.95
-type TextRole = "Headline2" | "Subheadline" | "Body" | "Caption"
+type TextRole = "Headline1" | "Headline2" | "Subheadline" | "Body" | "Caption"
 const TYPE_SCALE: Record<TextRole, {size: number; weight: number}> = {
+  Headline1: {size: 54, weight: 700},
   Headline2: {size: 48, weight: 700}, Subheadline: {size: 41, weight: 700},
   Body: {size: 39, weight: 500}, Caption: {size: 38, weight: 500}
 }
@@ -40,25 +42,31 @@ export class DeskCompanionSpeechBubbleUI extends BaseScriptComponent {
   @input
   @widget(new SliderWidget(14, 40, 0.5))
   @hint("Bubble width (cm)")
-  widthCm: number = 24
+  widthCm: number = 26
 
   @input
-  @widget(new SliderWidget(6, 20, 0.5))
-  @hint("Bubble height (cm) — room for ~3 lines of Japanese and ~3 lines of English")
-  heightCm: number = 12.5
+  @widget(new SliderWidget(6, 24, 0.5))
+  @hint("Bubble height (cm) — room for a badge row, ~4 lines of English and ~3 lines of Japanese")
+  heightCm: number = 16
 
   @input("vec4", "{1, 1, 1, 1}")
   @widget(new ColorWidget())
-  @hint("Japanese subtitle color (keep light: the display is additive)")
-  jaColor: vec4
+  @hint("English (big, voiced) subtitle color — keep light: the display is additive")
+  enColor: vec4
 
   @input("vec4", "{0.78, 0.88, 1, 0.95}")
   @widget(new ColorWidget())
-  @hint("English subtitle color")
-  enColor: vec4
+  @hint("Japanese (small) subtitle color")
+  jaColor: vec4
+
+  @input("vec4", "{1, 0.9, 0.5, 1}")
+  @widget(new ColorWidget())
+  @hint("Mode badge color (e.g. \"Smart mode · 知的モード\" right after a mode switch)")
+  badgeColor: vec4
   @ui.group_end
 
   private panel: SceneObject
+  private badgeText: Text
   private jaText: Text
   private enText: Text
   private wantVisible = false
@@ -66,10 +74,12 @@ export class DeskCompanionSpeechBubbleUI extends BaseScriptComponent {
   private cancel: CancelFunction | null = null
   private _ja = ""
   private _en = ""
+  private _badge = ""
 
   public get isShown(): boolean { return this.wantVisible }
   public get currentJa(): string { return this.wantVisible ? this._ja : "" }
   public get currentEn(): string { return this.wantVisible ? this._en : "" }
+  public get currentBadge(): string { return this.wantVisible ? this._badge : "" }
 
   onAwake(): void {
     this.panel = global.scene.createSceneObject("BubblePanel")
@@ -96,14 +106,17 @@ export class DeskCompanionSpeechBubbleUI extends BaseScriptComponent {
     flex.paddingBottom = 0.8
 
     const innerW = this.widthCm - 2.4
-    const innerH = this.heightCm - 1.6 - 0.5
-    const jaH = innerH * 0.55
-    const enH = innerH - jaH
-    const ja = this.addWrappedText(content, "Ja", "Body", innerW, jaH, this.jaColor)
-    const en = this.addWrappedText(content, "En", "Caption", innerW, enH, this.enColor)
+    const badgeH = 1.6
+    const innerH = this.heightCm - 1.6 - 1.0 - badgeH
+    const enH = innerH * 0.6
+    const jaH = innerH - enH
+    const badge = this.addWrappedText(content, "Badge", "Caption", innerW, badgeH, this.badgeColor)
+    const en = this.addWrappedText(content, "En", "Headline2", innerW, enH, this.enColor)
+    const ja = this.addWrappedText(content, "Ja", "Caption", innerW, jaH, this.jaColor)
+    this.badgeText = badge.text
     this.jaText = ja.text
     this.enText = en.text
-    flex.addItems([ja.item, en.item])
+    flex.addItems([badge.item, en.item, ja.item])
 
     // Start hidden — disable only at the tail of the BackPlate's own init.
     plate.onInitialized.add(() => {
@@ -113,12 +126,14 @@ export class DeskCompanionSpeechBubbleUI extends BaseScriptComponent {
     })
   }
 
-  /** Show a line (Japanese + English). Replaces whatever is showing. */
-  public showLine(ja: string, en: string): void {
+  /** Show a line (English big, Japanese small) and an optional mode badge. Replaces whatever is showing. */
+  public showLine(ja: string, en: string, badge: string = ""): void {
     this._ja = ja
     this._en = en
+    this._badge = badge
     if (this.jaText) this.jaText.text = ja
     if (this.enText) this.enText.text = en
+    if (this.badgeText) this.badgeText.text = badge
     this.wantVisible = true
     if (this.initialized) this.pop(true)
   }
@@ -162,6 +177,7 @@ export class DeskCompanionSpeechBubbleUI extends BaseScriptComponent {
   }
 
   private setAlpha(a: number): void {
+    if (this.badgeText) this.badgeText.textFill.color = new vec4(this.badgeColor.x, this.badgeColor.y, this.badgeColor.z, this.badgeColor.w * a)
     if (this.jaText) this.jaText.textFill.color = new vec4(this.jaColor.x, this.jaColor.y, this.jaColor.z, this.jaColor.w * a)
     if (this.enText) this.enText.textFill.color = new vec4(this.enColor.x, this.enColor.y, this.enColor.z, this.enColor.w * a)
   }

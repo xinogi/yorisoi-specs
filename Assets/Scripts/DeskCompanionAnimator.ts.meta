@@ -31,6 +31,8 @@
     danceClip: false
     danceVideo: false
     fallbackOnceSeconds: false
+    happyLaughClip: false
+    happyLaughVideo: false
     idleClip: false
     idleVideo: false
     leanInClip: false
@@ -41,8 +43,12 @@
     readClip: false
     readVideo: false
     stepsPerSecond: false
+    surprisedClip: false
+    surprisedVideo: false
     talkClip: false
     talkVideo: false
+    thoughtfulClip: false
+    thoughtfulVideo: false
     videoCard: false
     walkClip: false
     walkVideo: false
@@ -67,6 +73,9 @@
       readVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
       danceVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
       poseVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      happyLaughVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      surprisedVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      thoughtfulVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
       idleClip: idle
       walkClip: walk
       talkClip: talk
@@ -75,6 +84,9 @@
       readClip: read
       danceClip: dance
       poseClip: pose
+      happyLaughClip: laugh
+      surprisedClip: surpris
+      thoughtfulClip: thought
       stepsPerSecond: 1.800000
       fallbackOnceSeconds: 2.500000
   ScriptTypes:
@@ -99,6 +111,9 @@
     - '// @input Asset.Texture readVideo {"hint":"read.mp4 — once, when she opens the book"}'
     - '// @input Asset.Texture danceVideo {"hint":"dance.mp4 — once, for the dance button"}'
     - '// @input Asset.Texture poseVideo {"hint":"pose clip — once, for the pose button (empty = uses the dance clip)"}'
+    - '// @input Asset.Texture happyLaughVideo {"hint":"happy_laugh.mp4 — once, after she sums up the book"}'
+    - '// @input Asset.Texture surprisedVideo {"hint":"surprised.mp4 — once, when you call her right after she teased you"}'
+    - '// @input Asset.Texture thoughtfulVideo {"hint":"thoughtful.mp4 — once, while she explains a word"}'
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">AnimationPlayer clip names (3D model only)</span>"}'
@@ -111,6 +126,9 @@
     - '// @input string readClip = "read" {"hint":"Substring of the read clip"}'
     - '// @input string danceClip = "dance" {"hint":"Substring of the dance clip"}'
     - '// @input string poseClip = "pose" {"hint":"Substring of the pose clip"}'
+    - '// @input string happyLaughClip = "laugh" {"hint":"Substring of the happy / laugh clip"}'
+    - '// @input string surprisedClip = "surpris" {"hint":"Substring of the surprised clip"}'
+    - '// @input string thoughtfulClip = "thought" {"hint":"Substring of the thoughtful clip"}'
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Settings</span>"}'

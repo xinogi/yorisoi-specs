@@ -10,7 +10,7 @@ persona/characters/<キャラ名>/
 ```
 
 ## 今使っているキャラ
-- `yorisoi-default/`（作成中）。動画ができたら `Assets/Companion/Clips/` に同じ名前で入る。
+- **Yori（作者の個人のキャラ・非公開）**。動画は作者の PC の `Assets/Companion/Clips/` にだけあり、公開リポには仮の人影（PLACEHOLDER）の動画が入っている（git は skip-worktree で本物を記録しない）。デモ動画で見られる。
 
 ## 新しいキャラを足す手順（将来）
 1. 上の形でフォルダを作る（動画は黒背景・全身・正面寄り・MP4/H.264・1本10MB未満・縦横は16の倍数）。

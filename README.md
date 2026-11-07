@@ -177,7 +177,15 @@ Clips: pure black background, full body, mostly facing front, MP4/H.264, under 1
 
 Rules: no real people's faces and no celebrity look-alikes, no revealing clothes or sexual content, and check every AI-generated clip frame by frame (split arms or hands, objects that multiply, a face that changes) before using it.
 
-Voice lines: drop an audio file onto the matching line-id slot of `DeskCompanionVoice` in the Inspector.
+Voice lines: name the MP3 after the line id (for example `word_bara.mp3`, or `smart__call.mp3` for a mode line), use 44.1 kHz, put it in `Assets/Companion/Voice/` (mode lines in `Voice/modes/`), and add it to the **Voice clips** list of `DeskCompanionVoice` on `VoiceSource`. Clips are matched to lines by file name.
+
+## How translation works
+
+- **Live, when online.** Pinching a highlighted word, or typing with **Translate…**, sends only that word or text to the free [MyMemory](https://mymemory.translated.net/) API (`https://api.mymemory.translated.net/get?q=…&langpair=…`): no key, no account. English words are translated to Japanese, Korean to English and Japanese, Japanese to English. Typed text goes into the other two languages. Results are cached per text and language pair to stay under the anonymous limit (about 5000 characters a day).
+- **Offline fallback.** If the request fails or takes longer than about 3 s, the card uses the hard-coded answer from `Assets/Scripts/DeskCompanionContent.ts` and shows a small **offline** label (otherwise **live**). Her spoken explanation of a page word is always the pre-recorded line.
+- **Privacy.** Only the text you choose to translate is sent. No email address, account, camera image, audio, location or device data is attached.
+- **Keyboard in the preview.** The Specs AR keyboard does not appear in Lens Studio's preview with SPECS 27, so in the preview **Translate…** falls back to a short demo phrase (labelled "demo text") after about 2 s. On glasses you type normally.
+- Code: `Assets/Scripts/DeskCompanionTranslator.ts`.
 
 ## LEAF tests
 
@@ -196,7 +204,7 @@ Criteria with no test: TBD.
 
 ## Limitations
 
-- **Preview stand-ins.** The preview can't read real text or hear your voice. Reading a word is a pinch on a highlighted word on a virtual page, and talking to her is the Call button. Her answers are hard-coded; there is no live AI behind them.
+- **Preview stand-ins.** The preview can't read real text or hear your voice. Reading a word is a pinch on a highlighted word on a virtual page, and talking to her is the Call button. Translation is live when online (see "How translation works"); everything else she says (explanations, Ask answers, teasing) is pre-written. There is no live AI conversation.
 - **No real camera reading.** She can't read real books or signs yet.
 - **The video character is flat from the side.** She is a camera-facing card, which works because you sit facing her. There are small jumps between clips, and her mouth movement is generic, not matched to the words.
 - **Additive display.** Dark areas (hair, eyes, shadows) render see-through, so a photoreal person looks partly translucent.

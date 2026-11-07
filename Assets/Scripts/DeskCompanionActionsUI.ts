@@ -1,10 +1,11 @@
 /**
- * DeskCompanionActionsUI — the small "Dance / Pose" panel that appears near her after she has
- * come over, and hides when she walks away.
+ * DeskCompanionActionsUI — the small "Dance / Pose / Mode / Ask" panel that appears near her after
+ * she has come over, and hides when she walks away.
  *
- * Owns: a UIKit BackPlate with two UIKit Buttons on SceneObjects named "DanceButton" and
- * "PoseButton" (LEAF-findable), and the show/hide animation. A passive view.
- * Public API: onDance, onPose (Event<void>), show(), hide(), isShown.
+ * Owns: a UIKit BackPlate with five UIKit Buttons on SceneObjects named "DanceButton",
+ * "PoseButton", "ModeButton", "AskButton" and "TranslateButton" (LEAF-findable), and the
+ * show/hide animation. Labels are English-first.
+ * Public API: onDance, onPose, onMode, onAsk, onTranslate (Event<void>), show(), hide(), isShown.
  * Placement/facing is done by DeskCompanionBillboard on the same SceneObject.
  * Must not: decide whether she can dance (the controller does).
  */
@@ -17,9 +18,9 @@ import Event, {PublicApi} from "SpectaclesInteractionKit.lspkg/Utils/Event"
 import animate, {CancelFunction} from "SpectaclesInteractionKit.lspkg/Utils/animate"
 
 const FONT_SIZE_SCALE = 0.95
-type TextRole = "Button" | "Caption"
+type TextRole = "Headline2" | "Button" | "Caption"
 const TYPE_SCALE: Record<TextRole, {size: number; weight: number}> = {
-  Button: {size: 39, weight: 500}, Caption: {size: 38, weight: 500}
+  Headline2: {size: 48, weight: 700}, Button: {size: 39, weight: 500}, Caption: {size: 38, weight: 500}
 }
 function applyTextRole(t: Text, role: TextRole, distanceCm: number = 110): void {
   t.size = TYPE_SCALE[role].size * FONT_SIZE_SCALE * (distanceCm / 110)
@@ -36,7 +37,7 @@ const BUTTON_LABEL_Z = 0.08
 
 @component
 export class DeskCompanionActionsUI extends BaseScriptComponent {
-  @ui.label('<span style="color: #60A5FA;">DeskCompanionActionsUI – Dance / Pose buttons near her</span>')
+  @ui.label('<span style="color: #60A5FA;">DeskCompanionActionsUI – Dance / Pose / Mode / Ask buttons near her</span>')
   @ui.separator
 
   @ui.label('<span style="color: #60A5FA;">Settings</span>')
@@ -44,7 +45,7 @@ export class DeskCompanionActionsUI extends BaseScriptComponent {
   @input
   @widget(new SliderWidget(5, 14, 0.5))
   @hint("Width of each button (cm)")
-  buttonWidthCm: number = 7.5
+  buttonWidthCm: number = 5.8
 
   @input
   @widget(new SliderWidget(3, 8, 0.5))
@@ -53,23 +54,53 @@ export class DeskCompanionActionsUI extends BaseScriptComponent {
 
   @input
   @hint("Dance button label")
-  danceLabel: string = "ダンス Dance"
+  danceLabel: string = "Dance"
 
   @input
   @hint("Pose button label")
-  poseLabel: string = "ポーズ Pose"
+  poseLabel: string = "Pose"
+
+  @input
+  @hint("Mode button label (each press switches her mode)")
+  modeLabel: string = "Mode"
+
+  @input
+  @hint("Glyph shown on the Mode button face")
+  modeGlyph: string = "⇄"
+
+  @input
+  @hint("Ask button label (each press: weather -> today's plan -> project tip)")
+  askLabel: string = "Ask"
+
+  @input
+  @hint("Glyph shown on the Ask button face")
+  askGlyph: string = "?"
+
+  @input
+  @hint("Translate button label (opens the keyboard; she translates what you type)")
+  translateLabel: string = "Translate…"
+
+  @input
+  @hint("Glyph shown on the Translate button face")
+  translateGlyph: string = "文"
   @ui.group_end
 
   private panel: SceneObject
   private wantVisible = false
-  private pendingInits = 3
+  private pendingInits = 6
   private initialized = false
   private cancel: CancelFunction | null = null
   private _onDance = new Event<void>()
   private _onPose = new Event<void>()
+  private _onMode = new Event<void>()
+  private _onAsk = new Event<void>()
+  private _onTranslate = new Event<void>()
 
   get onDance(): PublicApi<void> { return this._onDance.publicApi() }
   get onPose(): PublicApi<void> { return this._onPose.publicApi() }
+  get onMode(): PublicApi<void> { return this._onMode.publicApi() }
+  get onAsk(): PublicApi<void> { return this._onAsk.publicApi() }
+  get onTranslate(): PublicApi<void> { return this._onTranslate.publicApi() }
   public get isShown(): boolean { return this.wantVisible }
 
   onAwake(): void {
@@ -99,7 +130,10 @@ export class DeskCompanionActionsUI extends BaseScriptComponent {
 
     const dance = this.addButton(content, "DanceButton", this.danceLabel, ICON_DANCE, () => this._onDance.invoke())
     const pose = this.addButton(content, "PoseButton", this.poseLabel, ICON_POSE, () => this._onPose.invoke())
-    flex.addItems([dance.item, pose.item])
+    const mode = this.addButton(content, "ModeButton", this.modeLabel, null, () => this._onMode.invoke(), this.modeGlyph)
+    const ask = this.addButton(content, "AskButton", this.askLabel, null, () => this._onAsk.invoke(), this.askGlyph)
+    const tr = this.addButton(content, "TranslateButton", this.translateLabel, null, () => this._onTranslate.invoke(), this.translateGlyph)
+    flex.addItems([dance.item, pose.item, mode.item, ask.item, tr.item])
 
     const done = () => {
       this.pendingInits--
@@ -111,6 +145,9 @@ export class DeskCompanionActionsUI extends BaseScriptComponent {
     plate.onInitialized.add(done)
     dance.button.onInitialized.add(done)
     pose.button.onInitialized.add(done)
+    mode.button.onInitialized.add(done)
+    ask.button.onInitialized.add(done)
+    tr.button.onInitialized.add(done)
   }
 
   public show(): void {
@@ -153,7 +190,8 @@ export class DeskCompanionActionsUI extends BaseScriptComponent {
     }
   }
 
-  private addButton(parent: SceneObject, name: string, label: string, icon: Texture, onTap: () => void): {button: Button; item: FlexItem} {
+  private addButton(parent: SceneObject, name: string, label: string, icon: Texture | null, onTap: () => void,
+    glyph: string = ""): {button: Button; item: FlexItem} {
     const so = global.scene.createSceneObject(name)
     so.setParent(parent)
     so.getTransform().setLocalPosition(new vec3(0, 0, 0.02))
@@ -175,17 +213,32 @@ export class DeskCompanionActionsUI extends BaseScriptComponent {
     f.alignItems = FlexAlign.Center
     f.rowGap = 0.25
 
+    const iconSize = Math.min(2.0, this.buttonHeightCm * 0.42)
     const iconSO = global.scene.createSceneObject("Icon")
     iconSO.setParent(face)
-    const img = iconSO.createComponent("Component.Image") as Image
-    const mat = imageMaterial.clone()
-    mat.mainPass.baseTex = icon
-    mat.mainPass.depthTest = true
-    mat.mainPass.depthWrite = false
-    img.clearMaterials()
-    img.addMaterial(mat)
-    const iconSize = Math.min(2.0, this.buttonHeightCm * 0.42)
-    iconSO.getTransform().setLocalScale(new vec3(iconSize, iconSize, 1))
+    if (icon) {
+      const img = iconSO.createComponent("Component.Image") as Image
+      const mat = imageMaterial.clone()
+      mat.mainPass.baseTex = icon
+      mat.mainPass.depthTest = true
+      mat.mainPass.depthWrite = false
+      img.clearMaterials()
+      img.addMaterial(mat)
+      iconSO.getTransform().setLocalScale(new vec3(iconSize, iconSize, 1))
+    } else {
+      // text glyph instead of an icon image
+      const g = iconSO.createComponent("Component.Text") as Text
+      g.font = FONT_JA
+      g.text = glyph
+      g.depthTest = true
+      applyTextRole(g, "Headline2", VIEW_DISTANCE_CM)
+      g.textFill.color = new vec4(1, 1, 1, 1)
+      g.horizontalAlignment = HorizontalAlignment.Center
+      g.verticalAlignment = VerticalAlignment.Center
+      g.horizontalOverflow = HorizontalOverflow.Overflow
+      g.verticalOverflow = VerticalOverflow.Overflow
+      g.layoutRect = Rect.create(-iconSize / 2, iconSize / 2, -iconSize / 2, iconSize / 2)
+    }
     const iconItem = iconSO.createComponent(FlexItem.getTypeName()) as FlexItem
     iconItem.overrideWidth = iconSize
     iconItem.overrideHeight = iconSize

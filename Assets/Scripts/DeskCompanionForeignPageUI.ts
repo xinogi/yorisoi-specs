@@ -7,7 +7,9 @@
  * on a SceneObject named "Word_<id>"), the translation card view and its fade timer.
  * Public API (Channel A):
  *   onWordPinched: Event<string>   — word id, fired when a highlighted word is pinched
- *   showTranslation(wordId, word, reading, meaningJa, meaningEn)
+ *   showTranslation(wordId, word, reading, meaningJa, meaningEn)   (card: word -> reading ->
+ *       English meaning, large -> Japanese meaning, small; tiny source label "translating…")
+ *   setTranslationResult(wordId, meaningEn, meaningJa, source)    (live / offline update)
  *   hideTranslation()
  *   shownTranslationWordId         — "" when the card is hidden
  * Must not: decide what the answer is (DeskCompanionMain passes it in) or talk to the companion.
@@ -90,11 +92,11 @@ export class DeskCompanionForeignPageUI extends BaseScriptComponent {
 
   @input
   @hint("Small caption at the top of the page so the stand-in is obvious")
-  headerText: string = "外国語の本（代役） · Foreign book — stand-in"
+  headerText: string = "Foreign book (stand-in) · 外国語の本"
 
   @input
   @hint("Hint at the bottom of the page")
-  footerText: string = "光っている単語をつまむと教えてくれます · Pinch a highlighted word"
+  footerText: string = "Pinch a highlighted word · 光っている単語をつまんでね"
   @ui.group_end
 
   private panel: SceneObject
@@ -105,6 +107,8 @@ export class DeskCompanionForeignPageUI extends BaseScriptComponent {
   private cardReading: Text
   private cardJa: Text
   private cardEn: Text
+  private cardSource: Text
+  private _shownSource = ""
   private cardWant = false
   private cardInitialized = false
   private cardHideAt = -1
@@ -177,6 +181,8 @@ export class DeskCompanionForeignPageUI extends BaseScriptComponent {
     this.cardReading.text = reading
     this.cardJa.text = meaningJa
     this.cardEn.text = meaningEn
+    this._shownSource = "translating…"
+    if (this.cardSource) this.cardSource.text = this._shownSource
 
     // place the card above the word, inside the page width, lifted toward the viewer
     const inv = this.panel.getTransform().getInvertedWorldTransform()
@@ -189,6 +195,20 @@ export class DeskCompanionForeignPageUI extends BaseScriptComponent {
     this.cardWant = true
     this.cardHideAt = getTime() + this.translationHoldSeconds
     if (this.cardInitialized) this.popCard(true)
+  }
+
+  /** Update the showing card with the live (or offline) translation for that word. */
+  public setTranslationResult(wordId: string, meaningEn: string, meaningJa: string, source: string): void {
+    if (wordId !== this._shownWordId) return // the card has moved on to another word
+    if (this.cardEn) this.cardEn.text = meaningEn
+    if (this.cardJa) this.cardJa.text = meaningJa
+    this._shownSource = source
+    if (this.cardSource) this.cardSource.text = source
+  }
+
+  /** Source label on the card: "translating…" | "live" | "offline" ("" when hidden). */
+  public get shownTranslationSource(): string {
+    return this._shownWordId ? this._shownSource : ""
   }
 
   /** Fade the translation card out. */
@@ -330,23 +350,28 @@ export class DeskCompanionForeignPageUI extends BaseScriptComponent {
     const wordItem = this.addText(top, "", "Headline1", 6.0, 2.6, FONT_JA, new vec4(1, 0.93, 0.55, 1), HorizontalAlignment.Left, VIEW_DISTANCE_CM)
     this.cardWord = wordItem.getSceneObject().getComponent("Component.Text") as Text
     topKids.push(wordItem)
-    const readingItem = this.addText(top, "", "Body", innerW - 6.0 - 1.7 - 1.0, 2.6, FONT_JA, new vec4(1, 1, 1, 0.85), HorizontalAlignment.Left, VIEW_DISTANCE_CM)
+    const readingItem = this.addText(top, "", "Body", innerW - 6.0 - 1.7 - 1.0 - 3.2, 2.6, FONT_JA, new vec4(1, 1, 1, 0.85), HorizontalAlignment.Left, VIEW_DISTANCE_CM)
     this.cardReading = readingItem.getSceneObject().getComponent("Component.Text") as Text
     this.cardReading.horizontalOverflow = HorizontalOverflow.Shrink
     topKids.push(readingItem)
+    const sourceItem = this.addText(top, "", "Caption", 3.2, 2.6, FONT_JA, new vec4(1, 0.9, 0.5, 0.9), HorizontalAlignment.Right, VIEW_DISTANCE_CM)
+    this.cardSource = sourceItem.getSceneObject().getComponent("Component.Text") as Text
+    this.cardSource.horizontalOverflow = HorizontalOverflow.Shrink
+    topKids.push(sourceItem)
     tf.addItems(topKids)
     items.push(topItem)
 
-    const jaItem = this.addText(content, "", "Body", innerW, 2.0, FONT_JA, new vec4(1, 1, 1, 1), HorizontalAlignment.Left, VIEW_DISTANCE_CM)
-    jaItem.alignSelf = FlexAlignSelf.Stretch
-    this.cardJa = jaItem.getSceneObject().getComponent("Component.Text") as Text
-    this.cardJa.horizontalOverflow = HorizontalOverflow.Shrink
-    items.push(jaItem)
-    const enItem = this.addText(content, "", "Caption", innerW, 2.0, FONT_JA, new vec4(0.8, 0.9, 1, 0.95), HorizontalAlignment.Left, VIEW_DISTANCE_CM)
+    // English meaning first and large, Japanese meaning small below (English-first for the judges)
+    const enItem = this.addText(content, "", "Body", innerW, 2.0, FONT_JA, new vec4(1, 1, 1, 1), HorizontalAlignment.Left, VIEW_DISTANCE_CM)
     enItem.alignSelf = FlexAlignSelf.Stretch
     this.cardEn = enItem.getSceneObject().getComponent("Component.Text") as Text
     this.cardEn.horizontalOverflow = HorizontalOverflow.Shrink
     items.push(enItem)
+    const jaItem = this.addText(content, "", "Caption", innerW, 2.0, FONT_JA, new vec4(0.8, 0.9, 1, 0.95), HorizontalAlignment.Left, VIEW_DISTANCE_CM)
+    jaItem.alignSelf = FlexAlignSelf.Stretch
+    this.cardJa = jaItem.getSceneObject().getComponent("Component.Text") as Text
+    this.cardJa.horizontalOverflow = HorizontalOverflow.Shrink
+    items.push(jaItem)
     flex.addItems(items)
 
     // Start hidden: disable only once the card's BackPlate has initialized (tail of its init).

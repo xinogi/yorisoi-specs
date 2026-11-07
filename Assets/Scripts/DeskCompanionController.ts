@@ -18,8 +18,13 @@
  * reading | dance | pose -> attend -> leaving -> roam_idle. After `idleTeaseSeconds` with no
  * interaction (and some time roaming) she comes closer and teases you.
  *
+ * Modes (persona/modes.md, applied by DeskCompanionModeController through applyMode()): the active
+ * mode sets the tease interval (0 = never), the wander size (resting distance never closer than
+ * 240 cm so her whole body stays in view at the ~14 deg desk gaze), the clips she favours while
+ * idle, and her call / tease / leave lines.
+ *
  * Test hooks (read-only getters): state, isNear, isRecentering, distanceToUserCm,
- * angleOffCenterDeg, isInView, isWholeBodyInView.
+ * angleOffCenterDeg, isInView, isWholeBodyInView, callLineId, teaseLineIds, leaveLineId, modeId.
  *
  * Inputs: animator, voice, sounds, optional facing, handAnchor, book. There are more tunables than
  * the usual 6 because her placement and timing IS the experience the learner wants to tune.
@@ -31,11 +36,12 @@ import {DeskCompanionAnimator, CompanionAnim} from "./DeskCompanionAnimator"
 import {DeskCompanionVoice} from "./DeskCompanionVoice"
 import {DeskCompanionSounds} from "./DeskCompanionSounds"
 import {DeskCompanionBook} from "./DeskCompanionBook"
-import {BOOK, TEASE_LINE_IDS} from "./DeskCompanionContent"
+import {BOOK, lineIdForMode, SHARED_TEASE_LINE_IDS} from "./DeskCompanionContent"
+import {PersonaMode} from "./DeskCompanionPersonaData"
 import {angleDelta, clamp, degToRad, lerp, smoothStep01, yawAngle} from "./DeskCompanionMath"
 
 export type CompanionState = "roam_walk" | "roam_idle" | "approach" | "attend" | "reading" | "dance" | "pose" | "leaving"
-type ApproachReason = "call" | "tease" | "book" | "word"
+type ApproachReason = "call" | "call_surprised" | "tease" | "book" | "word"
 
 interface Scheduled {
   at: number
@@ -50,6 +56,12 @@ const BODY_HEIGHT_CM = 165
 const BODY_HALF_WIDTH_CM = 22
 /** How long she must be off before the lazy follow kicks in (s) — ignores quick glances. */
 const RECENTER_DWELL_S = 0.25
+/** Resting spot never closer than this (cm): keeps her whole body in view at the ~14 deg desk gaze. */
+const MIN_REST_DISTANCE_CM = 240
+/** Calling her this soon (s) after she teased you makes her look surprised. */
+const SURPRISE_WINDOW_S = 10
+/** Wander multipliers for the mode's wander size. */
+const WANDER_SCALE: Record<string, number> = {small: 0.6, medium: 1, large: 1.6}
 
 @component
 export class DeskCompanionController extends BaseScriptComponent {
@@ -122,11 +134,6 @@ export class DeskCompanionController extends BaseScriptComponent {
   @ui.label('<span style="color: #60A5FA;">Behavior</span>')
   @ui.group_start("Behavior")
   @input
-  @widget(new SliderWidget(5, 120, 1))
-  @hint("Seconds with no interaction before she comes over to tease you")
-  idleTeaseSeconds: number = 20
-
-  @input
   @widget(new SliderWidget(30, 160, 5))
   @hint("Walking speed (cm/s) when she comes over or wanders")
   walkSpeedCmPerSec: number = 75
@@ -151,7 +158,17 @@ export class DeskCompanionController extends BaseScriptComponent {
   debugLogs: boolean = true
   @ui.group_end
 
+  /** Seconds with no interaction before she comes over to tease you (0 = never). Set by the active mode. */
+  public idleTeaseSeconds: number = 20
+
   private camT: Transform | null = null
+  private mode: PersonaMode | null = null
+  private wanderScale = 1
+  private favoriteAnims: string[] = ["idle"]
+  private _callLineId = "call_whats_up"
+  private _teaseLineIds: string[] = SHARED_TEASE_LINE_IDS.slice()
+  private _leaveLineId = "leave"
+  private lastTeaseArriveAt = -100
   private floorY = 0
   private _state: CompanionState = "roam_idle"
   private stateStart = 0
@@ -245,6 +262,39 @@ export class DeskCompanionController extends BaseScriptComponent {
     return getTime() - this.lastInteraction
   }
 
+  /** Line ids the active mode uses (for tests / logs). */
+  public get callLineId(): string { return this._callLineId }
+  public get teaseLineIds(): string[] { return this._teaseLineIds.slice() }
+  public get leaveLineId(): string { return this._leaveLineId }
+  public get modeId(): string { return this.mode ? this.mode.id : "" }
+
+  /** Apply a persona mode: tease interval, wander size, favourite idle clips, call/tease/leave lines. */
+  public applyMode(mode: PersonaMode): void {
+    this.mode = mode
+    this.idleTeaseSeconds = mode.teaseSeconds
+    this.wanderScale = WANDER_SCALE[mode.wander] || 1
+    this.favoriteAnims = mode.favoriteAnims && mode.favoriteAnims.length > 0 ? mode.favoriteAnims.slice() : ["idle"]
+    this._callLineId = lineIdForMode(mode, "call", "call_whats_up")
+    const teases = ["tease_1", "tease_2", "tease_3"].filter((k) => !!mode.lines[k]).map((k) => lineIdForMode(mode, k, k))
+    this._teaseLineIds = teases.length > 0 ? teases : SHARED_TEASE_LINE_IDS.slice()
+    this._leaveLineId = lineIdForMode(mode, "leave", "leave")
+    this.pickWander()
+    if (this.debugLogs) {
+      print("DeskCompanion mode: " + mode.id + " tease=" + mode.teaseSeconds + "s wander=" + mode.wander + " favorites=" + this.favoriteAnims.join(","))
+    }
+  }
+
+  /** Step back to her resting spot now (e.g. so cue cards can show beside her). */
+  public returnToSpot(sayLeaveLine: boolean): void {
+    if (this.isRoamState()) return
+    if (this._state === "reading") return
+    if (sayLeaveLine && this.voice) this.voice.say(this._leaveLineId)
+    this.pickWander()
+    this.roamSince = getTime()
+    this.setState("leaving")
+    this._onLeft.invoke()
+  }
+
   onAwake(): void {
     this.createEvent("OnStartEvent").bind(() => this.start())
     this.createEvent("UpdateEvent").bind(() => this.tick())
@@ -282,12 +332,13 @@ export class DeskCompanionController extends BaseScriptComponent {
     this.noteInteraction()
     if (this._state === "reading" || this._state === "dance" || this._state === "pose") return
     if (this.sounds) this.sounds.playChime()
-    if (this.voice) this.voice.say("call_whats_up")
+    if (this.voice) this.voice.say(this._callLineId)
+    const surprised = getTime() - this.lastTeaseArriveAt < SURPRISE_WINDOW_S || (this._state === "approach" && this.reason === "tease")
     if (this.isNear) {
-      if (this.animator) this.animator.playOnce("wave")
+      if (this.animator) this.animator.playOnce(surprised ? "surprised" : "wave")
       return
     }
-    this.beginApproach("call")
+    this.beginApproach(surprised ? "call_surprised" : "call")
   }
 
   /** She comes closer on her own and teases you. */
@@ -302,7 +353,10 @@ export class DeskCompanionController extends BaseScriptComponent {
     this.noteInteraction()
     if (this.voice) this.voice.say(lineId)
     if (this._state === "reading" || this._state === "dance" || this._state === "pose") return
-    if (this.isNear) return
+    if (this.isNear) {
+      if (this.animator) this.animator.playOnce("thoughtful")
+      return
+    }
     this.beginApproach("word")
   }
 
@@ -383,7 +437,7 @@ export class DeskCompanionController extends BaseScriptComponent {
   private targetPolar(): {r: number; theta: number} {
     if (this.isRoamState()) {
       return {
-        r: this.restDistanceCm + this.wanderDR,
+        r: Math.max(MIN_REST_DISTANCE_CM, this.restDistanceCm + this.wanderDR),
         theta: this.committedYaw + degToRad(this.restOffsetDeg) + this.wanderDTheta
       }
     }
@@ -399,21 +453,27 @@ export class DeskCompanionController extends BaseScriptComponent {
   }
 
   private pickWander(): void {
-    this.wanderDTheta = degToRad((Math.random() * 2 - 1) * this.wanderDeg)
-    this.wanderDR = (Math.random() * 2 - 1) * this.wanderCm
+    this.wanderDTheta = degToRad((Math.random() * 2 - 1) * this.wanderDeg * this.wanderScale)
+    this.wanderDR = (Math.random() * 2 - 1) * this.wanderCm * this.wanderScale
   }
 
   private onArrive(): void {
     this.setState("attend")
     this._onArrived.invoke()
     if (this.reason === "tease") {
-      const id = TEASE_LINE_IDS[Math.floor(Math.random() * TEASE_LINE_IDS.length)]
+      const ids = this._teaseLineIds
+      const id = ids[Math.floor(Math.random() * ids.length)]
+      this.lastTeaseArriveAt = getTime()
       if (this.animator) this.animator.playOnce("lean_in")
       if (this.voice) this.voice.say(id)
     } else if (this.reason === "book") {
       this.takeBook()
     } else if (this.reason === "call") {
       if (this.animator) this.animator.playOnce("wave")
+    } else if (this.reason === "call_surprised") {
+      if (this.animator) this.animator.playOnce("surprised")
+    } else if (this.reason === "word") {
+      if (this.animator) this.animator.playOnce("thoughtful")
     }
   }
 
@@ -427,7 +487,10 @@ export class DeskCompanionController extends BaseScriptComponent {
     })
     this.schedule(Math.max(d1, 1.8) + 1.2, () => {
       const d2 = this.voice ? this.voice.say(BOOK.summaryLineId) : 6
-      this.schedule(d2 + 1.0, () => {
+      this.schedule(d2 + 0.2, () => {
+        if (this.animator) this.animator.playOnce("happy_laugh") // "Such a fun read!"
+      })
+      this.schedule(d2 + 1.6, () => {
         this.book.setOpen(false)
         if (this.voice) this.voice.say(BOOK.returnLineId)
         this.schedule(0.8, () => {
@@ -440,7 +503,7 @@ export class DeskCompanionController extends BaseScriptComponent {
   }
 
   private leave(): void {
-    if (this.voice) this.voice.say("leave")
+    if (this.voice) this.voice.say(this._leaveLineId)
     this.pickWander()
     this.roamSince = getTime()
     this.setState("leaving")
@@ -508,6 +571,7 @@ export class DeskCompanionController extends BaseScriptComponent {
             this.idleUntil = now + 4 + Math.random() * 5
             this.chooseIdleFacing()
             this.setState("roam_idle")
+            this.playFavoriteIdle()
           }
         }
         break
@@ -550,7 +614,7 @@ export class DeskCompanionController extends BaseScriptComponent {
     // quiet for a while while roaming -> come over and tease
     // (also needs ~8 s back at her spot, so she does not step back and turn straight around)
     const roaming = this._state === "roam_idle" || this._state === "roam_walk"
-    if (roaming && !this.gliding && now - this.lastInteraction > this.idleTeaseSeconds && now - this.roamSince > 8) {
+    if (roaming && !this.gliding && this.idleTeaseSeconds > 0 && now - this.lastInteraction > this.idleTeaseSeconds && now - this.roamSince > 8) {
       this.tease()
     }
 
@@ -616,6 +680,14 @@ export class DeskCompanionController extends BaseScriptComponent {
   private faceUserNow(): void {
     const p = this.getTransform().getWorldPosition()
     this.desiredYaw = yawAngle(this.userFloor().sub(p))
+  }
+
+  /** At a wander spot: maybe play one of the mode's favourite clips (more entries = more likely). */
+  private playFavoriteIdle(): void {
+    if (!this.animator || (this.voice && this.voice.isSpeaking)) return
+    const pick = this.favoriteAnims[Math.floor(Math.random() * this.favoriteAnims.length)]
+    if (!pick || pick === "idle" || pick === "walk") return
+    this.animator.playOnce(pick as CompanionAnim)
   }
 
   /** After a small idle move: mostly face you, sometimes look a little aside. */

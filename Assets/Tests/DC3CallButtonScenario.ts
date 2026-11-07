@@ -1,5 +1,6 @@
 /**
- * Done criterion 3 — pinching the Call button makes her say "What's up?" (どうしたの？) and walk up
+ * Done criterion 3 — pinching the Call button makes her say the active mode's call line (default
+ * Sweetheart: "Hey, what's up?" / どうしたの？ — line id comes from controller.callLineId) and walk up
  * to ~1.2 m in front, face and upper body in view; the Dance/Pose panel appears near her.
  *
  * Parameter: arriveLimitMs = "2500" (how long she may take to arrive after the pinch).
@@ -12,6 +13,7 @@ import {sleep} from "Leaf.lspkg/Utils/common/Utils"
 import WorldCameraFinderProvider from "SpectaclesInteractionKit.lspkg/Providers/CameraProvider/WorldCameraFinderProvider"
 import {CheckList, f1, FOV_HALF_H, FOV_HALF_V, Lens, log, viewAngles, waitForLensReady, waitUntil} from "./DeskCompanionLeafHelpers"
 import {DeskCompanionLeafInteractor} from "./DeskCompanionLeafInteractor"
+import {findLine} from "../Scripts/DeskCompanionContent"
 
 const APPROACH_DISTANCE_CM = 120
 
@@ -35,10 +37,12 @@ export class DC3CallButtonScenario extends Scenario {
     await sleep(100)
 
     const id = lens.voice.lastLineId
-    checks.check("says call_whats_up", id === "call_whats_up", `lastLineId=${id}`)
+    const callId = c.callLineId
+    const callLine = findLine(callId)
+    checks.check(`says the mode's call line (${callId})`, id === callId && !!callLine, `lastLineId=${id} mode=${c.modeId}`)
     checks.check(
-      "bubble shows どうしたの？ / What's up?",
-      lens.bubble.isShown && lens.bubble.currentJa === "どうしたの？" && lens.bubble.currentEn === "What's up?",
+      `bubble shows ${callLine ? callLine.ja + " / " + callLine.en : "?"}`,
+      lens.bubble.isShown && !!callLine && lens.bubble.currentJa === callLine.ja && lens.bubble.currentEn === callLine.en,
       `isShown=${lens.bubble.isShown} ja="${lens.bubble.currentJa}" en="${lens.bubble.currentEn}"`
     )
 

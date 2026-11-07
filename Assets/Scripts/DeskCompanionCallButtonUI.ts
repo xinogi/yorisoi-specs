@@ -49,7 +49,7 @@ export class DeskCompanionCallButtonUI extends BaseScriptComponent {
 
   @input
   @hint("Label under the button")
-  labelText: string = "呼ぶ · Call"
+  labelText: string = "Call"
 
   @input("vec4", "{1, 1, 1, 1}")
   @widget(new ColorWidget())

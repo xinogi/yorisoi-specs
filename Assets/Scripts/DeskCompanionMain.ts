@@ -5,6 +5,10 @@
  *   Highlighted word pinched   -> page.showTranslation(..) next to the word + companion.explainWord(line)
  *   Book grabbed / offered     -> companion.noteInteraction() / companion.offerBook() (reads + summarizes)
  *   Dance / Pose pinched       -> companion.dance() / companion.pose()
+ *   Mode pinched               -> modes.cycleMode()   (persona modes + cue cards live in DeskCompanionModeController)
+ *   Ask pinched                -> modes.ask()         (weather / today's plan / project tip, sample data)
+ *   Word pinched (also)        -> translator.translateWord() -> page.setTranslationResult() (live / offline)
+ *   Translate… pinched         -> translator.openFreeInput()  (AR keyboard -> live translation card)
  *   Companion arrived / left   -> actions.show() / actions.hide()
  *
  * Owns: event wiring only, the UI click sound, and making sure the camera has an AudioListener
@@ -18,6 +22,8 @@ import {DeskCompanionBook} from "./DeskCompanionBook"
 import {DeskCompanionCallButtonUI} from "./DeskCompanionCallButtonUI"
 import {DeskCompanionForeignPageUI} from "./DeskCompanionForeignPageUI"
 import {DeskCompanionActionsUI} from "./DeskCompanionActionsUI"
+import {DeskCompanionModeController} from "./DeskCompanionModeController"
+import {DeskCompanionTranslator} from "./DeskCompanionTranslator"
 import {findWord} from "./DeskCompanionContent"
 
 @component
@@ -48,6 +54,14 @@ export class DeskCompanionMain extends BaseScriptComponent {
   book: DeskCompanionBook
 
   @input
+  @hint("Persona modes + cue cards (Mode button)")
+  modes: DeskCompanionModeController
+
+  @input
+  @hint("Live translation (MyMemory) with the hard-coded table as fallback")
+  translator: DeskCompanionTranslator
+
+  @input
   @allowUndefined
   @hint("Non-spatial AudioComponent for UI clicks")
   uiClickAudio: AudioComponent
@@ -67,8 +81,8 @@ export class DeskCompanionMain extends BaseScriptComponent {
   @ui.group_end
 
   onAwake(): void {
-    if (!this.companion || !this.callButton || !this.page || !this.actions || !this.book) {
-      print("DeskCompanionMain: a required @input is not wired (companion / callButton / page / actions / book). Check the scene.")
+    if (!this.companion || !this.callButton || !this.page || !this.actions || !this.book || !this.modes) {
+      print("DeskCompanionMain: a required @input is not wired (companion / callButton / page / actions / book / modes). Check the scene.")
       return
     }
     this.createEvent("OnStartEvent").bind(() => this.onStart())
@@ -91,6 +105,9 @@ export class DeskCompanionMain extends BaseScriptComponent {
       print("DeskCompanionMain: word pinched " + wordId)
       this.page.showTranslation(w.id, w.word, w.reading, w.meaningJa, w.meaningEn)
       this.companion.explainWord(w.lineId)
+      if (this.translator) {
+        this.translator.translateWord(w).then((r) => this.page.setTranslationResult(w.id, r.meaningEn, r.meaningJa, r.source))
+      }
     })
 
     this.book.onGrabbed.add(() => this.companion.noteInteraction())
@@ -104,6 +121,23 @@ export class DeskCompanionMain extends BaseScriptComponent {
       this.click()
       this.companion.pose()
     })
+    this.actions.onMode.add(() => {
+      this.click()
+      this.modes.cycleMode()
+    })
+    this.actions.onAsk.add(() => {
+      this.click()
+      this.modes.ask()
+    })
+    this.actions.onTranslate.add(() => {
+      this.click()
+      if (this.translator) this.translator.openFreeInput()
+    })
+    // the Ask card and the translation card share the spot beside her head: one hides the other
+    this.modes.onAskShown = () => {
+      if (this.translator) this.translator.hideCard()
+    }
+    if (this.translator) this.translator.onCardShown.add(() => this.modes.hideAskCard())
 
     this.companion.onArrived.add(() => this.actions.show())
     this.companion.onLeft.add(() => this.actions.hide())

@@ -1,6 +1,7 @@
 /**
  * DeskCompanionAnimator — the companion's animation hooks:
- *   idle, walk, talk (loop)   ·   wave, lean_in, read, dance, pose (play once, then idle)
+ *   idle, walk, talk (loop)   ·   wave, lean_in, read, dance, pose, happy_laugh, surprised,
+ *   thoughtful (play once — capped at a few seconds per hook, since the clips are 10 s — then idle)
  *
  * Owns: what the CompanionModel subtree shows. Never moves the Companion root (the controller does).
  *
@@ -13,16 +14,27 @@
  *   3. "joints" — the model has joints named Hips / Spine / Head / LeftUpperArm / LeftForearm /
  *                 RightUpperArm / RightForearm / LeftLeg / RightLeg: animated procedurally.
  *   4. "tween"  — anything else (e.g. a static mesh): bob / tilt / spin the whole model.
- * Missing hooks degrade: pose -> dance -> idle, lean_in -> talk -> idle, others -> idle.
+ * Missing hooks degrade: pose -> dance -> idle, lean_in -> talk -> idle, thoughtful -> talk -> idle,
+ * happy_laugh -> wave -> idle, pout -> scold -> surprised -> idle, forgive -> idle, others -> idle.
  *
  * Must not: decide WHEN to play anything (DeskCompanionController does), talk, or touch UI.
  */
 import {clamp, degToRad, lerp} from "./DeskCompanionMath"
 
-export type CompanionAnim = "idle" | "walk" | "talk" | "read" | "dance" | "pose" | "wave" | "lean_in"
+export type CompanionAnim =
+  | "idle" | "walk" | "talk" | "read" | "dance" | "pose" | "wave" | "lean_in"
+  | "happy_laugh" | "surprised" | "thoughtful" | "pout" | "scold" | "forgive"
 
 const LOOP_HOOKS: CompanionAnim[] = ["idle", "walk", "talk"]
-const ALL_HOOKS: CompanionAnim[] = ["idle", "walk", "talk", "read", "dance", "pose", "wave", "lean_in"]
+const ALL_HOOKS: CompanionAnim[] = [
+  "idle", "walk", "talk", "read", "dance", "pose", "wave", "lean_in", "happy_laugh", "surprised", "thoughtful", "pout", "scold", "forgive"
+]
+
+/** Longest time (s) a play-once hook stays on screen before returning to idle (clips are ~10 s). */
+const ONCE_CAP_S: Partial<Record<CompanionAnim, number>> = {
+  wave: 3.5, lean_in: 4, surprised: 3, happy_laugh: 4, thoughtful: 6, dance: 6, pose: 4, read: 10, talk: 4,
+  pout: 4, scold: 4, forgive: 4
+}
 
 type JointName =
   | "Hips" | "Spine" | "Head"
@@ -66,6 +78,12 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
   @input @allowUndefined @hint("read.mp4 — once, when she opens the book") readVideo: Texture
   @input @allowUndefined @hint("dance.mp4 — once, for the dance button") danceVideo: Texture
   @input @allowUndefined @hint("pose clip — once, for the pose button (empty = uses the dance clip)") poseVideo: Texture
+  @input @allowUndefined @hint("happy_laugh.mp4 — once, after she sums up the book") happyLaughVideo: Texture
+  @input @allowUndefined @hint("surprised.mp4 — once, when you call her right after she teased you") surprisedVideo: Texture
+  @input @allowUndefined @hint("thoughtful.mp4 — once, while she explains a word") thoughtfulVideo: Texture
+  @input @allowUndefined @hint("pout.mp4 (optional) — once, when poked too often (empty = scold, then surprised)") poutVideo: Texture
+  @input @allowUndefined @hint("scold.mp4 (optional) — used when there is no pout clip") scoldVideo: Texture
+  @input @allowUndefined @hint("forgive.mp4 (optional) — once, when she forgives you (empty = idle)") forgiveVideo: Texture
   @ui.group_end
 
   @ui.separator
@@ -79,6 +97,12 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
   @input @hint("Substring of the read clip") readClip: string = "read"
   @input @hint("Substring of the dance clip") danceClip: string = "dance"
   @input @hint("Substring of the pose clip") poseClip: string = "pose"
+  @input @hint("Substring of the happy / laugh clip") happyLaughClip: string = "laugh"
+  @input @hint("Substring of the surprised clip") surprisedClip: string = "surpris"
+  @input @hint("Substring of the thoughtful clip") thoughtfulClip: string = "thought"
+  @input @hint("Substring of the pout clip") poutClip: string = "pout"
+  @input @hint("Substring of the scold clip") scoldClip: string = "scold"
+  @input @hint("Substring of the forgive clip") forgiveClip: string = "forgive"
   @ui.group_end
 
   @ui.separator
@@ -200,7 +224,7 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
       else if (Object.keys(this.joints).length >= 4) this.mode = "joints"
       else this.mode = "tween"
     }
-    print("DeskCompanionAnimator: strategy=" + this.mode)
+    print("DeskCompanionAnimator: strategy=" + this.mode + (this.mode === "video" && this.idleVideo ? " idleClip=" + this.idleVideo.getWidth() + "x" + this.idleVideo.getHeight() : ""))
     this.ready = true
     this.show(this.base, !this.isLoop(this.base))
   }
@@ -210,7 +234,9 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
     for (const c of this.player.clips) names.push(c.name)
     const wanted: Record<CompanionAnim, string> = {
       idle: this.idleClip, walk: this.walkClip, talk: this.talkClip, wave: this.waveClip,
-      lean_in: this.leanInClip, read: this.readClip, dance: this.danceClip, pose: this.poseClip
+      lean_in: this.leanInClip, read: this.readClip, dance: this.danceClip, pose: this.poseClip,
+      happy_laugh: this.happyLaughClip, surprised: this.surprisedClip, thoughtful: this.thoughtfulClip,
+      pout: this.poutClip, scold: this.scoldClip, forgive: this.forgiveClip
     }
     for (const h of ALL_HOOKS) {
       const key = (wanted[h] || h).toLowerCase()
@@ -250,8 +276,11 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
       }
       if (ctrl.isPlaybackReady) start()
       else this.videoStart.set(ctrl, start)
-      // safety net in case a finish callback never arrives
-      if (once) this.onceEndsAt = getTime() + Math.max(1, ctrl.duration > 0 ? ctrl.duration + 0.5 : 8)
+      // end a one-shot after its cap (clips are ~10 s), or when the clip finishes, whichever is first
+      if (once) {
+        const cap = ONCE_CAP_S[hook] || 5
+        this.onceEndsAt = getTime() + (ctrl.duration > 0 ? Math.min(cap, ctrl.duration + 0.5) : cap)
+      }
       return
     }
 
@@ -323,17 +352,22 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
 
   private degrade(h: CompanionAnim): CompanionAnim {
     if (h === "pose") return "dance"
-    if (h === "lean_in") return "talk"
+    if (h === "lean_in" || h === "thoughtful") return "talk"
+    if (h === "happy_laugh") return "wave"
+    if (h === "pout") return "scold"
+    if (h === "scold") return "surprised"
     return "idle"
   }
 
   private videoFor(h: CompanionAnim): Texture | null {
     const slot: Record<CompanionAnim, Texture | undefined> = {
       idle: this.idleVideo, walk: this.walkVideo, talk: this.talkVideo, wave: this.waveVideo,
-      lean_in: this.leanInVideo, read: this.readVideo, dance: this.danceVideo, pose: this.poseVideo
+      lean_in: this.leanInVideo, read: this.readVideo, dance: this.danceVideo, pose: this.poseVideo,
+      happy_laugh: this.happyLaughVideo, surprised: this.surprisedVideo, thoughtful: this.thoughtfulVideo,
+      pout: this.poutVideo, scold: this.scoldVideo, forgive: this.forgiveVideo
     }
     let cur: CompanionAnim = h
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       if (slot[cur]) return slot[cur]
       cur = this.degrade(cur)
     }
