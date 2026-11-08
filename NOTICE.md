@@ -1,6 +1,6 @@
 # NOTICE: third-party and generated assets
 
-This file lists everything in the Yorisoi repository that was not written by hand for this project, with its source and license. Items marked **[要確認]** (to be verified) have not been checked against the original license text yet. They will be resolved before the repository is made public.
+This file lists everything in the Yorisoi repository that was not written by hand for this project, with its source and license. Items still marked **[要確認]** (to be verified) have not been checked against the original license text yet.
 
 Last updated: 2026-11-08
 
@@ -8,21 +8,21 @@ Last updated: 2026-11-08
 
 | What | Where | Author | License |
 |---|---|---|---|
-| TypeScript behavior scripts | `Assets/Scripts/DeskCompanion*.ts` | Xinogi Studio (しのぎ). Built with CLAD (Snap's Lens Studio agents) under the author's direction | TBD [要確認] |
-| Persona definitions, lines, cue cards | `persona/`, `Assets/Scripts/DeskCompanionContent.ts` | Xinogi Studio | TBD [要確認] |
-| Foreign-language page (example sentences and word explanations) | `Assets/Scripts/DeskCompanionContent.ts` | Xinogi Studio (original short examples) | TBD [要確認] |
-| Tools | `tools/build_persona.py`, `tools/ls_mcp_bridge.py` | Xinogi Studio | TBD [要確認] |
-| Docs | `README.md`, `devpost/` | Xinogi Studio | TBD [要確認] |
+| TypeScript behavior scripts | `Assets/Scripts/DeskCompanion*.ts` | Xinogi Studio (しのぎ). Built with CLAD (Snap's Lens Studio agents) under the author's direction | **MIT** (see [LICENSE](LICENSE)) |
+| Persona definitions, lines, cue cards | `persona/`, `Assets/Scripts/DeskCompanionContent.ts` | Xinogi Studio | **MIT** (see [LICENSE](LICENSE)) |
+| Foreign-language page (example sentences and word explanations) | `Assets/Scripts/DeskCompanionContent.ts` | Xinogi Studio (original short examples) | **MIT** (see [LICENSE](LICENSE)) |
+| Tools | `tools/build_persona.py`, `tools/ls_mcp_bridge.py` | Xinogi Studio | **MIT** (see [LICENSE](LICENSE)) |
+| Docs | `README.md`, `devpost/` | Xinogi Studio | **MIT** (see [LICENSE](LICENSE)) |
 
 ## 2. Snap packages and template
 
 | Package | Where | Publisher | License |
 |---|---|---|---|
-| Spectacles Interaction Kit (SIK) | `Packages/SpectaclesInteractionKit.lspkg` | Snap Inc. | TBD [要確認]. No license file is bundled inside the `.lspkg`. Installed from the Lens Studio Asset Library; check the license wording in Snap's documentation or Asset Library listing. |
-| Spectacles UI Kit | `Packages/SpectaclesUIKit.lspkg` | Snap Inc. | TBD [要確認]. Same as above. |
-| LEAF (testing framework) | `Packages/Leaf.lspkg` | Snap Inc. | TBD [要確認]. Same as above. |
-| Bitmoji 3D (dependency declared by LEAF) | `Packages/Bitmoji 3D.lsc` | Snap Inc. | TBD [要確認]. Same as above. |
-| Specs Base Template (project starting point) | whole project, created from Lens Studio 5.24.1 | Snap Inc. | TBD [要確認] |
+| Spectacles Interaction Kit (SIK) | `Packages/SpectaclesInteractionKit.lspkg` | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's MIT License. |
+| Spectacles UI Kit | `Packages/SpectaclesUIKit.lspkg` | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's MIT License. |
+| LEAF (testing framework) | `Packages/Leaf.lspkg` | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's MIT License. |
+| Bitmoji 3D (dependency declared by LEAF) | `Packages/Bitmoji 3D.lsc` | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's MIT License. |
+| Specs Base Template (project starting point) | whole project, created from Lens Studio 5.24.1 | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's MIT License. |
 
 Code inside SIK that carries its own notice:
 
@@ -39,7 +39,7 @@ Notes:
 
 - Both files are subsets made from Noto Sans JP / KR fonts installed on Windows. **[要確認]** Confirm the exact source files and versions. The files' internal names still read `NotoSansJP-Thin` / `NotoSansKR-Thin` with style "Regular", which suggests they were cut from the variable font; check that the Medium weight was applied as intended.
 - Under the OFL, a modified version must not use the Reserved Font Name ("Source"). The subsets are named "Noto Sans JP" / "Noto Sans KR", which do not use it. **[要確認]**
-- The OFL requires every copy to include the copyright notice and the license. The notice is in the fonts' metadata, but the full license text is not in the repo yet. **[要確認] Add `OFL.txt` (the full SIL OFL 1.1 text) to the repository.**
+- The OFL requires every copy to include the copyright notice and the license. The notice is in the fonts' metadata, but the full license text is not in the repo yet. Done: the full SIL OFL 1.1 text is in [`licenses/OFL-NotoSans.txt`](licenses/OFL-NotoSans.txt). (Originally planned: add `OFL.txt` (the full SIL OFL 1.1 text) to the repository.**
 - License text: https://openfontlicense.org/
 
 ## 4. Icons
@@ -56,7 +56,7 @@ Notes:
 
 | Files | Where | How they were made | License |
 |---|---|---|---|
-| `CompanionAttentionChime`, `CompanionFootstep1`, `CompanionFootstep2`, `CompanionPageFlip`, `CompanionSparkle`, `UIClickSoft` (.wav) | `Assets/GeneratedSFX/` | Synthesized locally with CLAD's `build-sfx` skill (algorithmic synthesis; no recorded samples) | Original work by Xinogi Studio. Same license as section 1 (TBD) |
+| `CompanionAttentionChime`, `CompanionFootstep1`, `CompanionFootstep2`, `CompanionPageFlip`, `CompanionSparkle`, `UIClickSoft` (.wav) | `Assets/GeneratedSFX/` | Synthesized locally with CLAD's `build-sfx` skill (algorithmic synthesis; no recorded samples) | Original work by Xinogi Studio. All rights reserved (see [LICENSE](LICENSE)) |
 
 ## 6. Character images and videos (AI-generated)
 
@@ -64,7 +64,7 @@ The companion is a **fictional person**. She is not a real person and is not mad
 
 | What | Where | How it was made | Rights / license |
 |---|---|---|---|
-| Final character stills and clips | `Assets/Companion/Clips/`, `persona/characters/<name>/` | Generated by the author with AI: **Meta Muse** | The user keeps ownership of the output under the Muse supplemental terms, §2.1. **[要確認]** Re-check the exact wording and its date at submission time, and record any attribution or labelling requirement. Final clips: TBD |
+| Final character stills and clips | `Assets/Companion/Clips/`, `persona/characters/<name>/` | Generated by the author with AI: **Meta Muse** | The user keeps ownership of the output under the Muse supplemental terms, §2.1. **[要確認]** Re-check the exact wording and its date at submission time, and record any attribution or labelling requirement. Yori's final clips are **not in this repo** (placeholders only); they appear in the demo video, which is labelled as AI-generated on YouTube |
 | Fallback clips | same | **Z-Image-Turbo** (still image) → **Wan2.2** (image-to-video), generated locally | Both models are released under the **Apache License 2.0**. The clips are the author's output. **[要確認]** Record the exact model versions used |
 | Placeholder clips (current) | `Assets/Companion/Clips/*.mp4` | Created during the first CLAD build as stand-ins | **[要確認]** Record how the placeholders were produced. They will be replaced by the final clips |
 
@@ -85,7 +85,7 @@ The companion is a **fictional person**. She is not a real person and is not mad
 
 | Tool | Where | Notes |
 |---|---|---|
-| plan-lens skill pack | `.claude/skills/plan-lens/` | Provided for the Learn AR with SPECS hackathon. **[要確認]** Check the skill pack's license or terms before redistributing it in a public repo |
+| plan-lens skill pack | not included | Provided for the Learn AR with SPECS hackathon | Not redistributed here (no license file in the pack). Get it from the hackathon resources page: https://learn-specs.devpost.com/resources |
 | Lens Studio 5.24.1, CLAD, Lens Studio MCP server, LEAF | (not in the repo, except the LEAF package above) | Snap Inc. Used under Snap's terms |
 | `AGENTS.md` | repo root | Partly auto-generated by Lens Studio (the "Lens Studio managed" block) |
 
@@ -101,7 +101,7 @@ The companion is a **fictional person**. She is not a real person and is not mad
 - [ ] 仮のキャラクター動画をどう作ったか確認する（最終版に差し替えるなら行ごと削除）
 - [ ] Google Gemini TTS の利用規約（生成音声の権利・商用利用・合成音声の表示義務）を確認する
 - [ ] plan-lens スキルパックを公開リポジトリに含めてよいか（配布条件）を確認する
-- [ ] このプロジェクト自体のライセンス（MIT など）を決めて、第1節と README の「TBD」を埋める
+- [x] このプロジェクト自体のライセンス＝コードは MIT、Yori・声・曲・動画は全権利保持（LICENSE）。2026-11-08 本人決定
 
 ## Live data sources (fetched at runtime, not bundled)
 

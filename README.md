@@ -226,7 +226,7 @@ Live data used by the Lens (no API keys, no user data sent):
 - **Briefing** weather for Tokyo comes from [Open-Meteo](https://open-meteo.com/) (CC BY 4.0); offline, sample weather is shown, labelled "offline". Tasks and reminders on the card are sample data.
 - **Translation** uses MyMemory (see "How translation works").
 
-License for this project's own code and content: TBD.
+License: the project's own source code is under the **MIT License** ([LICENSE](LICENSE)). The character Yori (her look, clips and voice), the voice lines, the original music and the demo video are **all rights reserved** by Xinogi Studio. Third-party parts keep their own licenses ([NOTICE.md](NOTICE.md)).
 
 ---
 

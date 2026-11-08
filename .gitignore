@@ -47,3 +47,6 @@ tempAssetGen/
 # Added by Lens Studio (LEAF plugin)
 leaf_plugin_settings.json
 
+
+# hackathon-provided skill pack (no redistribution license): get it from the hackathon resources page
+.claude/skills/plan-lens/
