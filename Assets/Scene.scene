@@ -4388,8 +4388,6 @@
   Enabled: true
   ScriptAsset: !<reference> 124f1fe5-f611-4834-b445-10fdbfc5d503
   ScriptInputsDefault:
-    musicFocus: true
-    musicRelax: true
     musicVolume: true
     musicDuckVolume: true
     briefingHoldSeconds: true
@@ -4404,8 +4402,8 @@
       card: !<MappingBased.AssignableType_4> 1d76f315-a832-4bf2-89a9-ae944afd6871
       modes: !<MappingBased.AssignableType_5> a3957c59-b9d0-4d54-b640-69fc1c18f792
       stretch: !<MappingBased.AssignableType_6> d5f67e6b-7166-4766-b847-14aa106a520b
-      musicFocus: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
-      musicRelax: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
+      musicFocus: !<reference.AudioTrackAsset> fbed3451-8ab8-41f0-a438-d4fac73aade3
+      musicRelax: !<reference.AudioTrackAsset> b4ba95cc-f566-419a-8ec2-7ac6c2ff6e9c
       musicVolume: 0.400000
       musicDuckVolume: 0.150000
       briefingHoldSeconds: !<float> 14.000000

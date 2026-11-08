@@ -66,12 +66,25 @@ export class DC10SecretaryScenario extends Scenario {
 
       // ── 3. music ──
       const seq: string[] = []
+      const playing: boolean[] = []
+      let duckOk = false
+      let fullOk = false
       for (let i = 0; i < 3; i++) {
         await sleep(400)
         await interactor.tap("MusicButton")
         await sleep(150)
         seq.push(sec.musicTrack)
+        playing.push(sec.musicPlaying)
+        if (i === 0) {
+          // she answers "Let's listen…" -> music ducks; after she stops talking it comes back up
+          duckOk = lens.voice.isSpeaking && sec.musicCurrentVolume <= sec.musicDuckVolume + 0.001
+          await waitUntil(() => !lens.voice.isSpeaking, 6000)
+          await sleep(200)
+          fullOk = Math.abs(sec.musicCurrentVolume - sec.musicVolume) < 0.01
+        }
       }
+      checks.check("music really plays (Focus, Relax) and stops (Off)", playing.join(",") === "true,true,false", `playing=${playing.join(",")}`)
+      checks.check("music ducks while she speaks, back up after", duckOk && fullOk, `duck=${duckOk} full=${fullOk} volume=${f1(sec.musicCurrentVolume)} (set ${sec.musicVolume}, duck ${sec.musicDuckVolume})`)
       checks.check("Music cycles Off -> Focus -> Relax -> Off", seq.join(">") === "focus>relax>off" && lines.indexOf("music_on") >= 0 && lens.voice.lastLineId === "music_off", `seq=${seq.join(">")} last=${lens.voice.lastLineId}`)
 
       // ── 4. look it up ──

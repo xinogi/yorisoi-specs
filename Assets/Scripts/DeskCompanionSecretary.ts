@@ -125,6 +125,16 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
   public get timerRemaining(): number { return this._timerRemaining }
   public get timerKind(): string { return this._timerKind }
   public get musicTrack(): string { return this._musicTrack }
+  /** True while a music track is actually playing. */
+  public get musicPlaying(): boolean {
+    try {
+      return !!this.musicAudio && this.musicAudio.isPlaying()
+    } catch (e) {
+      return false
+    }
+  }
+  /** Volume the music is playing at right now (ducked while she speaks). */
+  public get musicCurrentVolume(): number { return this.musicAudio ? this.musicAudio.volume : 0 }
   /** Title of the last looked-up topic ("" before the first). */
   public get lastLookupTitle(): string { return this._lastLookupTitle }
   /** "live" (Wikipedia) or "offline" (built-in summary). */
