@@ -15,6 +15,7 @@ import {DC8AskAndTranslateScenario} from "./DC8AskAndTranslateScenario"
 import {ViewDeskScenario} from "./ViewDeskScenario"
 import {DC9StretchScenario} from "./DC9StretchScenario"
 import {DC10SecretaryScenario} from "./DC10SecretaryScenario"
+import {DemoReelScenario} from "./DemoReelScenario"
 
 @component
 export class LeafIndex extends BaseScriptComponent {
@@ -69,6 +70,12 @@ export class LeafIndex extends BaseScriptComponent {
       id: "dc10-secretary",
       typename: DC10SecretaryScenario.getTypeName(),
       parameters: {timeScale: "10"}
+    },
+    {
+      // hands-free demo video driver (devpost/video-script.md); not a done criterion
+      id: "demo-reel",
+      typename: DemoReelScenario.getTypeName(),
+      parameters: {}
     },
     {
       id: "view-desk",
