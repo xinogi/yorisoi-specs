@@ -114,7 +114,7 @@ About 1.5 s per clip, hard cuts, one caption each.
 - **Preview shows:** fade from her waving to a plain end card.
 - **Card text:**
   - **Yorisoi**: your girlfriend and a super-capable secretary, in your real space.
-  - Planned with **plan-lens** · Built with **CLAD + Lens Studio MCP** · Tested with **LEAF** (DC1–DC8 pass in preview) [update if DC9 / DC10 pass]
+  - Planned with **plan-lens** · Built with **CLAD + Lens Studio MCP** · Tested with **LEAF** (DC1–DC10 pass in preview)
   - Recorded in Lens Studio's Interactive Preview. No SPECS device.
   - Repo: github.com/xinogi/yorisoi-specs [confirm public]
   - Xinogi Studio (しのぎ)
@@ -133,6 +133,17 @@ About 1.5 s per clip, hard cuts, one caption each.
 - [ ] Voice volume around 70%, Mute off. Her voice sits above the music in the mix.
 
 ## Recording and editing notes
+
+**As recorded (2026-11-08):** the whole take is driven hands-free by the `demo-reel` LEAF scenario
+(`Assets/Tests/DemoReelScenario.ts`). Head turns are done with the real preview camera (so the Sunlit
+Room turns too); the reel waits for each turn, and the waits are cut. The Lens Studio window was
+captured silently with Windows Graphics Capture (ffmpeg `gfxcapture`), and the sound was rebuilt from
+the Lens Studio log: every `DeskCompanion says [id]` line is placed with its real voice MP3, plus the
+original music, ducked under her voice. Shot 6 is a pick-up take looking 10° left so the word card
+stays in frame. Captions sit in the left margin beside the preview, so they never cover her bubble or
+the cards. Final cut: 2:35.
+
+Original plan:
 
 - Record the Preview panel at 1920x1080 with OBS. Hide the other editor panels, or crop to the Preview.
 - Record each shot as its own short take and cut them together. Do not show the Asset Browser, file paths or any folder outside the repo.

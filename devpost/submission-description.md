@@ -3,14 +3,10 @@
 <!--
 Notes before pasting (do not paste this block)
 - Paste each "##" section into the matching Devpost field. "Name" and "Tagline" go in the top fields.
-- Lines tagged (new) are features being finished on 2026-11-08: Briefing, timers/reminders, music, Sunlit Room.
-  Before submitting, delete any (new) line that is not in the final build, or move it to "What's next".
-  Then remove the "(new)" tags themselves.
-- Confirm before pasting:
-  - Exact button names for Briefing / reminder / Music as built (the text uses those words).
-  - The room in the video is the "Sunlit Room" preview scene, not part of the Lens on glasses.
-  - LEAF table: fill DC9 and DC10 only after they pass in the preview. DC10's scope is written as planned.
-  - Video URL and repo URL (repo must be public, with the Lens Studio project and devpost/).
+- Briefing, Timer, Music and Look up are all in the final build (buttons: Briefing, Timer, Music, Look up).
+- The room in the video is the "Sunlit Room" preview scene, not part of the Lens on glasses.
+- LEAF: DC1-DC10 all pass in the preview (2026-11-08).
+- Still to fill before pasting: the YouTube URL, and confirm the repo is public.
 -->
 
 ## Name
@@ -56,16 +52,17 @@ You sit at your desk and work. **Yori** stands in your room, a little to the rig
 
 ### The secretary side
 
-- **Briefing (new):** pinch **Briefing** and she runs through **today's real weather for a demo city, Tokyo** (live from [Open-Meteo](https://open-meteo.com/), free, no key; the Lens never reads your location) and your schedule (**sample data**), then asks *"Want to rehearse?"*
-- **Timers and reminders (new):** set a reminder and a countdown appears beside her; when it ends she tells you in her own words. They last for the current session only.
+- **Briefing:** pinch **Briefing** and she runs through **today's real weather for a demo city, Tokyo** (live from [Open-Meteo](https://open-meteo.com/), free, no key; the Lens never reads your location) and your schedule (**sample data**), then asks *"Want to rehearse?"*
+- **Timers and reminders:** pinch **Timer** to pick a preset (1 min, 5 min rehearsal, a stretch reminder, a talk reminder) and a countdown appears beside her; when it ends she tells you in her own words. They last for the current session only.
 - **Stretch break:** pinch **Stretch** and she leads a 1 to 2 minute desk-break routine: arms up, side lean, shoulder rolls, neck tilt, with the move name, a 1-2-3-4 count and a timer beside her. It ends with *"Great job! Feel better?"* (She leads and you follow. The preview can't track your body.)
+- **Look up:** pinch **Look up** and she brings a short summary of a topic from **Wikipedia** (live, with the source line on the card; offline fallback).
 - **Ask:** everyday questions like tomorrow's weather, today's plan or a project tip. These answers are **sample data** and the card says so.
 
 ### The girlfriend side
 
 - **Always in front of you, never behind you.** If you turn away and she ends up more than about 12° off her spot, she glides back into view within about 1.4 seconds. This came straight from the learner's design note: *"If I'm working at my desk, I want her always in front of my view. I don't want her behind me."*
 - **Quiet by default.** The **Chat** toggle starts off, so she never talks unprompted. Pinch **Call** and she says *"Hey, what's up?"* and walks up to about 1.2 m in front of you. If you turn Chat on, she checks in now and then, never repeats the same line twice in a row, and waits twice as long if you don't answer.
-- **Music together (new):** put on an original track and she sways along with you to wind down.
+- **Music together:** pinch **Music** to put on one of two original tracks made for this project (Focus, Relax); she sways along, and the music dips whenever she speaks.
 - **Poke her** and she reacts: a tickle, then a pout if you keep going (*"Okay, that's enough. Hands off!"*), then she forgives you. There is no reaction tied to specific body parts.
 - **Hand her a book** (*Alice's Adventures in Wonderland*, public domain) and she reads it and gives you a short summary. **Dance** and **Pose** buttons appear when she is close. Cute and fun, never sexual.
 
@@ -81,12 +78,13 @@ You sit at your desk and work. **Yori** stands in your room, a little to the rig
 | Part | In this build |
 |---|---|
 | Word and text translation | **Live** (MyMemory API), offline fallback labeled "offline" |
-| Weather in the Briefing (new) | **Live** (Open-Meteo) |
+| Weather in the Briefing | **Live** (Open-Meteo) |
+| Look up summaries | **Live** (Wikipedia), offline fallback labeled "offline" |
 | Schedule, Ask answers | **Sample data**, labeled on the card |
-| Timers, reminders (new), cue-card timing | Real timers, current session only |
+| Timers, reminders, cue-card timing | Real timers, current session only |
 | Her spoken lines | Pre-recorded English voice lines (AI text-to-speech), not a live AI |
 | Talking to her | In the preview you pinch **Call**. Voice input on the device is future work |
-| The room in the video | The "Sunlit Room" preview scene (new). On glasses, she stands in your real room |
+| The room in the video | The "Sunlit Room" preview scene. On glasses, she stands in your real room |
 
 ### What's new about it
 
@@ -119,8 +117,8 @@ We followed the hackathon's full agent workflow: **plan-lens → approved brief 
 | DC6 | Mode cycling, and the full cue-card talk list: highlight, time bar, Next / Back, coaching, Auto, Rehearse, deck switch, ±5s, reorder, jump | Pass |
 | DC7 | Poking her: tickle, then annoyed, then she forgives you; Call still works right after | Pass |
 | DC8 | Ask answers with the "sample data" label; translation returns a result (live or offline); Translate… works with the demo phrase | Pass |
-| DC9 | Stretch break: four moves in order with count and card, then "Great job! Feel better?"; another button cancels it | TBD |
-| DC10 | Briefing, timers / reminders and music (scenario being written) | TBD |
+| DC9 | Stretch break: four moves in order with count and card, then "Great job! Feel better?"; another button cancels it | Pass |
+| DC10 | Briefing card with live Tokyo weather; Timer presets count down and fire the reminder; Music plays Focus / Relax, ducks under her voice and stops; Look up shows a Wikipedia summary with its source | Pass |
 
 Not covered by any test: anything only real glasses can tell (comfort over a long session, real hand tracking, real speech recognition, real furniture hiding her).
 
@@ -137,7 +135,7 @@ Not covered by any test: anything only real glasses can tell (comfort over a lon
 
 - **A complete experience, not a feature demo.** The video follows one working session: call her, get a briefing, rehearse a talk with cue cards, translate a word, take a stretch break, wind down with music.
 - **Two practical features that are real:** private cue cards with timing and coaching, and live translation that lands on the page.
-- **Eight LEAF scenarios passing in the preview** (DC1–DC8): every done criterion in the brief, plus poke reactions, Ask and typed translation.
+- **Ten LEAF scenarios passing in the preview** (DC1–DC10): every done criterion in the brief, plus poke reactions, Ask, typed translation, the stretch break and the secretary features.
 - **Honest labels everywhere:** live, offline, sample data and demo text are shown on the cards themselves.
 - **A personality anyone can edit:** six modes and your own cue-card decks in one Markdown file, no code needed.
 - **A non-engineer-directed build:** the learner made the design decisions; the agents built and tested them.
