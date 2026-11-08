@@ -138,16 +138,16 @@
 
 **カンペの中身: Yorisoi の紹介（デモ用）**
 書き方: `番号. [秒数] 話す内容 ｜ 話し方: 指示`。その下に2文字下げの `- ` で詳しいメモ（今のカードの時だけ開く）。束は何個でも作れる（Lens の「Deck」ボタンで切り替え）。
-1. [20秒] Hi, I'm presenting Yorisoi: an AR companion who shares your space. ｜ 話し方: 笑顔で、ゆっくり。会場を見る
-   - 名前の由来: 寄り添い = staying close
-2. [25秒] On a screen, an AI partner always feels fake. On glasses, she stands in your real room. ｜ 話し方: 「fake」と「real」を強く
-   - 例: VR は全部作り物、AR は本物の部屋
-3. [30秒] She's your girlfriend and a super-capable secretary: she translates, shows your cue cards, and answers your questions. ｜ 話し方: 指を折って3つ数える
-   - 翻訳は本物（無料の翻訳サービス）
-   - 天気・予定はサンプル
-4. [25秒] Like right now: only I can see these cards. You can't. ｜ 話し方: ここで一呼吸。いたずらっぽく笑う
-5. [20秒] Next: real voice, real memory, and someday a real body. ｜ 話し方: 少しゆっくり、前向きに
-6. [15秒] Thank you! Questions? ｜ 話し方: 会場を見て、間をとる
+1. [20秒] Hi, I'm presenting Yorisoi: an AR companion who shares your space. ｜ 話し方: Smile, slow down, look at the audience
+   - The name: "yorisoi" = staying close
+2. [25秒] On a screen, an AI partner always feels fake. On glasses, she stands in your real room. ｜ 話し方: Stress "fake" and "real"
+   - VR is all made up; AR is your real room
+3. [30秒] She's your girlfriend and a super-capable secretary: she translates, shows your cue cards, and answers your questions. ｜ 話し方: Count the three on your fingers
+   - Translation is real (free translation API)
+   - Schedule is sample data
+4. [25秒] Like right now: only I can see these cards. You can't. ｜ 話し方: Pause. Playful smile
+5. [20秒] Next: real voice, real memory, and someday a real body. ｜ 話し方: Slower, upbeat
+6. [15秒] Thank you! Questions? ｜ 話し方: Look around, take a beat
 
 **カンペの中身: AI の講義（例）**
 1. [30秒] Today: three ways AI can work beside you, not just on a screen. ｜ 話し方: ゆっくり、全体を見る
