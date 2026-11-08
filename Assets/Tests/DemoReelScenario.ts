@@ -20,8 +20,20 @@ import {DeskCompanionModeController} from "../Scripts/DeskCompanionModeControlle
 import {DeskCompanionCueCardsUI} from "../Scripts/DeskCompanionCueCardsUI"
 import {DeskCompanionSecretary} from "../Scripts/DeskCompanionSecretary"
 import {DeskCompanionStretch} from "../Scripts/DeskCompanionStretch"
+import {Logger} from "Leaf.lspkg/Utils/common/Logger"
+import WorldCameraFinderProvider from "SpectaclesInteractionKit.lspkg/Providers/CameraProvider/WorldCameraFinderProvider"
 
 const DESK_PITCH = -14
+/**
+ * true (recording): head turns are done by the real preview camera (MovePreviewCamera lookAt from
+ * the recording agent, or a right-drag), so the simulated room turns too. The reel prints
+ * "[REEL] LOOK yaw=.. pitch=.." and waits until the camera faces that way, then "[REEL] LOOKED".
+ * false: LEAF's head controller turns only the Lens camera (the preview room does not turn).
+ */
+const EXTERNAL_HEAD = true
+/** Pick-up take: run only shot 6 (translation), looking a little left so the word cards stay in frame. */
+const ONLY_TRANSLATION = false
+const PAGE_YAW = 10
 
 @component
 export class DemoReelScenario extends Scenario {
@@ -41,7 +53,23 @@ export class DemoReelScenario extends Scenario {
     await waitForLensReady(lens)
     await waitUntil(() => !!findInteractableByName("CallButton", undefined, true), 5000)
     const ui = new DeskCompanionLeafInteractor()
-    const head = new LeafHead("leafHead", true)
+    const head = EXTERNAL_HEAD ? null : new LeafHead("leafHead", true)
+    const camT = WorldCameraFinderProvider.getInstance().getComponent().getTransform()
+    const look = async (yaw: number, pitch: number): Promise<void> => {
+      if (head) {
+        await head.turnTo(yaw, pitch)
+        return
+      }
+      const want = LeafHead.direction(yaw, pitch)
+      const t = getTime()
+      print("[REEL] LOOK yaw=" + yaw + " pitch=" + pitch)
+      await waitUntil(() => camT.getWorldRotation().multiplyVec3(vec3.back()).dot(want) > 0.995, 120000)
+      print("[REEL] LOOKED after " + (getTime() - t).toFixed(1) + "s")
+    }
+    // hide LEAF's on-screen log strip for the recording (its camera object is the strip's parent)
+    const strip = (Logger as any).screenText as Text | undefined
+    if (strip) strip.getSceneObject().getParent().enabled = false
+    print("[REEL] overlay hidden")
     // tap helper: never let one missing button stop the reel
     const tap = async (name: string, after: number = 0.4): Promise<void> => {
       try {
@@ -52,9 +80,22 @@ export class DemoReelScenario extends Scenario {
       if (after > 0) await sleep(after * 1000)
     }
     try {
-      await head.turnTo(0, DESK_PITCH)
+      await look(0, DESK_PITCH)
       await sleep(800)
       this.t0 = getTime()
+
+      if (ONLY_TRANSLATION) {
+        this.shot(6, "translation")
+        await sleep(1500)
+        await look(PAGE_YAW, -48)
+        await sleep(1200)
+        await tap("Word_bara", 7.5)
+        await tap("Word_gamsahamnida", 7.5)
+        await look(0, DESK_PITCH)
+        await sleep(1500)
+        print("[REEL] end t=" + (getTime() - this.t0).toFixed(1))
+        return
+      }
 
       // 1 — quiet at the desk
       this.shot(1, "open-quiet")
@@ -62,9 +103,9 @@ export class DemoReelScenario extends Scenario {
 
       // 2 — look away, she glides back in front
       this.shot(2, "always-in-front")
-      await head.turnTo(60, -8)
+      await look(60, -8)
       await sleep(2200)
-      await head.turnTo(0, DESK_PITCH)
+      await look(0, DESK_PITCH)
       await sleep(1500)
 
       // 3 — Call her
@@ -108,11 +149,11 @@ export class DemoReelScenario extends Scenario {
 
       // 6 — real translation on the page
       this.shot(6, "translation")
-      await head.turnTo(0, -48)
+      await look(0, -48)
       await sleep(800)
       await tap("Word_bara", 7.5)
       await tap("Word_gamsahamnida", 6.5)
-      await head.turnTo(0, DESK_PITCH)
+      await look(0, DESK_PITCH)
       await sleep(1000)
 
       // 7 — the stretch reminder fires (sped up)
@@ -174,7 +215,7 @@ export class DemoReelScenario extends Scenario {
       }
       if (!c.avatarVisible) c.setAvatarVisible(true)
       if (modes.currentModeId !== "sweetheart") modes.enterMode("sweetheart")
-      head.restore()
+      if (head) head.restore()
     }
   }
 }
