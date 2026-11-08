@@ -208,7 +208,7 @@ export class DemoReelScenario extends Scenario {
       modes.cueTimeScale = 1
       if (stretch.stretchActive) stretch.cancel()
       let guard = 0
-      while (sec.musicTrack !== "off" && guard++ < 3) sec.cycleMusic()
+      while (sec.musicTrack !== "off" && guard++ < 4) sec.cycleMusic()
       if (sec.timerKind !== "") {
         guard = 0
         while (sec.timerKind !== "" && guard++ < 5) sec.cycleTimer()

@@ -4412,6 +4412,7 @@
       stretch: !<MappingBased.AssignableType_6> d5f67e6b-7166-4766-b847-14aa106a520b
       musicFocus: !<reference.AudioTrackAsset> fbed3451-8ab8-41f0-a438-d4fac73aade3
       musicRelax: !<reference.AudioTrackAsset> b4ba95cc-f566-419a-8ec2-7ac6c2ff6e9c
+      musicCalm: !<reference.AudioTrackAsset> 8d0aff9e-a4b9-499f-9746-6a29610e9fc7
       musicVolume: 0.400000
       musicDuckVolume: 0.150000
       briefingHoldSeconds: !<float> 14.000000

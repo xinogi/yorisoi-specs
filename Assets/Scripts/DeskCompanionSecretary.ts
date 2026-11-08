@@ -9,7 +9,7 @@
  *   - Timer (Timer button cycles: 1 min -> 5 min (rehearsal) -> Stretch reminder (demo 30 s) ->
  *     Talk in 1 min (demo 20 s) -> off). A big countdown floats beside her; on done she says
  *     timer_done / reminder_stretch (+ Stretch shortcut) / reminder_talk. Session-only.
- *   - Music (Music button cycles Off -> Focus -> Relax -> Off): loops the track at `musicVolume`
+ *   - Music (Music button cycles Off -> Focus -> Relax -> Calm -> Off): loops the track at `musicVolume`
  *     (desk slider), ducks to 15 % while she speaks, and she sways (a dance one-shot now and then)
  *     while idle. Missing track files are tolerated (the mode still cycles, nothing plays).
  *   - Look it up (Look up button cycles Risotto -> Kyoto -> Augmented reality -> Alice's Adventures
@@ -37,7 +37,7 @@ const TIMER_PRESETS: TimerPreset[] = [
   {label: "Stretch reminder (demo: 30 s)", seconds: 30, kind: "stretch"},
   {label: "Talk in 1 min (demo: 20 s)", seconds: 20, kind: "talk"}
 ]
-type MusicTrack = "off" | "focus" | "relax"
+type MusicTrack = "off" | "focus" | "relax" | "calm"
 
 const LOOKUP_TOPICS = ["Risotto", "Kyoto", "Augmented reality", "Alice's Adventures in Wonderland"]
 const LOOKUP_TYPE = "Type a topic…"
@@ -87,6 +87,7 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
   @input @allowUndefined @hint("Stretch routine (Stretch shortcut)") stretch: DeskCompanionStretch
   @input @allowUndefined @hint("music_focus.mp3 (optional — missing = silent)") musicFocus: AudioTrackAsset
   @input @allowUndefined @hint("music_relax.mp3 (optional — missing = silent)") musicRelax: AudioTrackAsset
+  @input @allowUndefined @hint("music_calm.mp3 (optional — missing = silent)") musicCalm: AudioTrackAsset
   @ui.group_end
 
   @ui.separator
@@ -364,10 +365,11 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
 
   // ───────────────────────────── music ─────────────────────────────
 
-  /** Music button: Off -> Focus -> Relax -> Off. */
+  /** Music button: Off -> Focus -> Relax -> Calm -> Off. */
   public cycleMusic(): void {
     if (this.controller) this.controller.noteInteraction()
-    const next: MusicTrack = this._musicTrack === "off" ? "focus" : this._musicTrack === "focus" ? "relax" : "off"
+    const order: MusicTrack[] = ["off", "focus", "relax", "calm"]
+    const next: MusicTrack = order[(order.indexOf(this._musicTrack) + 1) % order.length]
     this._musicTrack = next
     const a = this.musicAudio
     if (a) {
@@ -376,7 +378,7 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
       } catch (e) {
         // nothing playing yet
       }
-      const track = next === "focus" ? this.musicFocus : next === "relax" ? this.musicRelax : null
+      const track = next === "focus" ? this.musicFocus : next === "relax" ? this.musicRelax : next === "calm" ? this.musicCalm : null
       if (track) {
         a.audioTrack = track
         a.volume = this.musicVolume

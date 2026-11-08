@@ -62,7 +62,7 @@ You sit at your desk and work. **Yori** stands in your room, a little to the rig
 
 - **Always in front of you, never behind you.** If you turn away and she ends up more than about 12° off her spot, she glides back into view within about 1.4 seconds. This came straight from the learner's design note: *"If I'm working at my desk, I want her always in front of my view. I don't want her behind me."*
 - **Quiet by default.** The **Chat** toggle starts off, so she never talks unprompted. Pinch **Call** and she says *"Hey, what's up?"* and walks up to about 1.2 m in front of you. If you turn Chat on, she checks in now and then, never repeats the same line twice in a row, and waits twice as long if you don't answer.
-- **Music together:** pinch **Music** to put on one of two original tracks made for this project (Focus, Relax); she sways along, and the music dips whenever she speaks.
+- **Music together:** pinch **Music** to put on one of three original tracks made for this project (Focus, Relax, Calm); she sways along, and the music dips whenever she speaks.
 - **Poke her** and she reacts: a tickle, then a pout if you keep going (*"Okay, that's enough. Hands off!"*), then she forgives you. There is no reaction tied to specific body parts.
 - **Hand her a book** (*Alice's Adventures in Wonderland*, public domain) and she reads it and gives you a short summary. **Dance** and **Pose** buttons appear when she is close. Cute and fun, never sexual.
 

@@ -4,7 +4,7 @@
  *    labelled "offline"), today's tasks and a reminder; she says briefing_intro.
  * 2. Timer: pinch Timer until "Talk in 1 min (demo 20 s)"; the countdown runs (clock sped up,
  *    parameter timeScale "10") and fires reminder_talk.
- * 3. Music: Off -> Focus -> Relax -> Off (music_on / music_off lines; missing tracks are allowed).
+ * 3. Music: Off -> Focus -> Relax -> Calm -> Off (music_on / music_off lines; missing tracks are allowed).
  * 4. Look up: the first preset topic (Risotto) shows a summary (live Wikipedia or offline) with the
  *    "Source: Wikipedia (CC BY-SA)" line.
  */
@@ -69,7 +69,7 @@ export class DC10SecretaryScenario extends Scenario {
       const playing: boolean[] = []
       let duckOk = false
       let fullOk = false
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 4; i++) {
         await sleep(400)
         await interactor.tap("MusicButton")
         await sleep(150)
@@ -83,9 +83,9 @@ export class DC10SecretaryScenario extends Scenario {
           fullOk = Math.abs(sec.musicCurrentVolume - sec.musicVolume) < 0.01
         }
       }
-      checks.check("music really plays (Focus, Relax) and stops (Off)", playing.join(",") === "true,true,false", `playing=${playing.join(",")}`)
+      checks.check("music really plays (Focus, Relax, Calm) and stops (Off)", playing.join(",") === "true,true,true,false", `playing=${playing.join(",")}`)
       checks.check("music ducks while she speaks, back up after", duckOk && fullOk, `duck=${duckOk} full=${fullOk} volume=${f1(sec.musicCurrentVolume)} (set ${sec.musicVolume}, duck ${sec.musicDuckVolume})`)
-      checks.check("Music cycles Off -> Focus -> Relax -> Off", seq.join(">") === "focus>relax>off" && lines.indexOf("music_on") >= 0 && lens.voice.lastLineId === "music_off", `seq=${seq.join(">")} last=${lens.voice.lastLineId}`)
+      checks.check("Music cycles Off -> Focus -> Relax -> Calm -> Off", seq.join(">") === "focus>relax>calm>off" && lines.indexOf("music_on") >= 0 && lens.voice.lastLineId === "music_off", `seq=${seq.join(">")} last=${lens.voice.lastLineId}`)
 
       // ── 4. look it up ──
       await sleep(400)
