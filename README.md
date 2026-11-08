@@ -4,14 +4,13 @@
 
 *Yorisoi* (寄り添い) means "staying close beside someone." Made for the Devpost hackathon [Learn AR with SPECS](https://learn-specs.devpost.com/) by **Xinogi Studio (しのぎ)**.
 
-<!-- TODO: capture docs/images/hero.png (see devpost/portfolio/assets-todo.md) -->
-![Yorisoi: a life-size companion standing in front of the desk in the Lens Studio preview](docs/images/hero.png)
+![Yorisoi: the cue-card talk list beside her in the Lens Studio preview; the current point runs long and its time bar turns red](docs/images/hero.png)
 
-*Hero image: TBD.* · **Demo video:** TBD (YouTube, under 3 minutes)
+**Demo video (2:06):** https://youtu.be/l1H7K6IRivE
 
 Lens Studio 5.24.1 · SPECS · TypeScript · Spectacles Interaction Kit + UI Kit · LEAF
 
-> **Status:** work in progress for the hackathon. The final character clips, the LEAF test results and the demo video are still TBD. The character in the project right now is a placeholder.
+> **Status:** submitted to the hackathon (November 2026). All ten LEAF scenarios (DC1–DC10) pass in the Lens Studio preview. Yori, the author's personal character, appears only in the demo video; this repo ships placeholder character clips and a swappable character system.
 
 ---
 
@@ -51,7 +50,7 @@ flowchart LR
 
 1. **Plan: plan-lens.** The [plan-lens skill pack](.claude/skills/plan-lens/SKILL.md) interviewed the learner (in Japanese), checked each answer against AR design habits and against what Lens Studio's preview can do, and wrote [`devpost/design-brief.md`](devpost/design-brief.md). The learner made every decision, and the brief was approved before any building started.
 2. **Build: CLAD through the Lens Studio MCP server.** CLAD, Snap's Lens Studio agent toolkit, read the brief and built the scene, the SIK / UI Kit interactions and the TypeScript behavior scripts in Lens Studio 5.24.1, working through the Lens Studio MCP server.
-3. **Test: LEAF.** One LEAF scenario per done criterion in the brief, run in the Lens Studio preview. Results are TBD ([table below](#leaf-tests)).
+3. **Test: LEAF.** One LEAF scenario per done criterion in the brief, run in the Lens Studio preview. All ten pass ([table below](#leaf-tests)).
 4. **Iterate with design notes.** Changes go back to the agent in design terms, then the tests run again. For example: *"If I'm working at my desk, I want her always in front of my view. I don't want her behind me."* That note became the lazy head-follow in `DeskCompanionController`.
 
 ### How the AI-agent workflow went (honestly)
@@ -107,7 +106,7 @@ specs-lens/
 │   ├── build_persona.py       persona/modes.md -> Assets/Scripts/DeskCompanionPersonaData.ts
 │   └── ls_mcp_bridge.py       stdio bridge for the Lens Studio MCP server
 ├── devpost/                   design brief, submission text, video script, portfolio notes
-├── docs/images/               screenshots and GIFs (TBD)
+├── docs/images/               hero image
 ├── .claude/skills/plan-lens/  the plan-lens skill pack that wrote the brief
 ├── AGENTS.md                  Lens Studio's reference for coding agents (auto-generated)
 └── NOTICE.md                  third-party and generated assets, with licenses
@@ -191,16 +190,22 @@ Voice lines: name the MP3 after the line id (for example `word_bara.mp3`, or `sm
 
 One scenario per done criterion in [`devpost/design-brief.md`](devpost/design-brief.md), run in the Lens Studio preview.
 
-| # | Done criterion | Scenario | Result |
-|---|---|---|---|
-| 1 | At start she is about 2.5 m in front, slightly right, whole body in view at the working gaze. Turning away makes her glide back into view within about 2 s | TBD | TBD |
-| 2 | After about 20 s without interaction she walks closer and teases (voice + subtitle) | TBD | TBD |
-| 3 | Pinching Call makes her say "What's up?" and walk to about 1.2 m, face and upper body in view | TBD | TBD |
-| 4 | Pinching a highlighted word shows the translation right next to it, then it fades | TBD | TBD |
-| 5 | Handing her the book makes her open it and give a short summary | TBD | TBD |
-| 6 | Mode cycles her mode and she answers in the new mode. In Cue cards mode, Next shows the next card and the last card makes her say "You did great!" | TBD | TBD |
+| # | What it checks | Result |
+|---|---|---|
+| DC1 | At start she is about 2.5 m in front, slightly right, whole body in view at the desk gaze; turning away makes her glide back into view within 2 s | Pass |
+| DC2 | Quiet by default. With Chat on she comes closer and checks in, never repeats a line twice in a row, and waits twice as long when ignored | Pass |
+| DC3 | Call makes her say "Hey, what's up?" and walk to about 1.2 m; voice slider and Mute work; Voice only hides her body while Call still answers | Pass |
+| DC4 | Pinching a highlighted word shows the translation right next to it, then it fades | Pass |
+| DC5 | Handing her the book makes her read it and give a short summary | Pass |
+| DC6 | Mode cycling, and the full cue-card talk list: highlight, time bar, Next / Back, coaching, Auto, Rehearse, deck switch, ±5s, reorder, jump | Pass |
+| DC7 | Poking her: tickle, then annoyed, then she forgives you; Call still works right after | Pass |
+| DC8 | Ask answers with the "sample data" label; translation returns a result (live or offline); Translate… works with the demo phrase | Pass |
+| DC9 | Stretch break: four moves in order with count and card, then "Great job! Feel better?"; another button cancels it | Pass |
+| DC10 | Briefing card with live Tokyo weather; Timer presets count down and fire the reminder, and My song plays as the alarm; Music plays Focus / Relax / Calm / My song (downloaded from its link), ducks under her voice and stops; Look up shows a Wikipedia summary with its source | Pass |
 
-Criteria with no test: TBD.
+Not covered by any test: anything only real glasses can tell (comfort over a long session, real hand tracking, real speech recognition, real furniture hiding her).
+
+Scenarios: `Assets/Tests/DC1…DC10*.ts` (run them from the LEAF panel, or set `scenarioIds` on the `LeafAutoRun` object).
 
 ## Limitations
 
@@ -210,7 +215,7 @@ Criteria with no test: TBD.
 - **Additive display.** Dark areas (hair, eyes, shadows) render see-through, so a photoreal person looks partly translucent. Her video card is brightened slightly (about 1.18x) so she reads more solid; this cannot make dark parts opaque.
 - **Occlusion and physics.** She never walks through the virtual desk (a keep-out area around it), and the virtual desk, page and book hide the part of her behind them. Real furniture can't hide her in the preview: that needs the Specs world mesh on a device, and it is still "feel unproven".
 - **Not tested on a device.** Comfort over long sessions and real hand tracking are unproven.
-- **Placeholders.** The current character clips are placeholders. Final clips, LEAF results and the video URL are TBD.
+- **Placeholders.** The character clips in this repo are placeholders; Yori's own clips appear only in the demo video.
 
 ## Credits and licenses
 
