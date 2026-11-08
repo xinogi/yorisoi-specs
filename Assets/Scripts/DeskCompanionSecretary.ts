@@ -9,7 +9,11 @@
  *   - Timer (Timer button cycles: 1 min -> 5 min (rehearsal) -> Stretch reminder (demo 30 s) ->
  *     Talk in 1 min (demo 20 s) -> off). A big countdown floats beside her; on done she says
  *     timer_done / reminder_stretch (+ Stretch shortcut) / reminder_talk. Session-only.
- *   - Music (Music button cycles Off -> Focus -> Relax -> Calm -> Off): loops the track at `musicVolume`
+ *   - My song: the 5th Music step plays YOUR song from a link (a direct audio-file URL you own;
+ *     the Lens ships no third-party music). The link is typed on the AR keyboard ("Change link" on
+ *     the card) and remembered in persistent storage; the editor preview uses a CC0 demo recording.
+ *     When a timer / reminder fires, your song also plays as the alarm for `alarmSeconds`.
+ *   - Music (Music button cycles Off -> Focus -> Relax -> Calm -> My song -> Off): loops the track at `musicVolume`
  *     (desk slider), ducks to 15 % while she speaks, and she sways (a dance one-shot now and then)
  *     while idle. Missing track files are tolerated (the mode still cycles, nothing plays).
  *   - Look it up (Look up button cycles Risotto -> Kyoto -> Augmented reality -> Alice's Adventures
@@ -37,7 +41,11 @@ const TIMER_PRESETS: TimerPreset[] = [
   {label: "Stretch reminder (demo: 30 s)", seconds: 30, kind: "stretch"},
   {label: "Talk in 1 min (demo: 20 s)", seconds: 20, kind: "talk"}
 ]
-type MusicTrack = "off" | "focus" | "relax" | "calm"
+type MusicTrack = "off" | "focus" | "relax" | "calm" | "mine"
+/** Demo link for "My song" in the editor preview: Satie, Gymnopédie No. 1, a CC0 recording on Wikimedia Commons. */
+const MY_SONG_DEMO_URL = "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b7/Gymnopedie_No._1..ogg/Gymnopedie_No._1..ogg.mp3"
+const MY_SONG_DEMO_LABEL = "Gymnopédie No. 1 (Satie) · CC0 demo link"
+const MY_SONG_STORE_KEY = "yorisoi.mySongUrl"
 
 const LOOKUP_TOPICS = ["Risotto", "Kyoto", "Augmented reality", "Alice's Adventures in Wonderland"]
 const LOOKUP_TYPE = "Type a topic…"
@@ -97,12 +105,21 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
   @input @widget(new SliderWidget(0, 1, 0.05)) @hint("Music volume while she speaks") musicDuckVolume: number = 0.15
   @input @widget(new SliderWidget(5, 30, 1)) @hint("Seconds the briefing card stays") briefingHoldSeconds: number = 14
   @input @widget(new SliderWidget(1, 8, 0.5)) @hint("Weather request timeout (s)") timeoutSeconds: number = 4
+  @input @hint("When a timer / reminder fires, play My song as the alarm") alarmWithMySong: boolean = true
+  @input @widget(new SliderWidget(4, 30, 1)) @hint("Seconds the My song alarm plays") alarmSeconds: number = 12
   @ui.group_end
 
   /** Test hook: timer clock speed (1 = real time). */
   public timeScale: number = 1
 
   private internetModule: InternetModule = require("LensStudio:InternetModule")
+  private remoteMedia: RemoteMediaModule = require("LensStudio:RemoteMediaModule")
+  private mySongUrl = ""
+  private mySongTrack: AudioTrackAsset | null = null
+  private _mySongState: "" | "loading" | "ready" | "failed" = ""
+  private mySongWaiters: ((ok: boolean) => void)[] = []
+  private alarmStopAt = -1
+  private _alarmPlaying = false
   private _briefingShown = false
   private briefingDone = false // the first Call of the session gets a briefing only once
   private _weatherSource: "" | "live" | "offline" = ""
@@ -114,7 +131,7 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
   private _musicTrack: MusicTrack = "off"
   private musicAudio: AudioComponent | null = null
   private nextSwayAt = 0
-  private shortcut: "" | "rehearse" | "stretch" | "learn" = ""
+  private shortcut: "" | "rehearse" | "stretch" | "learn" | "setsong" = ""
   private lookupIndex = -1
   private _lastLookupTitle = ""
   private _lookupSource: "" | "live" | "offline" = ""
@@ -142,6 +159,12 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
   public get lookupSource(): string { return this._lookupSource }
   /** True until the first briefing of the session has played. */
   public get firstCallBriefingPending(): boolean { return !this.briefingDone }
+  /** "" (not loaded yet), "loading", "ready" or "failed". */
+  public get mySongState(): string { return this._mySongState }
+  /** "demo" (the CC0 demo link) or "user" (a link the wearer typed). */
+  public get mySongSource(): string { return this.mySongUrl === MY_SONG_DEMO_URL ? "demo" : "user" }
+  /** True while My song is playing as a timer alarm. */
+  public get alarmPlaying(): boolean { return this._alarmPlaying }
 
   onAwake(): void {
     const so = global.scene.createSceneObject("MusicSource")
@@ -151,6 +174,13 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
       if (this.card) this.card.onShortcut.add(() => this.onShortcut())
     })
     this.createEvent("UpdateEvent").bind(() => this.tick())
+    this.mySongUrl = MY_SONG_DEMO_URL
+    try {
+      const saved = global.persistentStorageSystem.store.getString(MY_SONG_STORE_KEY)
+      if (saved && saved.length > 0) this.mySongUrl = saved
+    } catch (e) {
+      // no persistent storage (keep the demo link)
+    }
   }
 
   // ───────────────────────────── briefing ─────────────────────────────
@@ -331,6 +361,7 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
       return
     }
     const p = TIMER_PRESETS[this.presetIndex]
+    if (this.alarmWithMySong) this.loadMySong() // so the alarm is ready when the timer fires
     this._timerKind = p.kind
     this._timerRemaining = p.seconds
     this.briefingHideAt = -1
@@ -361,14 +392,146 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
     }
     this.briefingHideAt = getTime() + 8
     print("DeskCompanionSecretary: timer done (" + kind + ")")
+    if (this.alarmWithMySong && this._musicTrack === "off") this.startAlarm()
+  }
+
+  /** Plays My song for `alarmSeconds` (only when no music is on). */
+  private async startAlarm(): Promise<void> {
+    const ok = await this.loadMySong()
+    if (!ok || !this.musicAudio || this._musicTrack !== "off" || !this.mySongTrack) return
+    try {
+      if (this.musicAudio.isPlaying()) this.musicAudio.stop(false)
+    } catch (e) {
+      // nothing playing
+    }
+    this.musicAudio.audioTrack = this.mySongTrack
+    this.musicAudio.volume = this.musicVolume
+    this.musicAudio.play(1)
+    this._alarmPlaying = true
+    this.alarmStopAt = getTime() + this.alarmSeconds
+    print("DeskCompanionSecretary: alarm -> my song (" + this.mySongSource + ") for " + this.alarmSeconds + " s")
+  }
+
+  private stopAlarm(): void {
+    if (!this._alarmPlaying) return
+    this._alarmPlaying = false
+    this.alarmStopAt = -1
+    try {
+      if (this.musicAudio && this.musicAudio.isPlaying()) this.musicAudio.stop(true)
+    } catch (e) {
+      // already stopped
+    }
+    print("DeskCompanionSecretary: alarm stopped")
+  }
+
+  // ───────────────────────────── my song ─────────────────────────────
+
+  /** Downloads My song once (resolves true when it is ready to play). */
+  public loadMySong(): Promise<boolean> {
+    if (this._mySongState === "ready") return Promise.resolve(true)
+    return new Promise<boolean>((resolve) => {
+      this.mySongWaiters.push(resolve)
+      if (this._mySongState === "loading") return
+      this._mySongState = "loading"
+      const url = this.mySongUrl
+      const finish = (ok: boolean): void => {
+        const w = this.mySongWaiters
+        this.mySongWaiters = []
+        for (const f of w) f(ok)
+      }
+      try {
+        const res = this.internetModule.makeResourceFromUrl(url)
+        this.remoteMedia.loadResourceAsAudioTrackAsset(
+          res,
+          (track: AudioTrackAsset) => {
+            if (url !== this.mySongUrl) return // the link changed while loading
+            this.mySongTrack = track
+            this._mySongState = "ready"
+            print("DeskCompanionSecretary: my song loaded (" + this.mySongSource + ")")
+            finish(true)
+          },
+          (err: string) => {
+            if (url !== this.mySongUrl) return
+            this._mySongState = "failed"
+            print("DeskCompanionSecretary: my song failed: " + err)
+            finish(false)
+          }
+        )
+      } catch (e) {
+        this._mySongState = "failed"
+        print("DeskCompanionSecretary: my song failed: " + e)
+        finish(false)
+      }
+    })
+  }
+
+  /** Sets a new link for My song (saved for next time) and plays it if My song is on. */
+  public setMySongUrl(url: string): void {
+    const u = url.trim()
+    if (u.length === 0) return
+    this.mySongUrl = u
+    this.mySongTrack = null
+    this._mySongState = ""
+    try {
+      global.persistentStorageSystem.store.putString(MY_SONG_STORE_KEY, u)
+    } catch (e) {
+      // not saved (session only)
+    }
+    print("DeskCompanionSecretary: my song link set (" + this.mySongSource + ")")
+    if (this._musicTrack === "mine") this.playMySong()
+  }
+
+  private async playMySong(): Promise<void> {
+    if (this.card) this.card.showLines("My song", ["Loading your song…"], "")
+    this.briefingHideAt = -1
+    const ok = await this.loadMySong()
+    if (this._musicTrack !== "mine" || !this.musicAudio) return
+    const label = this.mySongSource === "demo" ? MY_SONG_DEMO_LABEL : "Your link · live"
+    if (ok && this.mySongTrack) {
+      this.musicAudio.audioTrack = this.mySongTrack
+      this.musicAudio.volume = this.musicVolume
+      this.musicAudio.play(-1)
+      if (this.voice) this.voice.say("music_mine")
+      this.shortcut = "setsong"
+      if (this.card) this.card.showLines("My song", [label], "Change link")
+    } else {
+      if (this.voice) this.voice.say("music_mine_fail")
+      this.shortcut = "setsong"
+      if (this.card) this.card.showLines("My song · offline", ["Couldn't load the link."], "Change link")
+    }
+    this.briefingHideAt = getTime() + 8
+  }
+
+  /** AR keyboard for a new My song link (the editor preview has no keyboard: keeps the demo link). */
+  private askSongUrl(): void {
+    if (this.card) this.card.showLines("My song", ["Type a link to an audio file you own (mp3)…"], "")
+    let typed = ""
+    try {
+      require("LensStudio:TextInputModule")
+      const options = new TextInputSystem.KeyboardOptions()
+      options.enablePreview = true
+      options.keyboardType = TextInputSystem.KeyboardType.Url
+      options.returnKeyType = TextInputSystem.ReturnKeyType.Done
+      options.onTextChanged = (text: string) => {
+        typed = text
+      }
+      options.onReturnKeyPressed = () => {
+        global.textInputSystem.dismissKeyboard()
+        if (typed.trim().length > 0) this.setMySongUrl(typed)
+      }
+      global.textInputSystem.requestKeyboard(options)
+    } catch (e) {
+      print("DeskCompanionSecretary: keyboard unavailable (preview keeps the demo link): " + e)
+    }
   }
 
   // ───────────────────────────── music ─────────────────────────────
 
-  /** Music button: Off -> Focus -> Relax -> Calm -> Off. */
+  /** Music button: Off -> Focus -> Relax -> Calm -> My song -> Off. */
   public cycleMusic(): void {
     if (this.controller) this.controller.noteInteraction()
-    const order: MusicTrack[] = ["off", "focus", "relax", "calm"]
+    this.stopAlarm()
+    const order: MusicTrack[] = ["off", "focus", "relax", "calm", "mine"]
     const next: MusicTrack = order[(order.indexOf(this._musicTrack) + 1) % order.length]
     this._musicTrack = next
     const a = this.musicAudio
@@ -379,7 +542,9 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
         // nothing playing yet
       }
       const track = next === "focus" ? this.musicFocus : next === "relax" ? this.musicRelax : next === "calm" ? this.musicCalm : null
-      if (track) {
+      if (next === "mine") {
+        // played when the download finishes (she speaks then)
+      } else if (track) {
         a.audioTrack = track
         a.volume = this.musicVolume
         a.play(-1)
@@ -387,7 +552,12 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
         print("DeskCompanionSecretary: no " + next + " track yet (music_" + next + ".mp3) — silent")
       }
     }
-    if (this.voice) this.voice.say(next === "off" ? "music_off" : "music_on")
+    if (next === "mine") this.playMySong()
+    else if (this.voice) this.voice.say(next === "off" ? "music_off" : "music_on")
+    if (next === "off" && this.shortcut === "setsong") {
+      this.shortcut = ""
+      if (this.card && this._timerKind === "") this.card.hide()
+    }
     this.nextSwayAt = getTime() + 6
     print("DeskCompanionSecretary: music -> " + next)
   }
@@ -405,6 +575,7 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
     if (this.shortcut === "rehearse" && this.modes) this.modes.enterMode("cue_cards")
     else if (this.shortcut === "stretch" && this.stretch) this.stretch.start()
     else if (this.shortcut === "learn" && this.learnTopic) this.lookUp(this.learnTopic)
+    else if (this.shortcut === "setsong") this.askSongUrl()
     this.shortcut = ""
   }
 
@@ -425,8 +596,9 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
       this._briefingShown = false
       if (this.card && this._timerKind === "") this.card.hide()
     }
+    if (this._alarmPlaying && (now >= this.alarmStopAt || !this.musicPlaying)) this.stopAlarm()
     // music: duck under her voice; sway now and then while she idles
-    if (this.musicAudio && this._musicTrack !== "off") {
+    if (this.musicAudio && (this._musicTrack !== "off" || this._alarmPlaying)) {
       const speaking = !!this.voice && this.voice.isSpeaking
       this.musicAudio.volume = speaking ? Math.min(this.musicVolume, this.musicDuckVolume) : this.musicVolume
       if (!speaking && now >= this.nextSwayAt && this.controller && this.animator) {

@@ -101,7 +101,9 @@ export const COMPANION_LINES: CompanionLine[] = [
   {id: "reminder_stretch", ja: "ストレッチの時間だよ。一緒にやる？", en: "It's time for a stretch break. Want to stretch with me?"},
   {id: "reminder_talk", ja: "もうすぐ発表、あと1分だよ。", en: "Heads up, your talk starts in one minute."},
   {id: "music_on", ja: "一緒に何か聴こう。", en: "Let's listen to something together."},
-  {id: "music_off", ja: "了解、音楽を止めるね。", en: "Okay, music off."}
+  {id: "music_off", ja: "了解、音楽を止めるね。", en: "Okay, music off."},
+  {id: "music_mine", ja: "あなたの曲、かけるね。", en: "Here's your song."},
+  {id: "music_mine_fail", ja: "うーん、曲を読み込めなかった。リンクを確認してみて？", en: "Hmm, I couldn't load your song. Can you check the link?"}
 ]
 
 /** Separator between mode id and line key in per-mode line ids ("sweetheart__tease_1"). */

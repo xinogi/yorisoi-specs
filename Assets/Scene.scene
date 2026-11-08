@@ -2499,6 +2499,8 @@
         - !<reference> 1d96488d-2169-4276-b331-e247c5faa891
         - !<reference> 75b57a74-f064-404b-aea0-1b606d9d1f29
         - !<reference> 47a60f53-af28-40b4-a04a-7adb90f4c69f
+        - !<reference> b0cc5b65-ed94-4f2e-bd2e-3db365de26f1
+        - !<reference> d6f724e9-a3a1-4ddd-be02-e0f5cf3cf96e
   ScriptTypes:
     "":
       {}
@@ -4400,6 +4402,8 @@
     musicDuckVolume: true
     briefingHoldSeconds: true
     timeoutSeconds: true
+    alarmWithMySong: true
+    alarmSeconds: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -4417,6 +4421,8 @@
       musicDuckVolume: 0.150000
       briefingHoldSeconds: !<float> 14.000000
       timeoutSeconds: !<float> 4.000000
+      alarmWithMySong: true
+      alarmSeconds: !<float> 12.000000
   ScriptTypes:
     "":
       {}

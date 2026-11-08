@@ -4,7 +4,9 @@
  *    labelled "offline"), today's tasks and a reminder; she says briefing_intro.
  * 2. Timer: pinch Timer until "Talk in 1 min (demo 20 s)"; the countdown runs (clock sped up,
  *    parameter timeScale "10") and fires reminder_talk.
- * 3. Music: Off -> Focus -> Relax -> Calm -> Off (music_on / music_off lines; missing tracks are allowed).
+ * 3. Music: Off -> Focus -> Relax -> Calm -> My song -> Off (music_on / music_mine / music_off lines).
+ *    My song downloads from its link (the CC0 demo link in the editor) and really plays.
+ * 2b. When the timer fires with no music on, My song plays as the alarm (needs the network).
  * 4. Look up: the first preset topic (Risotto) shows a summary (live Wikipedia or offline) with the
  *    "Source: Wikipedia (CC BY-SA)" line.
  */
@@ -63,16 +65,23 @@ export class DC10SecretaryScenario extends Scenario {
       checks.check("countdown runs", sec.timerRemaining < r0 && card.isShown, `remaining ${f1(r0)} -> ${f1(sec.timerRemaining)}`)
       const fired = await waitUntil(() => sec.timerKind === "" && lines.indexOf("reminder_talk") >= 0, (20 / timeScale + 4) * 1000)
       checks.check("timer fires the talk reminder", fired, `kind=${sec.timerKind} lines=${lines.join(",")}`)
+      const alarmed = await waitUntil(() => sec.alarmPlaying && sec.musicPlaying, 15000)
+      checks.check("My song plays as the alarm when the timer fires", alarmed, `alarm=${sec.alarmPlaying} song=${sec.mySongState} (${sec.mySongSource})`)
 
       // ── 3. music ──
       const seq: string[] = []
       const playing: boolean[] = []
       let duckOk = false
       let fullOk = false
-      for (let i = 0; i < 4; i++) {
+      let mineOk = false
+      for (let i = 0; i < 5; i++) {
         await sleep(400)
         await interactor.tap("MusicButton")
         await sleep(150)
+        if (sec.musicTrack === "mine") {
+          mineOk = await waitUntil(() => sec.mySongState !== "loading" && sec.musicPlaying, 15000)
+          await sleep(300)
+        }
         seq.push(sec.musicTrack)
         playing.push(sec.musicPlaying)
         if (i === 0) {
@@ -83,9 +92,10 @@ export class DC10SecretaryScenario extends Scenario {
           fullOk = Math.abs(sec.musicCurrentVolume - sec.musicVolume) < 0.01
         }
       }
-      checks.check("music really plays (Focus, Relax, Calm) and stops (Off)", playing.join(",") === "true,true,true,false", `playing=${playing.join(",")}`)
+      checks.check("music really plays (Focus, Relax, Calm, My song) and stops (Off)", playing.join(",") === "true,true,true,true,false" && mineOk && lines.indexOf("music_mine") >= 0,
+        `playing=${playing.join(",")} mySong=${sec.mySongState} (${sec.mySongSource})`)
       checks.check("music ducks while she speaks, back up after", duckOk && fullOk, `duck=${duckOk} full=${fullOk} volume=${f1(sec.musicCurrentVolume)} (set ${sec.musicVolume}, duck ${sec.musicDuckVolume})`)
-      checks.check("Music cycles Off -> Focus -> Relax -> Calm -> Off", seq.join(">") === "focus>relax>calm>off" && lines.indexOf("music_on") >= 0 && lens.voice.lastLineId === "music_off", `seq=${seq.join(">")} last=${lens.voice.lastLineId}`)
+      checks.check("Music cycles Off -> Focus -> Relax -> Calm -> My song -> Off", seq.join(">") === "focus>relax>calm>mine>off" && lines.indexOf("music_on") >= 0 && lens.voice.lastLineId === "music_off", `seq=${seq.join(">")} last=${lens.voice.lastLineId}`)
 
       // ── 4. look it up ──
       await sleep(400)
