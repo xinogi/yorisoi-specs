@@ -35,7 +35,7 @@ const EXTERNAL_HEAD = true
  * Pick-up takes ("" = the full reel): "translation" runs only shot 6, looking a little left so the
  * word cards stay in frame; "mysong" calls her and switches Music to My song.
  */
-const PICKUP: "" | "translation" | "mysong" = ""
+const PICKUP: "" | "translation" | "mysong" | "story" = ""
 const PAGE_YAW = 10
 
 @component
@@ -96,6 +96,80 @@ export class DemoReelScenario extends Scenario {
         await tap("Word_gamsahamnida", 7.5)
         await look(0, DESK_PITCH)
         await sleep(1500)
+        print("[REEL] end t=" + (getTime() - this.t0).toFixed(1))
+        return
+      }
+
+      if (PICKUP === "story") {
+        // One natural working session, real-time pacing (the learner found the 12-shot reel rushed):
+        // quiet -> Call -> briefing -> Rehearse shortcut -> cue cards -> translate a word -> stretch -> music / My song.
+        const ensureAttend = async (): Promise<void> => {
+          if (c.state === "attend") return
+          await tap("CallButton", 0)
+          await waitUntil(() => c.state === "attend", 8000)
+          await sleep(2200)
+        }
+        this.shot(1, "quiet") // the voice-over plays here in the edit
+        await sleep(21000)
+
+        this.shot(2, "call-and-briefing")
+        await tap("CallButton", 0)
+        await waitUntil(() => c.state === "attend", 8000)
+        await waitUntil(() => sec.briefingShown, 8000)
+        await waitUntil(() => lens.voice.lastLineId === "briefing_rehearse", 15000)
+        await sleep(3500)
+
+        this.shot(3, "rehearse")
+        await tap("InfoShortcutButton", 0) // "Rehearse" on the briefing card -> Cue cards mode
+        await waitUntil(() => modes.cueCardShown, 8000)
+        await sleep(4000)
+        await tap("CueRehearseButton", 6.5)
+        await tap("CueNextButton", 1.5)
+        if (modes.cueAuto) await tap("CueAutoButton", 0.8)
+        for (let i = 0; i < 5 && modes.cueCardSeconds(modes.cueIndex) > 10; i++) await tap("CueMinus5Button", 0.6)
+        await waitUntil(() => lens.voice.lastLineId === "cue_cards__cue_slow_down", 25000)
+        await sleep(3500)
+        print("[REEL] skip-to-last")
+        let last = -1
+        for (let sl = 0; sl < list.rowCount; sl++) if (list.rowCardIndex(sl) === modes.cueCount - 1) last = sl
+        if (last >= 0) await tap("CueRow_" + last, 2.5)
+        await tap("CueNextButton", 0)
+        await waitUntil(() => modes.cueFinished, 4000)
+        await sleep(4000)
+        modes.enterMode("sweetheart")
+        await sleep(3000)
+
+        this.shot(4, "translate")
+        await look(PAGE_YAW, -48)
+        await sleep(1500)
+        await tap("Word_bara", 9)
+        await look(0, DESK_PITCH)
+        await sleep(1500)
+
+        this.shot(5, "stretch")
+        await ensureAttend()
+        await tap("StretchButton", 0)
+        await waitUntil(() => stretch.stretchStep >= 1, 20000)
+        await sleep(8000)
+        print("[REEL] stretch-skip")
+        stretch.timeScale = 20
+        await waitUntil(() => !stretch.stretchActive, 20000)
+        stretch.timeScale = 1
+        await sleep(4500)
+
+        this.shot(6, "music")
+        await ensureAttend()
+        await tap("MusicButton", 9)
+        print("[REEL] to-my-song")
+        sec.cycleMusic() // relax
+        sec.cycleMusic() // calm
+        sec.cycleMusic() // my song (downloads, then she says "Here's your song.")
+        await waitUntil(() => sec.mySongState === "ready" && sec.musicPlaying, 15000)
+        await sleep(10000)
+
+        this.shot(7, "end")
+        c.playGesture("wave")
+        await sleep(5000)
         print("[REEL] end t=" + (getTime() - this.t0).toFixed(1))
         return
       }

@@ -143,7 +143,17 @@ original music, ducked under her voice. Shot 6 is a pick-up take looking 10° le
 stays in frame. Captions sit in the left margin beside the preview, so they never cover her bubble or
 the cards. Later additions: a My song pick-up after the music shot, and a 17-second developer voice-over
 over the quiet opening ("An AI partner on a screen always feels a little fake… Meet Yori.", AI
-text-to-speech). Final cut: 2:48.
+text-to-speech). That cut ran 2:48.
+
+**Final cut (2026-11-08 22:15, 2:05): "story" re-shoot.** The learner found the 12-shot cut rushed ("too
+much packed in, hard to follow"; Yori did not speak right after "Meet Yori."). It was re-shot as one
+natural working session in real time with the `demo-reel` scenario in `PICKUP = "story"` mode: the
+voice-over over the quiet opening -> "Meet Yori." -> Call ("Hey, what's up?") -> the first-call briefing
+-> the card's Rehearse shortcut -> cue cards (one point runs long, she whispers) -> "You did great!"
+-> translate one word -> a stretch break (skipped ahead to "Great job!") -> music together -> My song.
+No sped-up clocks on screen; 0.5 s crossfades between sections. The other features (modes, Ask, Look
+up, timers, Voice only, poke reactions, always in front) are listed on the end card instead of a montage.
+Edit script: `tools/build_demo_story.py` (outside the repo).
 
 Original plan:
 
