@@ -1,34 +1,28 @@
-MIT License (source code)
+Copyright (c) 2026 Xinogi Studio (しのぎ). All rights reserved.
 
-Copyright (c) 2026 Xinogi Studio (しのぎ)
+Source available for viewing only. This is NOT an open-source license.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. Viewing. Anyone may view the files in this repository on GitHub.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+2. Hackathon judging. As the official rules of the "Learn AR with SPECS"
+   hackathon require, the Sponsor (Snap Inc.), the Administrator (Devpost) and
+   the judges may access, download, run, test, evaluate and use this project,
+   free of charge and without restriction, for judging and testing until the
+   judging period ends.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+3. Everything else is reserved. Without prior written permission from
+   Xinogi Studio you may not copy, modify, merge, publish, distribute,
+   sublicense, sell or otherwise use this code or content, in whole or in part.
+   This covers the source code (Assets/Scripts/, Assets/Tests/, tools/), the
+   persona and cue-card texts, and all media: the character "Yori" (her name,
+   look, images, video clips and voice), the voice lines, the original music
+   and the demo video. Yori's own clips are not in this repository; the clips
+   here are placeholders.
 
--------------------------------------------------------------------------------
-What the MIT License covers, and what it does not
+4. Third-party parts (Snap packages, Noto fonts, icons, Wikipedia /
+   Open-Meteo / MyMemory data) keep their own licenses and terms; see
+   NOTICE.md and licenses/.
 
-- Covered (MIT): the project's own source code: Assets/Scripts/, Assets/Tests/,
-  tools/, and the persona Markdown and converter.
-- Not covered, all rights reserved by Xinogi Studio: the character "Yori"
-  (her name, look, images, video clips and voice), the voice lines, the
-  original music, and the demo video. Yori's own clips are not in this
-  repository; the clips here are placeholders. You may not reuse Yori's
-  likeness or voice.
-- Third-party parts (Snap packages, fonts, icons, Wikipedia / Open-Meteo /
-  MyMemory data) keep their own licenses and terms. See NOTICE.md.
+THE PROJECT IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+Contact for permission: https://xinogi.com

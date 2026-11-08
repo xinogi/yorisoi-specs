@@ -8,21 +8,21 @@ Last updated: 2026-11-08
 
 | What | Where | Author | License |
 |---|---|---|---|
-| TypeScript behavior scripts | `Assets/Scripts/DeskCompanion*.ts` | Xinogi Studio (しのぎ). Built with CLAD (Snap's Lens Studio agents) under the author's direction | **MIT** (see [LICENSE](LICENSE)) |
-| Persona definitions, lines, cue cards | `persona/`, `Assets/Scripts/DeskCompanionContent.ts` | Xinogi Studio | **MIT** (see [LICENSE](LICENSE)) |
-| Foreign-language page (example sentences and word explanations) | `Assets/Scripts/DeskCompanionContent.ts` | Xinogi Studio (original short examples) | **MIT** (see [LICENSE](LICENSE)) |
-| Tools | `tools/build_persona.py`, `tools/ls_mcp_bridge.py` | Xinogi Studio | **MIT** (see [LICENSE](LICENSE)) |
-| Docs | `README.md`, `devpost/` | Xinogi Studio | **MIT** (see [LICENSE](LICENSE)) |
+| TypeScript behavior scripts | `Assets/Scripts/DeskCompanion*.ts` | Xinogi Studio (しのぎ). Built with CLAD (Snap's Lens Studio agents) under the author's direction | **All rights reserved** (see [LICENSE](LICENSE)) |
+| Persona definitions, lines, cue cards | `persona/`, `Assets/Scripts/DeskCompanionContent.ts` | Xinogi Studio | **All rights reserved** (see [LICENSE](LICENSE)) |
+| Foreign-language page (example sentences and word explanations) | `Assets/Scripts/DeskCompanionContent.ts` | Xinogi Studio (original short examples) | **All rights reserved** (see [LICENSE](LICENSE)) |
+| Tools | `tools/build_persona.py`, `tools/ls_mcp_bridge.py` | Xinogi Studio | **All rights reserved** (see [LICENSE](LICENSE)) |
+| Docs | `README.md`, `devpost/` | Xinogi Studio | **All rights reserved** (see [LICENSE](LICENSE)) |
 
 ## 2. Snap packages and template
 
 | Package | Where | Publisher | License |
 |---|---|---|---|
-| Spectacles Interaction Kit (SIK) | `Packages/SpectaclesInteractionKit.lspkg` | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's MIT License. |
-| Spectacles UI Kit | `Packages/SpectaclesUIKit.lspkg` | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's MIT License. |
-| LEAF (testing framework) | `Packages/Leaf.lspkg` | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's MIT License. |
-| Bitmoji 3D (dependency declared by LEAF) | `Packages/Bitmoji 3D.lsc` | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's MIT License. |
-| Specs Base Template (project starting point) | whole project, created from Lens Studio 5.24.1 | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's MIT License. |
+| Spectacles Interaction Kit (SIK) | `Packages/SpectaclesInteractionKit.lspkg` | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's own license. |
+| Spectacles UI Kit | `Packages/SpectaclesUIKit.lspkg` | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's own license. |
+| LEAF (testing framework) | `Packages/Leaf.lspkg` | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's own license. |
+| Bitmoji 3D (dependency declared by LEAF) | `Packages/Bitmoji 3D.lsc` | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's own license. |
+| Specs Base Template (project starting point) | whole project, created from Lens Studio 5.24.1 | Snap Inc. | Snap Inc. terms (Lens Studio / Spectacles). Included because the hackathon asks for the whole Lens Studio project in a public repo; not covered by this repo's own license. |
 
 Code inside SIK that carries its own notice:
 
@@ -101,7 +101,7 @@ The companion is a **fictional person**. She is not a real person and is not mad
 - [ ] 仮のキャラクター動画をどう作ったか確認する（最終版に差し替えるなら行ごと削除）
 - [ ] Google Gemini TTS の利用規約（生成音声の権利・商用利用・合成音声の表示義務）を確認する
 - [ ] plan-lens スキルパックを公開リポジトリに含めてよいか（配布条件）を確認する
-- [x] このプロジェクト自体のライセンス＝コードは MIT、Yori・声・曲・動画は全権利保持（LICENSE）。2026-11-08 本人決定
+- [x] このプロジェクト自体のライセンス＝全権利保持（閲覧と大会の審査・試用のみ許可）。2026-11-08 本人決定（MIT から変更：まねされたくない）
 
 ## Live data sources (fetched at runtime, not bundled)
 
