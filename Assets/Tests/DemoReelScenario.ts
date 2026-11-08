@@ -31,8 +31,11 @@ const DESK_PITCH = -14
  * false: LEAF's head controller turns only the Lens camera (the preview room does not turn).
  */
 const EXTERNAL_HEAD = true
-/** Pick-up take: run only shot 6 (translation), looking a little left so the word cards stay in frame. */
-const ONLY_TRANSLATION = false
+/**
+ * Pick-up takes ("" = the full reel): "translation" runs only shot 6, looking a little left so the
+ * word cards stay in frame; "mysong" calls her and switches Music to My song.
+ */
+const PICKUP: "" | "translation" | "mysong" = ""
 const PAGE_YAW = 10
 
 @component
@@ -84,7 +87,7 @@ export class DemoReelScenario extends Scenario {
       await sleep(800)
       this.t0 = getTime()
 
-      if (ONLY_TRANSLATION) {
+      if (PICKUP === "translation") {
         this.shot(6, "translation")
         await sleep(1500)
         await look(PAGE_YAW, -48)
@@ -93,6 +96,24 @@ export class DemoReelScenario extends Scenario {
         await tap("Word_gamsahamnida", 7.5)
         await look(0, DESK_PITCH)
         await sleep(1500)
+        print("[REEL] end t=" + (getTime() - this.t0).toFixed(1))
+        return
+      }
+
+      if (PICKUP === "mysong") {
+        this.shot(13, "mysong")
+        await tap("CallButton", 0)
+        await waitUntil(() => c.state === "attend", 8000)
+        await sleep(3500)
+        // step quietly to Calm (cut in the edit), then a visible pinch to My song
+        sec.cycleMusic()
+        sec.cycleMusic()
+        sec.cycleMusic()
+        await sleep(2500)
+        print("[REEL] mysong-tap")
+        await tap("MusicButton", 0)
+        await waitUntil(() => sec.mySongState === "ready" && sec.musicPlaying, 15000)
+        await sleep(9000)
         print("[REEL] end t=" + (getTime() - this.t0).toFixed(1))
         return
       }
