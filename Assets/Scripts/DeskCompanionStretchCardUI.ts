@@ -17,7 +17,7 @@ import animate, {CancelFunction} from "SpectaclesInteractionKit.lspkg/Utils/anim
 const FONT_SIZE_SCALE = 0.95
 type TextRole = "Count" | "Title" | "Caption"
 const TYPE_SCALE: Record<TextRole, {size: number; weight: number}> = {
-  Count: {size: 120, weight: 700}, Title: {size: 54, weight: 700}, Caption: {size: 38, weight: 500}
+  Count: {size: 160, weight: 700}, Title: {size: 74, weight: 700}, Caption: {size: 52, weight: 500}
 }
 function applyTextRole(t: Text, role: TextRole, distanceCm: number = 110): void {
   t.size = TYPE_SCALE[role].size * FONT_SIZE_SCALE * (distanceCm / 110)
@@ -38,7 +38,7 @@ export class DeskCompanionStretchCardUI extends BaseScriptComponent {
   @input
   @widget(new SliderWidget(20, 60, 1))
   @hint("Card width (cm)")
-  cardWidthCm: number = 40
+  cardWidthCm: number = 56
 
   @input("vec4", "{1, 0.9, 0.5, 1}")
   @widget(new ColorWidget())
@@ -86,11 +86,12 @@ export class DeskCompanionStretchCardUI extends BaseScriptComponent {
       plate.size = new vec2(r.containerWidth, r.containerHeight)
     })
     const w = this.cardWidthCm - 3.2
-    const header = this.addText(content, "StretchHeader", "Caption", w, 2.2, new vec4(0.8, 0.8, 0.8, 1))
-    const en = this.addText(content, "StretchMoveEn", "Title", w, 3.4, new vec4(1, 1, 1, 1))
-    const ja = this.addText(content, "StretchMoveJa", "Caption", w, 2.2, new vec4(0.85, 0.85, 0.85, 1))
-    const count = this.addText(content, "StretchCount", "Count", w, 7, this.countColor)
-    const bar = this.addText(content, "StretchBar", "Caption", w, 2.2, new vec4(0.45, 0.95, 0.5, 1))
+    // sized to read from ~2.5 m
+    const header = this.addText(content, "StretchHeader", "Caption", w, 3.2, new vec4(0.8, 0.8, 0.8, 1))
+    const en = this.addText(content, "StretchMoveEn", "Title", w, 4.8, new vec4(1, 1, 1, 1))
+    const ja = this.addText(content, "StretchMoveJa", "Caption", w, 3.2, new vec4(0.85, 0.85, 0.85, 1))
+    const count = this.addText(content, "StretchCount", "Count", w, 9.5, this.countColor)
+    const bar = this.addText(content, "StretchBar", "Caption", w, 3.2, new vec4(0.45, 0.95, 0.5, 1))
     this.header = header.text
     this.en = en.text
     this.ja = ja.text

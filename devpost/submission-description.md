@@ -155,6 +155,8 @@ Not covered by any test: anything only real glasses can tell (comfort over a lon
 
 - **Real voice input on the device**, so you talk to her instead of pinching Call (SPECS speech recognition).
 - **A live AI behind her answers**, using the personality prompts already written for each mode.
+- **Camera on the real glasses**: point at a page or sign and Yori reads and translates it for you; she can turn a photo or a whiteboard into text (OCR) and transcribe what was said.
+- **Memories together**: look back through your captures with her ("this one's great, let's make it our special shot") and keep the best moments.
 - **Memory**, so she remembers your work and your day with you over time.
 - **Yoga and fitness lessons**, built on the same routine system as the stretch break.
 - **A physical AI body** someday, so the same companion can help in the real world.

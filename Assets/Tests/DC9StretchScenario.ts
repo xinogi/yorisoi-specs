@@ -42,6 +42,7 @@ export class DC9StretchScenario extends Scenario {
 
       const seenSteps: number[] = []
       let cardOk = true
+      const anims: string[] = []
       let countOk = false
       const deadline = getTime() + 60
       while (stretch.stretchActive && getTime() < deadline) {
@@ -50,6 +51,7 @@ export class DC9StretchScenario extends Scenario {
           seenSteps.push(st)
           await sleep(100)
           if (card.currentEn !== STRETCH_MOVES[st].en) cardOk = false
+          anims.push(lens.animator.currentAnim)
         }
         if (stretch.stretchCount >= 2) countOk = true
         await sleep(50)
@@ -58,6 +60,7 @@ export class DC9StretchScenario extends Scenario {
       const moveLines = STRETCH_MOVES.map((m) => m.lineId)
       checks.check("each move says its line", moveLines.every((id) => lines.indexOf(id) >= 0), `lines=${lines.join(",")}`)
       checks.check("card shows each move name", cardOk, `last card="${card.currentEn}"`)
+      checks.check("each move plays its stretch clip", anims.join(",") === STRETCH_MOVES.map((m) => m.anim).join(","), `anims=${anims.join(",")} strategy=${lens.animator.strategy}`)
       checks.check("1–2–3–4 count runs", countOk, `count reached ${stretch.stretchCount}`)
       checks.check("ends with stretch_done", !stretch.stretchActive && lens.voice.lastLineId === "stretch_done" && !card.isShown, `active=${stretch.stretchActive} line=${lens.voice.lastLineId} card=${card.isShown}`)
 

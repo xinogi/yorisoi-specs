@@ -93,8 +93,12 @@ export class DeskCompanionStretch extends BaseScriptComponent {
     this.stepLen = Math.max(1.5, d) + 0.3
     this.countStart = Number.MAX_VALUE
     if (this.card) this.card.hide()
-    // step back to her resting spot so her whole body (and the card beside her) is in view
-    if (this.controller) this.controller.returnToSpot(false)
+    // step back to her resting spot so her whole body (and the card beside her) is in view,
+    // and stand still there (no idle wander walk over the stretch clips)
+    if (this.controller) {
+      this.controller.returnToSpot(false)
+      this.controller.holdStill = true
+    }
     print("DeskCompanionStretch: start")
   }
 
@@ -103,6 +107,7 @@ export class DeskCompanionStretch extends BaseScriptComponent {
     if (!this._active) return
     this._active = false
     this._step = -1
+    if (this.controller) this.controller.holdStill = false
     if (this.card) this.card.hide()
     print("DeskCompanionStretch: cancelled")
   }
@@ -127,6 +132,7 @@ export class DeskCompanionStretch extends BaseScriptComponent {
     if (this.card) this.card.hide()
     if (this.voice) this.voice.say("stretch_done")
     if (this.animator) this.animator.playOnce("happy_laugh")
+    if (this.controller) this.controller.holdStill = false
     this._active = false
     print("DeskCompanionStretch: done")
   }
@@ -142,6 +148,11 @@ export class DeskCompanionStretch extends BaseScriptComponent {
       this.card.setRemaining(1 - t / this.stepLen, (this.stepLen - t) / Math.max(0.01, this.timeScale))
     }
     if (t < this.stepLen) return
+    // the first move waits (up to 6 s) until she has walked back to her spot
+    if (this._step === -1 && this.controller && t < this.stepLen + 6) {
+      const s = this.controller.state
+      if (s === "leaving" || s === "roam_walk" || s === "approach" || this.controller.isRecentering) return
+    }
     if (this._step + 1 < STRETCH_MOVES.length) this.beginMove(this._step + 1)
     else this.finish()
   }

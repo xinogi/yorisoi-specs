@@ -216,6 +216,11 @@ Criteria with no test: TBD.
 
 Third-party software, fonts, icons and generated assets (AI-generated character video and voice, synthesized sound effects) are listed with their licenses in **[NOTICE.md](NOTICE.md)**. The book is *Alice's Adventures in Wonderland* by Lewis Carroll (1865, public domain); her summary is our own wording.
 
+Live data used by the Lens (no API keys, no user data sent):
+- **Look it up** shows the first sentences of a page summary from the [Wikipedia REST API](https://en.wikipedia.org/api/rest_v1/) (text: Wikipedia contributors, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)); the card always shows "Source: Wikipedia (CC BY-SA)". Offline, short built-in summaries are shown, labelled "offline".
+- **Briefing** weather for Tokyo comes from [Open-Meteo](https://open-meteo.com/) (CC BY 4.0); offline, sample weather is shown, labelled "offline". Tasks and reminders on the card are sample data.
+- **Translation** uses MyMemory (see "How translation works").
+
 License for this project's own code and content: TBD.
 
 ---

@@ -25,6 +25,7 @@ import {DeskCompanionForeignPageUI} from "./DeskCompanionForeignPageUI"
 import {DeskCompanionActionsUI} from "./DeskCompanionActionsUI"
 import {DeskCompanionModeController} from "./DeskCompanionModeController"
 import {DeskCompanionStretch} from "./DeskCompanionStretch"
+import {DeskCompanionSecretary} from "./DeskCompanionSecretary"
 import {DeskCompanionTranslator} from "./DeskCompanionTranslator"
 import {findWord} from "./DeskCompanionContent"
 
@@ -70,6 +71,11 @@ export class DeskCompanionMain extends BaseScriptComponent {
 
   @input
   @allowUndefined
+  @hint("Briefing / timers / music (Briefing, Timer, Music buttons)")
+  secretary: DeskCompanionSecretary
+
+  @input
+  @allowUndefined
   @hint("Non-spatial AudioComponent for UI clicks")
   uiClickAudio: AudioComponent
 
@@ -103,6 +109,8 @@ export class DeskCompanionMain extends BaseScriptComponent {
       this.click()
       print("DeskCompanionMain: Call pinched")
       this.companion.callOver()
+      // the first Call of the session also brings the morning briefing (after she arrives)
+      if (this.secretary && this.secretary.firstCallBriefingPending) this.briefingOnArrival = true
     })
 
     // Chat toggle: quiet by default (she only talks when you act); on = occasional teases
@@ -153,7 +161,16 @@ export class DeskCompanionMain extends BaseScriptComponent {
     })
 
     this.book.onGrabbed.add(() => this.companion.noteInteraction())
-    this.book.onOffered.add(() => this.companion.offerBook())
+    this.book.onOffered.add(() => {
+      this.bookWasOffered = true
+      this.companion.offerBook()
+    })
+    // after she has read and returned the book, offer a real summary ("Learn more")
+    this.book.onReturnedHome.add(() => {
+      if (!this.bookWasOffered || !this.secretary) return
+      this.bookWasOffered = false
+      this.secretary.offerLearnMore("Alice's Adventures in Wonderland")
+    })
 
     this.actions.onDance.add(() => {
       this.click()
@@ -171,6 +188,29 @@ export class DeskCompanionMain extends BaseScriptComponent {
       this.click()
       this.modes.ask()
     })
+    if (this.secretary) {
+      this.actions.onBriefing.add(() => {
+        this.click()
+        this.secretary.briefing()
+      })
+      this.actions.onTimer.add(() => {
+        this.click()
+        this.secretary.cycleTimer()
+      })
+      this.actions.onMusic.add(() => {
+        this.click()
+        this.secretary.cycleMusic()
+      })
+      this.actions.onLookUp.add(() => {
+        this.click()
+        this.secretary.cycleLookup()
+      })
+      this.callButton.setMusicState(this.secretary.musicVolume)
+      this.callButton.onMusicVolume.add((v: number) => {
+        this.secretary.setMusicVolume(v)
+        this.callButton.setMusicState(this.secretary.musicVolume)
+      })
+    }
     this.actions.onStretch.add(() => {
       this.click()
       if (this.stretch) this.stretch.start()
@@ -185,7 +225,13 @@ export class DeskCompanionMain extends BaseScriptComponent {
     }
     if (this.translator) this.translator.onCardShown.add(() => this.modes.hideAskCard())
 
-    this.companion.onArrived.add(() => this.actions.show())
+    this.companion.onArrived.add(() => {
+      this.actions.show()
+      if (this.briefingOnArrival && this.secretary) {
+        this.briefingOnArrival = false
+        this.secretary.briefing()
+      }
+    })
     this.companion.onLeft.add(() => this.actions.hide())
 
     if (this.debugColliders) {
@@ -193,9 +239,14 @@ export class DeskCompanionMain extends BaseScriptComponent {
     }
   }
 
+  private briefingOnArrival = false
+  private bookWasOffered = false
+
   private click(): void {
     if (this.companion) this.companion.noteInteraction() // any button counts as answering her
     if (this.stretch && this.stretch.stretchActive) this.stretch.cancel() // any button stops a stretch break
+    if (this.secretary) this.secretary.cancelPendingSpeech() // and a briefing's follow-up line
+    this.briefingOnArrival = false
     if (!this.uiClickAudio || !this.uiClickSound) return
     try {
       if (this.uiClickAudio.isPlaying()) this.uiClickAudio.stop(false)

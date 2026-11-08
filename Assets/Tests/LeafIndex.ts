@@ -14,6 +14,7 @@ import {DC7PokeMoodScenario} from "./DC7PokeMoodScenario"
 import {DC8AskAndTranslateScenario} from "./DC8AskAndTranslateScenario"
 import {ViewDeskScenario} from "./ViewDeskScenario"
 import {DC9StretchScenario} from "./DC9StretchScenario"
+import {DC10SecretaryScenario} from "./DC10SecretaryScenario"
 
 @component
 export class LeafIndex extends BaseScriptComponent {
@@ -63,6 +64,11 @@ export class LeafIndex extends BaseScriptComponent {
       id: "dc9-stretch",
       typename: DC9StretchScenario.getTypeName(),
       parameters: {timeScale: "3"}
+    },
+    {
+      id: "dc10-secretary",
+      typename: DC10SecretaryScenario.getTypeName(),
+      parameters: {timeScale: "10"}
     },
     {
       id: "view-desk",

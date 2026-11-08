@@ -250,44 +250,44 @@ export const PERSONA_MODES: PersonaMode[] = [
     "cueCards": [
       {
         "text": "Hi, I'm presenting Yorisoi: an AR companion who shares your space.",
-        "note": "笑顔で、ゆっくり。会場を見る",
+        "note": "Smile, slow down, look at the audience",
         "seconds": 20,
         "details": [
-          "名前の由来: 寄り添い = staying close"
+          "The name: \"yorisoi\" = staying close"
         ]
       },
       {
         "text": "On a screen, an AI partner always feels fake. On glasses, she stands in your real room.",
-        "note": "「fake」と「real」を強く",
+        "note": "Stress \"fake\" and \"real\"",
         "seconds": 25,
         "details": [
-          "例: VR は全部作り物、AR は本物の部屋"
+          "VR is all made up; AR is your real room"
         ]
       },
       {
         "text": "She's your girlfriend and a super-capable secretary: she translates, shows your cue cards, and answers your questions.",
-        "note": "指を折って3つ数える",
+        "note": "Count the three on your fingers",
         "seconds": 30,
         "details": [
-          "翻訳は本物（無料の翻訳サービス）",
-          "天気・予定はサンプル"
+          "Translation is real (free translation API)",
+          "Schedule is sample data"
         ]
       },
       {
         "text": "Like right now: only I can see these cards. You can't.",
-        "note": "ここで一呼吸。いたずらっぽく笑う",
+        "note": "Pause. Playful smile",
         "seconds": 25,
         "details": []
       },
       {
         "text": "Next: real voice, real memory, and someday a real body.",
-        "note": "少しゆっくり、前向きに",
+        "note": "Slower, upbeat",
         "seconds": 20,
         "details": []
       },
       {
         "text": "Thank you! Questions?",
-        "note": "会場を見て、間をとる",
+        "note": "Look around, take a beat",
         "seconds": 15,
         "details": []
       }
@@ -298,44 +298,44 @@ export const PERSONA_MODES: PersonaMode[] = [
         "cards": [
           {
             "text": "Hi, I'm presenting Yorisoi: an AR companion who shares your space.",
-            "note": "笑顔で、ゆっくり。会場を見る",
+            "note": "Smile, slow down, look at the audience",
             "seconds": 20,
             "details": [
-              "名前の由来: 寄り添い = staying close"
+              "The name: \"yorisoi\" = staying close"
             ]
           },
           {
             "text": "On a screen, an AI partner always feels fake. On glasses, she stands in your real room.",
-            "note": "「fake」と「real」を強く",
+            "note": "Stress \"fake\" and \"real\"",
             "seconds": 25,
             "details": [
-              "例: VR は全部作り物、AR は本物の部屋"
+              "VR is all made up; AR is your real room"
             ]
           },
           {
             "text": "She's your girlfriend and a super-capable secretary: she translates, shows your cue cards, and answers your questions.",
-            "note": "指を折って3つ数える",
+            "note": "Count the three on your fingers",
             "seconds": 30,
             "details": [
-              "翻訳は本物（無料の翻訳サービス）",
-              "天気・予定はサンプル"
+              "Translation is real (free translation API)",
+              "Schedule is sample data"
             ]
           },
           {
             "text": "Like right now: only I can see these cards. You can't.",
-            "note": "ここで一呼吸。いたずらっぽく笑う",
+            "note": "Pause. Playful smile",
             "seconds": 25,
             "details": []
           },
           {
             "text": "Next: real voice, real memory, and someday a real body.",
-            "note": "少しゆっくり、前向きに",
+            "note": "Slower, upbeat",
             "seconds": 20,
             "details": []
           },
           {
             "text": "Thank you! Questions?",
-            "note": "会場を見て、間をとる",
+            "note": "Look around, take a beat",
             "seconds": 15,
             "details": []
           }

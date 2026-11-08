@@ -35,6 +35,8 @@
     debugColliders: false
     modes: false
     page: false
+    secretary: false
+    stretch: false
     translator: false
     uiClickAudio: false
     uiClickSound: false
@@ -54,6 +56,8 @@
       book: !<MappingBased.AssignableType_5> 00000000-0000-0000-0000-000000000000
       modes: !<MappingBased.AssignableType_6> 00000000-0000-0000-0000-000000000000
       translator: !<MappingBased.AssignableType_7> 00000000-0000-0000-0000-000000000000
+      stretch: !<MappingBased.AssignableType_8> 00000000-0000-0000-0000-000000000000
+      secretary: !<MappingBased.AssignableType_9> 00000000-0000-0000-0000-000000000000
       uiClickAudio: !<reference.AudioComponent> 00000000-0000-0000-0000-000000000000
       uiClickSound: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
       debugColliders: false
@@ -72,6 +76,8 @@
     - '// @input AssignableType_5 book {"hint":"Grabbable stand-in book on the desk"}'
     - '// @input AssignableType_6 modes {"hint":"Persona modes + cue cards (Mode button)"}'
     - '// @input AssignableType_7 translator {"hint":"Live translation (MyMemory) with the hard-coded table as fallback"}'
+    - '// @input AssignableType_8 stretch {"hint":"Stretch break routine (Stretch button)"}'
+    - '// @input AssignableType_9 secretary {"hint":"Briefing / timers / music (Briefing, Timer, Music buttons)"}'
     - '// @input Component.AudioComponent uiClickAudio {"hint":"Non-spatial AudioComponent for UI clicks"}'
     - '// @input Asset.AudioTrackAsset uiClickSound {"hint":"Click sound for desk buttons and word pinches"}'
     - '// @ui {"widget":"group_end"}'

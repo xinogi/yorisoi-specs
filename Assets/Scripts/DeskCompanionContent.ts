@@ -86,13 +86,22 @@ export const COMPANION_LINES: CompanionLine[] = [
   {id: "poke_tickle", ja: "くすぐったいよ！", en: "Hey, that tickles!"},
   {id: "poke_annoyed", ja: "もう、やめて！", en: "Okay, that's enough. Hands off!"},
   {id: "poke_forgive", ja: "もう…許してあげる。", en: "Hmph... fine. I forgive you."},
-  // Stretch break (subtitles; check against the recorded stretch_*.mp3)
-  {id: "stretch_intro", ja: "ちょっとストレッチしよう。まねしてね！", en: "Let's take a quick stretch break. Follow me!"},
-  {id: "stretch_arms_up", ja: "腕を上に、ぐーっと伸ばして。", en: "Arms up. Reach for the sky."},
-  {id: "stretch_side", ja: "ゆっくり横に倒して。", en: "Now lean to the side, slowly."},
-  {id: "stretch_shoulders", ja: "肩をゆっくり回して。", en: "Roll your shoulders back."},
-  {id: "stretch_neck", ja: "首をやさしく傾けて。", en: "Gently tilt your head."},
-  {id: "stretch_done", ja: "おつかれさま！すっきりした？", en: "Great job! Feel better?"}
+  // Stretch break (English = exactly what the stretch_*.mp3 recordings say)
+  {id: "stretch_intro", ja: "一緒にちょっとストレッチしよう。まねしてね！", en: "Let's take a quick stretch break together. Follow me!"},
+  {id: "stretch_arms_up", ja: "腕を上げて、伸ばして。1、2、3、4。", en: "Arms up, and stretch. One, two, three, four."},
+  {id: "stretch_side", ja: "横に倒して。1、2、3、4。反対側も。", en: "Now lean to the side. One, two, three, four. And the other side."},
+  {id: "stretch_shoulders", ja: "肩を後ろに、ゆっくり回して。1、2、3、4。", en: "Roll your shoulders back, nice and slow. One, two, three, four."},
+  {id: "stretch_neck", ja: "首をやさしく傾けて。1、2、3、4。反対側も。", en: "Gently tilt your head. One, two, three, four. And the other way."},
+  {id: "stretch_done", ja: "おつかれさま！すっきりした？ さあ仕事に戻ろう、きっとできるよ。", en: "Great job! Feel better? Back to work, you've got this."},
+  // Briefing / timers / music
+  {id: "briefing_intro", ja: "おはよう！今日の予定だよ。", en: "Good morning! Here's your day."},
+  {id: "briefing_rehearse", ja: "今日は発表があるね。一緒にリハーサルする？", en: "You have a talk today. Want to rehearse it with me?"},
+  {id: "timer_set", ja: "了解、タイマーをセットしたよ。", en: "Okay, timer's on."},
+  {id: "timer_done", ja: "時間だよ！", en: "Time's up!"},
+  {id: "reminder_stretch", ja: "ストレッチの時間だよ。一緒にやる？", en: "It's time for a stretch break. Want to stretch with me?"},
+  {id: "reminder_talk", ja: "もうすぐ発表、あと1分だよ。", en: "Heads up, your talk starts in one minute."},
+  {id: "music_on", ja: "一緒に何か聴こう。", en: "Let's listen to something together."},
+  {id: "music_off", ja: "了解、音楽を止めるね。", en: "Okay, music off."}
 ]
 
 /** Separator between mode id and line key in per-mode line ids ("sweetheart__tease_1"). */

@@ -102,3 +102,8 @@ The companion is a **fictional person**. She is not a real person and is not mad
 - [ ] Google Gemini TTS の利用規約（生成音声の権利・商用利用・合成音声の表示義務）を確認する
 - [ ] plan-lens スキルパックを公開リポジトリに含めてよいか（配布条件）を確認する
 - [ ] このプロジェクト自体のライセンス（MIT など）を決めて、第1節と README の「TBD」を埋める
+
+## Live data sources (fetched at runtime, not bundled)
+
+- **Wikipedia REST API** (page summaries for "Look it up"): text by Wikipedia contributors, licensed CC BY-SA 4.0 — https://creativecommons.org/licenses/by-sa/4.0/ . The Lens shows "Source: Wikipedia (CC BY-SA)" on every summary card.
+- **Open-Meteo** (Tokyo forecast for the Briefing): data licensed CC BY 4.0 — https://open-meteo.com/ .

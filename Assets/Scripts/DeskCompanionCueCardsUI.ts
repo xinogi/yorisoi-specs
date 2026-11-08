@@ -340,7 +340,9 @@ export class DeskCompanionCueCardsUI extends BaseScriptComponent {
       const textH = isCurrent ? CURRENT_TEXT_H : ROW_H
       this.setTextHeight(row.text, row.textItem, textH)
       const noteH = isCurrent && card.note ? NOTE_H : 0
-      row.note.text = noteH > 0 ? "話し方: " + card.note : ""
+      // English notes get an English label, Japanese notes keep 話し方
+      const jaNote = /[぀-ヿ一-鿿]/.test(card ? card.note : "")
+      row.note.text = noteH > 0 ? (jaNote ? "話し方: " : "Delivery: ") + card.note : ""
       this.setTextHeight(row.note, row.noteItem, noteH)
       const det = isCurrent && card.details ? card.details.filter((d) => d.length > 0) : []
       const detH = det.length * DETAIL_LINE_H

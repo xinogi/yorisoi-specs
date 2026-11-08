@@ -175,6 +175,8 @@ export class DeskCompanionController extends BaseScriptComponent {
 
   /** Seconds with no interaction before she comes over to tease you (0 = never). Set by the active mode. Only used while chat is on. */
   public idleTeaseSeconds: number = 20
+  /** True while something (the stretch break) needs her to stand still: no idle wander walks. */
+  public holdStill: boolean = false
   /** A tease counts as answered if you act (button, poke, word, book) within this many seconds; else the next wait doubles. */
   public teaseReplyWindowSeconds: number = 20
 
@@ -715,7 +717,7 @@ export class DeskCompanionController extends BaseScriptComponent {
         break
       }
       case "roam_idle": {
-        if (!this.gliding && now >= this.idleUntil) {
+        if (!this.gliding && now >= this.idleUntil && !this.holdStill) {
           this.pickWander() // a small move inside the front zone
           this.setState("roam_walk")
         }

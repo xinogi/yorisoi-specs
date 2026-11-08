@@ -224,6 +224,17 @@ export class DeskCompanionModeController extends BaseScriptComponent {
     this._onModeChanged.invoke(m.id)
   }
 
+  /** Jump straight to a mode by id (e.g. the briefing's "Rehearse" shortcut -> "cue_cards"). */
+  public enterMode(id: string): void {
+    let guard = 0
+    while (this.currentModeId !== id && guard++ < PERSONA_MODES.length) {
+      this.modeIndex = (this.modeIndex + 1) % PERSONA_MODES.length
+    }
+    // step back one so cycleMode() lands on it with its call line, list and side-step
+    this.modeIndex = (this.modeIndex - 1 + PERSONA_MODES.length) % PERSONA_MODES.length
+    this.cycleMode()
+  }
+
   /** Ask her the next everyday question (sample answers): weather -> today's plan -> project tip. */
   public ask(): void {
     if (ASK_ITEMS.length === 0) return

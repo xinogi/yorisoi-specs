@@ -87,6 +87,18 @@ export class DeskCompanionCallButtonUI extends BaseScriptComponent {
     if (this.avatarText) this.avatarText.text = visible ? "Yori: Visible" : "Yori: Voice only"
   }
   private _onVoiceVolume = new Event<number>()
+  private _onMusicVolume = new Event<number>()
+  private musicText: Text | null = null
+
+  /** Fires with the new music volume (0-1) while the Music slider moves. */
+  get onMusicVolume(): PublicApi<number> {
+    return this._onMusicVolume.publicApi()
+  }
+
+  /** Show the music volume. */
+  setMusicState(volume01: number): void {
+    if (this.musicText) this.musicText.text = "Music " + Math.round(volume01 * 100) + "%"
+  }
   private chatText: Text | null = null
   private voiceText: Text | null = null
   private muteText: Text | null = null
@@ -319,6 +331,37 @@ export class DeskCompanionCallButtonUI extends BaseScriptComponent {
     avItem.overrideWidth = chatW
     avItem.overrideHeight = chatH
 
-    flex.addItems([btnItem, labelItem, chatItem, voiceLabelItem, vrowItem, avItem])
+    // Music volume: label + slider (music itself is started with the Music button near her)
+    const musicLabelSO = global.scene.createSceneObject("MusicLabel")
+    musicLabelSO.setParent(content)
+    musicLabelSO.getTransform().setLocalPosition(new vec3(0, 0, 0.02))
+    const mlt = musicLabelSO.createComponent("Component.Text") as Text
+    mlt.font = FONT_JA
+    mlt.text = "Music 40%"
+    mlt.depthTest = true
+    applyTextRole(mlt, "Caption", VIEW_DISTANCE_CM)
+    mlt.textFill.color = this.labelColor
+    mlt.horizontalAlignment = HorizontalAlignment.Left
+    mlt.verticalAlignment = VerticalAlignment.Center
+    mlt.horizontalOverflow = HorizontalOverflow.Overflow
+    mlt.verticalOverflow = VerticalOverflow.Overflow
+    mlt.layoutRect = Rect.create(-lw / 2, lw / 2, -0.9, 0.9)
+    this.musicText = mlt
+    const musicLabelItem = musicLabelSO.createComponent(FlexItem.getTypeName()) as FlexItem
+    musicLabelItem.overrideWidth = lw
+    musicLabelItem.overrideHeight = 1.8
+    musicLabelItem.alignSelf = FlexAlignSelf.Stretch
+    const msSO = global.scene.createSceneObject("MusicSlider")
+    msSO.setParent(content)
+    msSO.getTransform().setLocalPosition(new vec3(0, 0, 0.02))
+    const ms = msSO.createComponent(Slider.getTypeName()) as Slider
+    ms.size = new vec3(lw, 1.6, 1) // size before the slider initializes (UIKit gotcha)
+    ms.currentValue = 0.4
+    ms.onValueChange.add((v: number) => this._onMusicVolume.invoke(v))
+    const msItem = msSO.createComponent(FlexItem.getTypeName()) as FlexItem
+    msItem.overrideWidth = lw
+    msItem.overrideHeight = 1.8
+
+    flex.addItems([btnItem, labelItem, chatItem, voiceLabelItem, vrowItem, avItem, musicLabelItem, msItem])
   }
 }

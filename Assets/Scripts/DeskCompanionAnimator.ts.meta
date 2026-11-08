@@ -49,6 +49,10 @@
     scoldClip: false
     scoldVideo: false
     stepsPerSecond: false
+    stretchArmsUpVideo: false
+    stretchNeckVideo: false
+    stretchShouldersVideo: false
+    stretchSideVideo: false
     surprisedClip: false
     surprisedVideo: false
     talkClip: false
@@ -85,6 +89,10 @@
       poutVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
       scoldVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
       forgiveVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      stretchArmsUpVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      stretchSideVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      stretchShouldersVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      stretchNeckVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
       idleClip: idle
       walkClip: walk
       talkClip: talk
@@ -129,6 +137,10 @@
     - '// @input Asset.Texture poutVideo {"hint":"pout.mp4 (optional) — once, when poked too often (empty = scold, then surprised)"}'
     - '// @input Asset.Texture scoldVideo {"hint":"scold.mp4 (optional) — used when there is no pout clip"}'
     - '// @input Asset.Texture forgiveVideo {"hint":"forgive.mp4 (optional) — once, when she forgives you (empty = idle)"}'
+    - '// @input Asset.Texture stretchArmsUpVideo {"hint":"stretch_arms_up.mp4 (optional; empty = dance)"}'
+    - '// @input Asset.Texture stretchSideVideo {"hint":"stretch_side.mp4 (optional; empty = dance)"}'
+    - '// @input Asset.Texture stretchShouldersVideo {"hint":"stretch_shoulders.mp4 (optional; empty = idle)"}'
+    - '// @input Asset.Texture stretchNeckVideo {"hint":"stretch_neck.mp4 (optional; empty = idle)"}'
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">AnimationPlayer clip names (3D model only)</span>"}'

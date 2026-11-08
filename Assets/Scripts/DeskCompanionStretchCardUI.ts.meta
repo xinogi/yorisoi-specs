@@ -49,6 +49,6 @@
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Settings</span>"}'
     - '// @ui {"widget":"group_start", "label":"Settings"}'
-    - '// @input float cardWidthCm = 34 {"hint":"Card width (cm)", "widget":"slider", "min":20, "max":60, "step":1}'
+    - '// @input float cardWidthCm = 56 {"hint":"Card width (cm)", "widget":"slider", "min":20, "max":60, "step":1}'
     - '// @input vec4 countColor = "{1, 0.9, 0.5, 1}" {"hint":"Count color", "widget":"color"}'
     - '// @ui {"widget":"group_end"}'

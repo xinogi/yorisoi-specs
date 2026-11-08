@@ -5,14 +5,14 @@
  * Owns: a UIKit BackPlate with five UIKit Buttons on SceneObjects named "DanceButton",
  * "PoseButton", "ModeButton", "AskButton" and "TranslateButton" (LEAF-findable), and the
  * show/hide animation. Labels are English-first.
- * Plus "StretchButton" (stretch break).
+ * Plus "StretchButton", "BriefingButton", "TimerButton", "MusicButton", "LookUpButton" (two rows).
  * Public API: onDance, onPose, onMode, onAsk, onTranslate, onStretch (Event<void>), show(), hide(), isShown.
  * Placement/facing is done by DeskCompanionBillboard on the same SceneObject.
  * Must not: decide whether she can dance (the controller does).
  */
 import {FlexLayout} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexLayout"
 import {FlexItem} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexItem"
-import {FlexAlign, FlexDirection, FlexJustify} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTypes"
+import {FlexAlign, FlexDirection, FlexJustify, FlexWrap} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTypes"
 import {BackPlate} from "SpectaclesUIKit.lspkg/Scripts/BackPlate"
 import {Button} from "SpectaclesUIKit.lspkg/Scripts/Components/Button/Button"
 import Event, {PublicApi} from "SpectaclesInteractionKit.lspkg/Utils/Event"
@@ -94,6 +94,10 @@ export class DeskCompanionActionsUI extends BaseScriptComponent {
   private _onDance = new Event<void>()
   private _onPose = new Event<void>()
   private _onStretch = new Event<void>()
+  private _onBriefing = new Event<void>()
+  private _onTimer = new Event<void>()
+  private _onMusic = new Event<void>()
+  private _onLookUp = new Event<void>()
   private _onMode = new Event<void>()
   private _onAsk = new Event<void>()
   private _onTranslate = new Event<void>()
@@ -102,6 +106,10 @@ export class DeskCompanionActionsUI extends BaseScriptComponent {
   get onPose(): PublicApi<void> { return this._onPose.publicApi() }
   /** "Stretch" pinched: start the stretch break. */
   get onStretch(): PublicApi<void> { return this._onStretch.publicApi() }
+  get onBriefing(): PublicApi<void> { return this._onBriefing.publicApi() }
+  get onTimer(): PublicApi<void> { return this._onTimer.publicApi() }
+  get onMusic(): PublicApi<void> { return this._onMusic.publicApi() }
+  get onLookUp(): PublicApi<void> { return this._onLookUp.publicApi() }
   get onMode(): PublicApi<void> { return this._onMode.publicApi() }
   get onAsk(): PublicApi<void> { return this._onAsk.publicApi() }
   get onTranslate(): PublicApi<void> { return this._onTranslate.publicApi() }
@@ -118,8 +126,11 @@ export class DeskCompanionActionsUI extends BaseScriptComponent {
     content.getTransform().setLocalPosition(new vec3(0, 0, 0.6))
     const flex = content.createComponent(FlexLayout.getTypeName()) as FlexLayout
     flex.autoDiscoverItemsOnStart = false // children are registered explicitly via addItems
-    flex.width = -1
+    // two rows of up to five buttons
+    flex.width = 5 * this.buttonWidthCm + 4 * 0.8 + 1.6
     flex.height = -1
+    flex.wrap = FlexWrap.Wrap
+    flex.rowGap = 0.8
     flex.direction = FlexDirection.Row
     flex.justifyContent = FlexJustify.Center
     flex.alignItems = FlexAlign.Center
@@ -138,7 +149,11 @@ export class DeskCompanionActionsUI extends BaseScriptComponent {
     const ask = this.addButton(content, "AskButton", this.askLabel, null, () => this._onAsk.invoke(), this.askGlyph)
     const tr = this.addButton(content, "TranslateButton", this.translateLabel, null, () => this._onTranslate.invoke(), this.translateGlyph)
     const stretch = this.addButton(content, "StretchButton", "Stretch", null, () => this._onStretch.invoke(), "↑")
-    flex.addItems([dance.item, pose.item, mode.item, ask.item, tr.item, stretch.item])
+    const briefing = this.addButton(content, "BriefingButton", "Briefing", null, () => this._onBriefing.invoke(), "☀")
+    const timer = this.addButton(content, "TimerButton", "Timer", null, () => this._onTimer.invoke(), "◷")
+    const music = this.addButton(content, "MusicButton", "Music", null, () => this._onMusic.invoke(), "♪")
+    const lookUp = this.addButton(content, "LookUpButton", "Look up", null, () => this._onLookUp.invoke(), "≡")
+    flex.addItems([dance.item, pose.item, mode.item, ask.item, tr.item, stretch.item, briefing.item, timer.item, music.item, lookUp.item])
 
     const done = () => {
       this.pendingInits--

@@ -1,0 +1,51 @@
+- !<AssetImportMetadata/6253f6d9-c0f7-4f6c-a306-0eb6fb1350df>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 8e105085-00fc-46ac-8fa4-1f246f518957
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 8e105085-00fc-46ac-8fa4-1f246f518957
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> d49acb78-d3d6-4da1-acb7-e2dd118f1298
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/d49acb78-d3d6-4da1-acb7-e2dd118f1298>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 3c3a893c-cabd-4036-ae58-728fea5d8eb1
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    cardWidthCm: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - cardWidthCm: !<float> 54.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">DeskCompanionInfoCardUI – briefing / timer card beside her</span>"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">Settings</span>"}'
+    - '// @ui {"widget":"group_start", "label":"Settings"}'
+    - '// @input float cardWidthCm = 26 {"hint":"Card width (cm)", "widget":"slider", "min":30, "max":80, "step":1}'
+    - '// @ui {"widget":"group_end"}'
