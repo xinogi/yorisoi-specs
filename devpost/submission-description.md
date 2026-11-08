@@ -63,6 +63,7 @@ You sit at your desk and work. **Yori** stands in your room, a little to the rig
 - **Always in front of you, never behind you.** If you turn away and she ends up more than about 12° off her spot, she glides back into view within about 1.4 seconds. This came straight from the learner's design note: *"If I'm working at my desk, I want her always in front of my view. I don't want her behind me."*
 - **Quiet by default.** The **Chat** toggle starts off, so she never talks unprompted. Pinch **Call** and she says *"Hey, what's up?"* and walks up to about 1.2 m in front of you. If you turn Chat on, she checks in now and then, never repeats the same line twice in a row, and waits twice as long if you don't answer.
 - **Music together:** pinch **Music** to put on one of three original tracks made for this project (Focus, Relax, Calm); she sways along, and the music dips whenever she speaks.
+- **My song:** the next step of **Music** plays *your* song from a link to an audio file you own (typed on the AR keyboard, remembered for next time). The Lens ships no third-party music. When a timer or reminder ends, your song also plays as a gentle alarm. In the preview it uses a CC0 recording of Satie's *Gymnopédie No. 1* from Wikimedia Commons, labeled "demo link".
 - **Poke her** and she reacts: a tickle, then a pout if you keep going (*"Okay, that's enough. Hands off!"*), then she forgives you. There is no reaction tied to specific body parts.
 - **Hand her a book** (*Alice's Adventures in Wonderland*, public domain) and she reads it and gives you a short summary. **Dance** and **Pose** buttons appear when she is close. Cute and fun, never sexual.
 
@@ -80,6 +81,7 @@ You sit at your desk and work. **Yori** stands in your room, a little to the rig
 | Word and text translation | **Live** (MyMemory API), offline fallback labeled "offline" |
 | Weather in the Briefing | **Live** (Open-Meteo) |
 | Look up summaries | **Live** (Wikipedia), offline fallback labeled "offline" |
+| My song | **Live** download from your link (CC0 demo link in the preview) |
 | Schedule, Ask answers | **Sample data**, labeled on the card |
 | Timers, reminders, cue-card timing | Real timers, current session only |
 | Her spoken lines | Pre-recorded English voice lines (AI text-to-speech), not a live AI |
@@ -118,7 +120,7 @@ We followed the hackathon's full agent workflow: **plan-lens → approved brief 
 | DC7 | Poking her: tickle, then annoyed, then she forgives you; Call still works right after | Pass |
 | DC8 | Ask answers with the "sample data" label; translation returns a result (live or offline); Translate… works with the demo phrase | Pass |
 | DC9 | Stretch break: four moves in order with count and card, then "Great job! Feel better?"; another button cancels it | Pass |
-| DC10 | Briefing card with live Tokyo weather; Timer presets count down and fire the reminder; Music plays Focus / Relax, ducks under her voice and stops; Look up shows a Wikipedia summary with its source | Pass |
+| DC10 | Briefing card with live Tokyo weather; Timer presets count down and fire the reminder, and My song plays as the alarm; Music plays Focus / Relax / Calm / My song (downloaded from its link), ducks under her voice and stops; Look up shows a Wikipedia summary with its source | Pass |
 
 Not covered by any test: anything only real glasses can tell (comfort over a long session, real hand tracking, real speech recognition, real furniture hiding her).
 
@@ -156,6 +158,7 @@ Not covered by any test: anything only real glasses can tell (comfort over a lon
 - **Camera on the real glasses**: point at a page or sign and Yori reads and translates it for you; she can turn a photo or a whiteboard into text (OCR) and transcribe what was said.
 - **Memories together**: look back through your captures with her ("this one's great, let's make it our special shot") and keep the best moments.
 - **Memory**, so she remembers your work and your day with you over time.
+- **Walking directions at night**: Yori walks a step ahead and points the way home ("this way"), using SPECS location and a maps service.
 - **Yoga and fitness lessons**, built on the same routine system as the stretch break.
 - **A physical AI body** someday, so the same companion can help in the real world.
 - And first of all: **testing on a real SPECS device** for comfort, hand tracking and how it feels to have her in front of you for a whole work session.
