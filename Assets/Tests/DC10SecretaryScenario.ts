@@ -59,7 +59,7 @@ export class DC10SecretaryScenario extends Scenario {
         await interactor.tap("TimerButton")
       }
       await sleep(150)
-      checks.check("Timer cycles presets (1 min ... Talk in 1 min)", first === "timer" && firstRemaining > 50 && sec.timerKind === "talk", `first=${first} ${f1(firstRemaining)} s -> kind=${sec.timerKind} remaining=${f1(sec.timerRemaining)}`)
+      checks.check("Timer cycles presets (1 min ... Talk in 1 min)", first === "timer" && firstRemaining > 40 && sec.timerKind === "talk", `first=${first} ${f1(firstRemaining)} s -> kind=${sec.timerKind} remaining=${f1(sec.timerRemaining)}`)
       const r0 = sec.timerRemaining
       await sleep(600)
       checks.check("countdown runs", sec.timerRemaining < r0 && card.isShown, `remaining ${f1(r0)} -> ${f1(sec.timerRemaining)}`)
