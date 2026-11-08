@@ -33,13 +33,16 @@
     fallbackOnceSeconds: false
     forgiveClip: false
     forgiveVideo: false
+    giggleVideo: false
     happyLaughClip: false
     happyLaughVideo: false
+    headshakeVideo: false
     idleClip: false
     idleVideo: false
     leanInClip: false
     leanInVideo: false
     modelRoot: false
+    nodVideo: false
     poseClip: false
     poseVideo: false
     poutClip: false
@@ -48,6 +51,7 @@
     readVideo: false
     scoldClip: false
     scoldVideo: false
+    shyVideo: false
     stepsPerSecond: false
     stretchArmsUpVideo: false
     stretchNeckVideo: false
@@ -64,6 +68,7 @@
     walkVideo: false
     waveClip: false
     waveVideo: false
+    winkVideo: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -93,6 +98,11 @@
       stretchSideVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
       stretchShouldersVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
       stretchNeckVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      shyVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      winkVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      nodVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      headshakeVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      giggleVideo: !<reference.Texture> 00000000-0000-0000-0000-000000000000
       idleClip: idle
       walkClip: walk
       talkClip: talk
@@ -141,6 +151,11 @@
     - '// @input Asset.Texture stretchSideVideo {"hint":"stretch_side.mp4 (optional; empty = dance)"}'
     - '// @input Asset.Texture stretchShouldersVideo {"hint":"stretch_shoulders.mp4 (optional; empty = idle)"}'
     - '// @input Asset.Texture stretchNeckVideo {"hint":"stretch_neck.mp4 (optional; empty = idle)"}'
+    - '// @input Asset.Texture shyVideo {"hint":"shy.mp4 (optional) — after she forgives a poke"}'
+    - '// @input Asset.Texture winkVideo {"hint":"wink.mp4 (optional) — now and then on Call in Sweetheart mode"}'
+    - '// @input Asset.Texture nodVideo {"hint":"nod.mp4 (optional) — when she confirms (timer set, Ask answer, mode switch)"}'
+    - '// @input Asset.Texture headshakeVideo {"hint":"headshake.mp4 (optional) — offline fallback answers"}'
+    - '// @input Asset.Texture giggleVideo {"hint":"giggle.mp4 (optional) — picked at random instead of happy_laugh"}'
     - '// @ui {"widget":"group_end"}'
     - '// @ui {"widget":"separator"}'
     - '// @ui {"widget":"label", "label":"<span style=\"color: #60A5FA;\">AnimationPlayer clip names (3D model only)</span>"}'

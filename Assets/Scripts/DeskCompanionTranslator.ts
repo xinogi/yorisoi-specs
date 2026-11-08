@@ -210,6 +210,7 @@ export class DeskCompanionTranslator extends BaseScriptComponent {
       secondary = "翻訳サービスにつながりませんでした"
       secondaryScript = "ja"
       if (this.voice) this.voice.say("live_offline")
+      if (this.controller) this.controller.playGesture("headshake")
     } else if (this.voice) {
       this.voice.say("live_result")
     }

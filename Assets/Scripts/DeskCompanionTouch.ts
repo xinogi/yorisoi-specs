@@ -142,7 +142,9 @@ export class DeskCompanionTouch extends BaseScriptComponent {
       if (this.voice) this.voice.say("poke_forgive")
       if (this.animator) this.animator.playOnce("forgive")
     } else if ((this.mood === "tickled" || this.mood === "forgiving") && now >= this.moodUntil) {
+      const wasForgiving = this.mood === "forgiving"
       this.setMood("normal", 0)
+      if (wasForgiving && this.animator) this.animator.playOnce("shy") // a little shy after making up
     }
   }
 

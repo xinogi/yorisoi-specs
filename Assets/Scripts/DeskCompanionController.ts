@@ -305,6 +305,12 @@ export class DeskCompanionController extends BaseScriptComponent {
     return this._chatEnabled && this.idleTeaseSeconds > 0 ? this.idleTeaseSeconds * this.teaseBackoff : 0
   }
 
+  /** A short expression (nod, headshake, shy…) unless she is busy reading / dancing / posing. */
+  public playGesture(hook: CompanionAnim): void {
+    if (this._state === "reading" || this._state === "dance" || this._state === "pose") return
+    if (this.animator) this.animator.playOnce(hook)
+  }
+
   /** True while she stands aside (~35° and a bit farther) so the cue-card talk list has the middle. */
   public get cardsAside(): boolean { return this._cardsAside }
 
@@ -368,7 +374,10 @@ export class DeskCompanionController extends BaseScriptComponent {
     this.wanderScale = WANDER_SCALE[mode.wander] || 1
     // "talk" is skipped as an idle extra: mouthing words with no voice reads as talking on her own
     const favs = (mode.favoriteAnims || []).filter((a) => a !== "talk")
-    this.favoriteAnims = favs.length > 0 ? favs : ["idle"]
+    const base = favs.length > 0 ? favs : ["idle"]
+    // a little extra variety with low weight (base pool counted twice, each extra once)
+    const extras = mode.id === "sweetheart" ? ["shy", "wink", "giggle"] : mode.id === "dance" ? ["giggle", "wink"] : []
+    this.favoriteAnims = extras.length > 0 ? base.concat(base, extras) : base
     this._callLineId = lineIdForMode(mode, "call", "call_whats_up")
     const teases = ["tease_1", "tease_2", "tease_3"].filter((k) => !!mode.lines[k]).map((k) => lineIdForMode(mode, k, k))
     this._teaseLineIds = teases.length > 0 ? teases : SHARED_TEASE_LINE_IDS.slice()
@@ -602,7 +611,9 @@ export class DeskCompanionController extends BaseScriptComponent {
     } else if (this.reason === "book") {
       this.takeBook()
     } else if (this.reason === "call") {
-      if (this.animator) this.animator.playOnce("wave")
+      // now and then a wink instead of the wave in Sweetheart mode
+      const wink = !!this.mode && this.mode.id === "sweetheart" && Math.random() < 0.3
+      if (this.animator) this.animator.playOnce(wink ? "wink" : "wave")
     } else if (this.reason === "call_surprised") {
       if (this.animator) this.animator.playOnce("surprised")
     } else if (this.reason === "word") {

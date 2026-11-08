@@ -213,6 +213,7 @@ export class DeskCompanionModeController extends BaseScriptComponent {
       this.controller.noteInteraction()
     }
     if (this.voice) this.voice.say(lineIdForMode(m, "call", "call_whats_up"), DeskCompanionModeController.badgeFor(m))
+    if (this.controller) this.controller.playGesture("nod")
     this.resetTalk(false)
     this.loadDeck(0)
     if (this.controller) this.controller.setCardsAside(this.deckCards.length > 0)
@@ -244,6 +245,7 @@ export class DeskCompanionModeController extends BaseScriptComponent {
     if (this.controller) this.controller.noteInteraction()
     if (this.onAskShown) this.onAskShown()
     const d = this.voice ? this.voice.say(item.lineId) : 4
+    if (this.controller) this.controller.playGesture("nod")
     if (this.askCard) this.askCard.showCard(item.glyph, item.card)
     this.askHideAt = getTime() + Math.max(this.askHoldSeconds, d)
     print("DeskCompanionModes: ask -> " + item.id)

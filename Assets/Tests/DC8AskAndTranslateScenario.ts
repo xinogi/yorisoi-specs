@@ -52,9 +52,11 @@ export class DC8AskAndTranslateScenario extends Scenario {
       const asked: string[] = []
       let lineOk = true
       let cardOk = true
+      const gestures: string[] = []
       for (let k = 0; k < ASK_ITEMS.length; k++) {
         await interactor.tap("AskButton")
         await sleep(250)
+        gestures.push(lens.animator.currentAnim)
         const item = ASK_ITEMS.filter((a) => a.id === modes.lastAskId)[0]
         asked.push(modes.lastAskId)
         if (!item || lens.voice.lastLineId !== item.lineId) lineOk = false
@@ -67,6 +69,7 @@ export class DC8AskAndTranslateScenario extends Scenario {
       checks.check("Ask cycles weather -> plan -> project", orderOk && new Set(asked).size === ASK_ITEMS.length, `asked=${asked.join(">")}`)
       checks.check("she says each answer", lineOk, `last=${lens.voice.lastLineId}`)
       checks.check("answer card shows the short answer", cardOk, `card="${askCard.currentText}"`)
+      checks.check("she nods with each answer", gestures.every((g) => g === "nod"), `anims=${gestures.join(",")}`)
 
       // quiet after Ask: nothing else is said for a few seconds
       const afterAsk = lines.length

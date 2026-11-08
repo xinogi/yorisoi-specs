@@ -25,18 +25,21 @@ export type CompanionAnim =
   | "idle" | "walk" | "talk" | "read" | "dance" | "pose" | "wave" | "lean_in"
   | "happy_laugh" | "surprised" | "thoughtful" | "pout" | "scold" | "forgive"
   | "stretch_arms_up" | "stretch_side" | "stretch_shoulders" | "stretch_neck"
+  | "shy" | "wink" | "nod" | "headshake" | "giggle"
 
 const LOOP_HOOKS: CompanionAnim[] = ["idle", "walk", "talk"]
 const ALL_HOOKS: CompanionAnim[] = [
   "idle", "walk", "talk", "read", "dance", "pose", "wave", "lean_in", "happy_laugh", "surprised", "thoughtful", "pout", "scold", "forgive",
-  "stretch_arms_up", "stretch_side", "stretch_shoulders", "stretch_neck"
+  "stretch_arms_up", "stretch_side", "stretch_shoulders", "stretch_neck",
+  "shy", "wink", "nod", "headshake", "giggle"
 ]
 
 /** Longest time (s) a play-once hook stays on screen before returning to idle (clips are ~10 s). */
 const ONCE_CAP_S: Partial<Record<CompanionAnim, number>> = {
   wave: 3.5, lean_in: 4, surprised: 3, happy_laugh: 4, thoughtful: 6, dance: 6, pose: 4, read: 10, talk: 4,
   pout: 4, scold: 4, forgive: 4,
-  stretch_arms_up: 9, stretch_side: 9, stretch_shoulders: 9, stretch_neck: 9
+  stretch_arms_up: 9, stretch_side: 9, stretch_shoulders: 9, stretch_neck: 9,
+  shy: 4, wink: 2.5, nod: 2.5, headshake: 3, giggle: 4
 }
 
 type JointName =
@@ -91,6 +94,11 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
   @input @allowUndefined @hint("stretch_side.mp4 (optional; empty = dance)") stretchSideVideo: Texture
   @input @allowUndefined @hint("stretch_shoulders.mp4 (optional; empty = idle)") stretchShouldersVideo: Texture
   @input @allowUndefined @hint("stretch_neck.mp4 (optional; empty = idle)") stretchNeckVideo: Texture
+  @input @allowUndefined @hint("shy.mp4 (optional) — after she forgives a poke") shyVideo: Texture
+  @input @allowUndefined @hint("wink.mp4 (optional) — now and then on Call in Sweetheart mode") winkVideo: Texture
+  @input @allowUndefined @hint("nod.mp4 (optional) — when she confirms (timer set, Ask answer, mode switch)") nodVideo: Texture
+  @input @allowUndefined @hint("headshake.mp4 (optional) — offline fallback answers") headshakeVideo: Texture
+  @input @allowUndefined @hint("giggle.mp4 (optional) — picked at random instead of happy_laugh") giggleVideo: Texture
   @ui.group_end
 
   @ui.separator
@@ -185,6 +193,8 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
    */
   public playOnce(hook: CompanionAnim): void {
     if (!this.ready) return
+    // variety: a giggle instead of the laugh about half the time (when the giggle clip exists)
+    if (hook === "happy_laugh" && this.giggleVideo && Math.random() < 0.5) hook = "giggle"
     if (this.base === "walk") this.base = "idle" // she has stopped (e.g. just arrived)
     this.oneShot = hook
     this.show(hook, true)
@@ -244,7 +254,8 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
       lean_in: this.leanInClip, read: this.readClip, dance: this.danceClip, pose: this.poseClip,
       happy_laugh: this.happyLaughClip, surprised: this.surprisedClip, thoughtful: this.thoughtfulClip,
       pout: this.poutClip, scold: this.scoldClip, forgive: this.forgiveClip,
-      stretch_arms_up: "stretch_arms_up", stretch_side: "stretch_side", stretch_shoulders: "stretch_shoulders", stretch_neck: "stretch_neck"
+      stretch_arms_up: "stretch_arms_up", stretch_side: "stretch_side", stretch_shoulders: "stretch_shoulders", stretch_neck: "stretch_neck",
+      shy: "shy", wink: "wink", nod: "nod", headshake: "headshake", giggle: "giggle"
     }
     for (const h of ALL_HOOKS) {
       const key = (wanted[h] || h).toLowerCase()
@@ -365,6 +376,8 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
     if (h === "pout") return "scold"
     if (h === "scold") return "surprised"
     if (h === "stretch_arms_up" || h === "stretch_side") return "dance"
+    if (h === "giggle") return "happy_laugh"
+    if (h === "wink") return "wave"
     return "idle"
   }
 
@@ -375,7 +388,8 @@ export class DeskCompanionAnimator extends BaseScriptComponent {
       happy_laugh: this.happyLaughVideo, surprised: this.surprisedVideo, thoughtful: this.thoughtfulVideo,
       pout: this.poutVideo, scold: this.scoldVideo, forgive: this.forgiveVideo,
       stretch_arms_up: this.stretchArmsUpVideo, stretch_side: this.stretchSideVideo,
-      stretch_shoulders: this.stretchShouldersVideo, stretch_neck: this.stretchNeckVideo
+      stretch_shoulders: this.stretchShouldersVideo, stretch_neck: this.stretchNeckVideo,
+      shy: this.shyVideo, wink: this.winkVideo, nod: this.nodVideo, headshake: this.headshakeVideo, giggle: this.giggleVideo
     }
     let cur: CompanionAnim = h
     for (let i = 0; i < 4; i++) {

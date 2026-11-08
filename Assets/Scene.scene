@@ -2117,6 +2117,11 @@
       stretchSideVideo: !<reference.Texture> 32e47491-1562-4f94-bdde-9b85e38bbd7a
       stretchShouldersVideo: !<reference.Texture> 76122af0-9fb3-4f80-9d78-77f4fe98bc31
       stretchNeckVideo: !<reference.Texture> 25603d49-f38b-4bb7-a777-10b0c79aa3bb
+      shyVideo: !<reference.Texture> a0018e5a-d9c9-45ee-b07f-33cad063cc88
+      winkVideo: !<reference.Texture> d75406f9-12f8-4873-b9bf-0b9b6978b2fe
+      nodVideo: !<reference.Texture> d7dd35cc-cee0-42a3-baff-c972e2ffd7f2
+      headshakeVideo: !<reference.Texture> 78f3df37-e25a-451b-bd5d-d924285dc7ba
+      giggleVideo: !<reference.Texture> 095baf77-a21d-49f2-9267-a3138764e3cf
       idleClip: idle
       walkClip: walk
       talkClip: talk

@@ -237,6 +237,7 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
     }
     this.briefingHideAt = getTime() + Math.max(this.briefingHoldSeconds, 12)
     if (this.voice) this.voice.say("live_result", "", {en: "Here's what I found.", ja: "調べてみたよ。"})
+    if (this.controller) this.controller.playGesture(r.source === "live" ? "nod" : "headshake")
     print("DeskCompanionSecretary: look up \"" + topic + "\" -> " + r.title + " (" + r.source + ")")
     this.lookupBusy = false
   }
@@ -334,6 +335,7 @@ export class DeskCompanionSecretary extends BaseScriptComponent {
     this.briefingHideAt = -1
     this.shortcut = ""
     if (this.voice) this.voice.say("timer_set")
+    if (this.controller) this.controller.playGesture("nod")
     if (this.card) this.card.showCountdown(p.label, p.seconds)
     print("DeskCompanionSecretary: timer -> " + p.label)
   }
