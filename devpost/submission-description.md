@@ -171,6 +171,6 @@ Lens Studio 5.24.1, Snap SPECS, CLAD, Lens Studio MCP, LEAF, Spectacles Interact
 ## Links
 
 - Demo video: https://youtu.be/l1H7K6IRivE
-- Repo: [TBD: confirm public] https://github.com/xinogi/yorisoi-specs
+- Repo: https://github.com/xinogi/yorisoi-specs
 
 Built by **Xinogi Studio (しのぎ)**.
