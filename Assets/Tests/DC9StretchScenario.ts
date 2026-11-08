@@ -32,7 +32,8 @@ export class DC9StretchScenario extends Scenario {
     const interactor = new DeskCompanionLeafInteractor()
     try {
       await interactor.tap("CallButton")
-      expect(await waitUntil(() => c.state === "attend", 6000), "she never came over after Call").toBe(true)
+      // generous: an earlier scenario may have left her mid-glide behind a turned head
+      expect(await waitUntil(() => c.state === "attend", 12000), "she never came over after Call").toBe(true)
       expect(await waitUntil(() => !!findInteractableByName("StretchButton", undefined, true), 3000), "StretchButton never appeared").toBe(true)
       await sleep(300)
       stretch.timeScale = timeScale
