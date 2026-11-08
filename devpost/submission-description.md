@@ -158,6 +158,7 @@ Not covered by any test: anything only real glasses can tell (comfort over a lon
 - **Camera on the real glasses**: point at a page or sign and Yori reads and translates it for you; she can turn a photo or a whiteboard into text (OCR) and transcribe what was said.
 - **Memories together**: look back through your captures with her ("this one's great, let's make it our special shot") and keep the best moments.
 - **Memory**, so she remembers your work and your day with you over time.
+- **Dancing to the mood of the music**: a slow sway for calm tracks and a livelier dance for upbeat ones (today she has one dance for every track).
 - **Walking directions at night**: Yori walks a step ahead and points the way home ("this way"), using SPECS location and a maps service.
 - **Yoga and fitness lessons**, built on the same routine system as the stretch break.
 - **A physical AI body** someday, so the same companion can help in the real world.
