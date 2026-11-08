@@ -141,7 +141,9 @@ captured silently with Windows Graphics Capture (ffmpeg `gfxcapture`), and the s
 the Lens Studio log: every `DeskCompanion says [id]` line is placed with its real voice MP3, plus the
 original music, ducked under her voice. Shot 6 is a pick-up take looking 10° left so the word card
 stays in frame. Captions sit in the left margin beside the preview, so they never cover her bubble or
-the cards. Final cut: 2:35.
+the cards. Later additions: a My song pick-up after the music shot, and a 17-second developer voice-over
+over the quiet opening ("An AI partner on a screen always feels a little fake… Meet Yori.", AI
+text-to-speech). Final cut: 2:48.
 
 Original plan:
 
